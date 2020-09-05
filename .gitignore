@@ -3,5 +3,5 @@
 /Inactivity
 /TruthOrDare
 **/__pycache__/**
-/enabled_cogs
+/enabled_cogs/**
 /env
