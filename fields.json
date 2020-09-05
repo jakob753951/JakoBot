@@ -1,0 +1,4 @@
+{
+	"general": ["token", "prefix", "description", "name", "chan_forward_dm", "minutes_between_saves", "minutes_between_checks"],
+	"server": ["role_lurker", "days_inactivity_before_role", "chan_truth_or_dare"]
+}
