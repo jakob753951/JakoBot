@@ -13,7 +13,7 @@ class TruthOrDare(commands.Cog):
 			self.questions = json.loads(question_file.read())
 
 	@commands.command(name='truth or dare', aliases=['tord', 'truthordare'])
-	async def truth_or_dare(self, ctx, category = 'sfw'):
+	async def truth_or_dare(self, ctx, *, category = 'sfw'):
 		# check for incorrect channel
 		if ctx.channel.id != self.cfg.servers[ctx.guild.id].chan_truth_or_dare:
 			return
