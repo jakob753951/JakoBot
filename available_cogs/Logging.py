@@ -1,61 +1,54 @@
 import discord
+from discord import Webhook, RequestsWebhookAdapter
 from discord.ext import commands
 from Configuration import Configuration, load_config
+from datetime import datetime, timedelta
 
 class Logging(commands.Cog):
 
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
+		self.last = datetime(1970, 1, 1)
 
 	@commands.Cog.listener()
 	async def on_message_edit(self, before, after):
-		if after.author.bot or not after.guild:
+		if not after.guild or after.author.bot:
 			return
+		
+		webhook = Webhook.from_url(self.cfg.servers[after.guild.id].webhook_url, adapter=RequestsWebhookAdapter())
 
-		log_channel = await self.get_msglog_channel(after.guild)
-		sender = after.author
-		msg_channel = after.channel
-
-		male = discord.utils.find(lambda r: r.name == 'Male', after.guild.roles)
-		female = discord.utils.find(lambda r: r.name == 'Female', after.guild.roles)
-		if male in sender.roles:
-			pronoun = 'his'
-		elif female in sender.roles:
-			pronoun = 'her'
-		else:
-			pronoun = 'their'
-
-		await log_channel.send(f'"{sender.name}#{sender.discriminator}" ({sender.id}) edited {pronoun} message in {msg_channel.mention}: "{before.content}" --> "{after.content}"')
+		embed = discord.Embed(color=0x0000ff, description=f'**Message edited in {after.channel.mention}**', timestamp=datetime.utcnow())
+		embed.set_author(name=f'{after.author.name}#{after.author.discriminator}', icon_url=after.author.avatar_url)
+		embed.add_field(name='Before', value=f'{before.content}', inline=False)
+		embed.add_field(name='After', value=f'{after.content}', inline=False)
+		embed.set_footer(text=f'User ID: {after.id}')
+		webhook.send(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_message_delete(self, message):
-		if message.author.bot or not message.guild:
+		if not message.guild or message.author.bot:
+			return
+		
+		webhook = Webhook.from_url(self.cfg.servers[message.guild.id].webhook_url, adapter=RequestsWebhookAdapter())
+
+		if message.channel.id == 731531789717340190 and message.embeds and message.embeds[0].colour.value != 0:
+			prev_time = datetime.utcnow() - timedelta(hours=1)
+			if prev_time > self.last:
+				embed = discord.Embed(color=0x000000, description='Ì̸̫͇̻̬ ̴̝͕̩͖̀͋́̿̋̌͌͐̔͋K̵̰͙̆́̓̆̓̈̒̍͘N̷̡̧̖̣͒̀̃͐Ȯ̷̡̟̹̬͍̦̪̱͖̈́̄͑̈́̾̔̚̕͝ͅẄ̷̪͇͙́ ̷̪͉̖̫͓̮̽͒W̵̢̪̥̮̋̒͘H̶̛̘̟̲̘̖͆̈́̃̄̔͘͠ͅA̸̡͖͉͎͙̒̿͒͝T̸̡̛̲͓̬͓̭̼̝͓̻̋̈́̋̍͆́̕ ̶̙̲̍͋͌̓͛̓͆̇Y̵̛̛̤̖͇̬͈͓̦̗͇̑̾̾̒͂͐̏̓O̴̦̝̱̝͎̒ͅṲ̵͎̥͎̱̳̠̲̍͑̈́̓̉̌̄͘͘ ̵̮̹̺̤͍͌͛̀̇̓͝Ḑ̷̞͖̟̫̫͈̣͌̉̄̍̚Í̶̝̹̭̩̯̂D̷̨͚͇̬͉̍̑')
+				self.last = datetime.utcnow()
+				webhook.send(embed=embed)
+				return
+
+		if message.author.id == 755103760866607164:
 			return
 
-		log_channel = await self.get_msglog_channel(message.guild)
-		sender = message.author
-		msg_channel = message.channel
-
-		await log_channel.send(f'Message was deleted in {msg_channel.mention}: "{sender.name}#{sender.discriminator}: {message.content}"')
-
-	@commands.Cog.listener()
-	async def on_member_ban(self, guild, user):
-		log_channel = self.get_membrlog_channel(guild.id)
-		await log_channel.send(f'User was banned:\n"Username: "{user.name}#{user.discriminator}"\n{"/Nickname: " + user.nick if user.nick else ""}\nID: {user.id}')
-
-
-	async def get_msglog_channel(self, guild: discord.Guild):
-		channel_id = self.cfg.servers[guild.guild.id].chan_message_log
-		channel = await self.bot.fetch_channel(channel_id)
-		return channel
-
-	async def get_membrlog_channel(self, guild: discord.Guild):
-		channel_id = self.cfg.servers[guild.id].chan_member_log
-		channel = await self.bot.fetch_channel(channel_id)
-		return channel
-
+		desc = f'**Message sent by {message.author.mention} deleted in {message.channel.mention}**\n{message.content}'
+		embed = discord.Embed(color=0xff0000, description=desc, timestamp=datetime.utcnow())
+		embed.set_author(name=f'{message.author.name}#{message.author.discriminator}', icon_url=message.author.avatar_url)
+		embed.set_footer(text=f'Author: {message.author.id} | Message ID: {message.id}')
+		webhook.send(embed=embed)
 
 
 def setup(bot):
-    bot.add_cog(Logging(bot))
+	bot.add_cog(Logging(bot))

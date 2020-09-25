@@ -17,7 +17,7 @@ bot = commands.Bot(command_prefix=commands.when_mentioned_or(cfg.prefix), descri
 #load cogs from cogs_dir
 cogs_dir = "enabled_cogs"
 if __name__ == '__main__':
-	#for file (no extension) in cogs_dir
+	#for every file (no extension) in cogs_dir
 	for file_name in [''.join(f.split('.')[:-1]) for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
 		bot.load_extension(f'{cogs_dir}.{file_name}')
 

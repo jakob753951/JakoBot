@@ -17,9 +17,17 @@ class Inactivity(commands.Cog):
 
 		self.write_to_file.start()
 		self.assign_role.start()
+		
+	def cfg_is_valid(self, guild_id):
+		cfg = self.cfg.servers[guild_id]
+		if not cfg.role_lurker or not cfg.days_inactivity_before_role:
+			return False
+
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
+		if not self.cfg_is_valid(message.guild.id):
+			return
 		server_cfg = self.cfg.servers[message.guild.id]
 		role = message.guild.get_role(server_cfg.role_lurker)
 		if role in message.author.roles:
@@ -40,14 +48,15 @@ class Inactivity(commands.Cog):
 			for user_id, timestamp in self.activity.items():
 				guild = await self.bot.fetch_guild(server_id)
 				user = await guild.fetch_member(user_id)
-				role = guild.get_role(server_cfg.role_lurker)
-				if role in user.roles:
+				lurker_role = guild.get_role(server_cfg.role_lurker)
+
+				if lurker_role in user.roles:
 					continue
 
 				must_be_after = datetime.utcnow() - timedelta(server_cfg.days_inactivity_before_role)
 				actual = datetime.fromisoformat(timestamp)
 				if actual < must_be_after:
-					await user.add_roles(role)
+					await user.add_roles(lurker_role)
 
 
 def setup(bot):
