@@ -9,7 +9,6 @@ class Logging(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
-		self.last = datetime(1970, 1, 1)
 
 	@commands.Cog.listener()
 	async def on_message_edit(self, before, after):
@@ -31,17 +30,6 @@ class Logging(commands.Cog):
 			return
 		
 		webhook = Webhook.from_url(self.cfg.servers[message.guild.id].webhook_url, adapter=RequestsWebhookAdapter())
-
-		if message.channel.id == 731531789717340190 and message.embeds and message.embeds[0].colour.value != 0:
-			prev_time = datetime.utcnow() - timedelta(hours=1)
-			if prev_time > self.last:
-				embed = discord.Embed(color=0x000000, description='Ì̸̫͇̻̬ ̴̝͕̩͖̀͋́̿̋̌͌͐̔͋K̵̰͙̆́̓̆̓̈̒̍͘N̷̡̧̖̣͒̀̃͐Ȯ̷̡̟̹̬͍̦̪̱͖̈́̄͑̈́̾̔̚̕͝ͅẄ̷̪͇͙́ ̷̪͉̖̫͓̮̽͒W̵̢̪̥̮̋̒͘H̶̛̘̟̲̘̖͆̈́̃̄̔͘͠ͅA̸̡͖͉͎͙̒̿͒͝T̸̡̛̲͓̬͓̭̼̝͓̻̋̈́̋̍͆́̕ ̶̙̲̍͋͌̓͛̓͆̇Y̵̛̛̤̖͇̬͈͓̦̗͇̑̾̾̒͂͐̏̓O̴̦̝̱̝͎̒ͅṲ̵͎̥͎̱̳̠̲̍͑̈́̓̉̌̄͘͘ ̵̮̹̺̤͍͌͛̀̇̓͝Ḑ̷̞͖̟̫̫͈̣͌̉̄̍̚Í̶̝̹̭̩̯̂D̷̨͚͇̬͉̍̑')
-				self.last = datetime.utcnow()
-				webhook.send(embed=embed)
-				return
-
-		if message.author.id == 755103760866607164:
-			return
 
 		desc = f'**Message sent by {message.author.mention} deleted in {message.channel.mention}**\n{message.content}'
 		embed = discord.Embed(color=0xff0000, description=desc, timestamp=datetime.utcnow())
