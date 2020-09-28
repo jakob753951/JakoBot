@@ -4,12 +4,13 @@ from Configuration import Configuration, load_config
 from datetime import datetime
 import jsons
 from dataclasses import dataclass
+from collections import defaultdict
 
 @dataclass
 class UserWarning:
-    time: datetime
-    reason: str = '[no reason given]'
-    strikes: int = 1
+	time: datetime
+	reason: str = '[no reason given]'
+	strikes: int = 1
 
 
 class Warnings(commands.Cog):
@@ -17,8 +18,9 @@ class Warnings(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
-		self.confirmation_reaction = self.cfg.servers[ctx.guild.id].confirm_sent_reaction
+		self.confirmation_reaction = self.cfg.confirm_sent_reaction
 		self.guilds = self.load_warnings()
+		jsons.suppress_warnings()
 
 	@commands.command(name='warn')
 	async def warn(self, ctx, user: discord.User, *, reason = '[no reason given]', strikes = 1):
@@ -33,10 +35,10 @@ class Warnings(commands.Cog):
 	@commands.command(name='userwarnings', aliases=['userwarnings', 'userwarns'])
 	async def user_warnings(self, ctx, user: discord.User):
 		embed = discord.Embed(color=0x0000ff, description=f'**User {user.mention} has the following warnings:**', timestamp=datetime.utcnow())
-		embed.set_author(name=f'{ctx.author.name}#{ctx.author.discriminator}', icon_url=ctx.author.avatar_url)
-		embed.set_footer(text=f'User ID: {after.id}')
+		embed.set_author(name=f'{user.name}#{user.discriminator}', icon_url=user.avatar_url)
+		embed.set_footer(text=f'User ID: {user.id}')
 
-		for warning in self.warnings[str(ctx.guild)][user.id]:
+		for warning in self.warnings[str(ctx.guild)][str(user.id)]:
 			embed.add_field(name=warning.strftime('Y-%m-%d %H:%M'), value=f'reason: "{warning.reason}" - {warning.strikes} Strikes', inline=True)
 
 		ctx.send(embed=embed)
