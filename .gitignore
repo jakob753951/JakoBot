@@ -6,3 +6,5 @@
 /enabled_cogs/**
 /env
 Warning/warnings.json
+ServerCfg.py
+Configuration.py
