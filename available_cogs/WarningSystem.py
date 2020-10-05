@@ -24,7 +24,7 @@ class Warning(commands.Cog):
 
 		self.add_warning(ctx.guild.id, user.id, reason, strikes)
 	
-	@commands.command(name='userwarnings', aliases=['userwarnings', 'userwarns'])
+	@commands.command(name='userwarnings', aliases=['userwarns'])
 	async def user_warnings(self, ctx, user: discord.User):
 		embed = discord.Embed(color=0x0000ff, description=f'**User {user.mention} has the following warnings:**', timestamp=datetime.utcnow())
 		embed.set_author(name=f'{user.name}#{user.discriminator}', icon_url=user.avatar_url)
@@ -36,7 +36,7 @@ class Warning(commands.Cog):
 		ctx.send(embed=embed)
 	
 	def add_warning(self, guild_id, user_id, reason, strikes):
-		self.guilds[str(guild_id)][str(user_id)].append(UserWarning(time=datetime.now(), reason=reason, strikes=strikes))
+		self.guilds[str(guild_id)][str(user_id)].append(Warning(time=datetime.now(), reason=reason, strikes=strikes))
 		self.save_warnings()
 
 	def load_warnings(self):
@@ -46,7 +46,7 @@ class Warning(commands.Cog):
 				guild_id: defaultdict(list,
 				{
 					id:[
-						UserWarning(warning['time'], warning['reason'], warning['strikes'])
+						Warning(warning['time'], warning['reason'], warning['strikes'])
 						for warning
 						in warning_list
 					]
@@ -62,4 +62,4 @@ class Warning(commands.Cog):
 			warning_file.write(jsons.dumps(self.guilds))
 
 def setup(bot):
-	bot.add_cog(Warning(bot))
+	bot.add_cog(WarningSystem(bot))
