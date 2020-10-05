@@ -2,8 +2,9 @@ import discord
 from discord.ext import commands
 from Configuration import *
 
-class Support(commands.Cog):
+get_cfg = lambda: {'general': [], 'server': ['chan_forward_dm']}
 
+class Support(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
@@ -16,14 +17,11 @@ class Support(commands.Cog):
 		if message.author.bot or message.guild:
 			return
 
-		forward_channel = await self.get_forward_channel()
+		forward_channel = await self.bot.fetch_channel(self.cfg.chan_forward_dm)
 		await forward_channel.send(f'{message.author.name}: "{message.content}"')
 		if message.attachments:
 			await forward_channel.send(f'with the following attachment{"s" if len(message.attachments) > 1 else ""}:')
 			await forward_channel.send('\n'.join([att.url for att in message.attachments]))
-
-	async def get_forward_channel(self):
-		return await self.bot.fetch_channel(self.cfg.chan_forward_dm)
 
 
 def setup(bot):

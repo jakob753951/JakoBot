@@ -3,22 +3,36 @@ from discord.ext import tasks, commands
 from Configuration import Configuration, load_config
 import asyncio
 
+get_cfg = lambda: {'general': [], 'server': ['confirm_reaction', 'chan_remind', 'role_remind']}
+
 class Remind(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
-		self.remind_bump.start()
+		self.is_waiting = False
 
-	def cog_unload(self):
-		self.remind_bump.cancel()
+	@commands.Cog.listener()
+	async def on_message(self, message):
+		if self.is_waiting:
+			return
+		
+		if message.content.lower() != '!d bump':
+			return
+		
+		guild = message.guild
+		server_cfg = self.cfg.servers[guild.id]
 
-	@tasks.loop(hours=2)
-	async def remind_bump(self):
-		await asyncio.sleep(10)
-		guild = await self.bot.fetch_guild(self.cfg.guild_remind)
-		role = guild.get_role(self.cfg.role_remind)
-		chan = await self.bot.fetch_channel(self.cfg.chan_remind)
-		await chan.send(f'{role.mention} Time to bump!\n`!d bump`')
+		if message.channel.id != server_cfg.chan_remind:
+			return
+
+		await message.add_reaction(server_cfg.confirm_reaction)		
+
+		self.is_waiting = True
+		await asyncio.sleep(2 * 60 * 60)
+		self.is_waiting = False
+
+		role = guild.get_role(server_cfg.role_remind)
+		await message.channel.send(f'{role.mention} Time to bump!\n`!d bump`')
 
 
 def setup(bot):

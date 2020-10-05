@@ -4,8 +4,9 @@ from Configuration import *
 import json
 import random
 
-class TruthOrDare(commands.Cog):
+get_cfg = lambda: {'general': [], 'server': ['chan_truth_or_dare']}
 
+class TruthOrDare(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')

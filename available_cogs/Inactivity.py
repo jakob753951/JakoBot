@@ -4,8 +4,9 @@ from Configuration import *
 import json
 from datetime import datetime, timedelta
 
-class Inactivity(commands.Cog):
+get_cfg = lambda: {'general': [], 'server': ['role_lurker', 'days_inactivity_before_role']}
 
+class Inactivity(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
@@ -17,17 +18,9 @@ class Inactivity(commands.Cog):
 
 		self.write_to_file.start()
 		self.assign_role.start()
-		
-	def cfg_is_valid(self, guild_id):
-		cfg = self.cfg.servers[guild_id]
-		if not cfg.role_lurker or not cfg.days_inactivity_before_role:
-			return False
-
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
-		if not self.cfg_is_valid(message.guild.id):
-			return
 		server_cfg = self.cfg.servers[message.guild.id]
 		role = message.guild.get_role(server_cfg.role_lurker)
 		if role in message.author.roles:

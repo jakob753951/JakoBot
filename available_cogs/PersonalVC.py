@@ -2,8 +2,9 @@ import discord
 from discord.ext import commands
 from Configuration import *
 
-class PersonalVC(commands.Cog):
+get_cfg = lambda: {'general': [], 'server': ['cate_personal_vc', 'chan_personal_vc']}
 
+class PersonalVC(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')

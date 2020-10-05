@@ -1,24 +1,16 @@
 import discord
 from discord.ext import commands
-from Configuration import Configuration, load_config
-from datetime import datetime
+from Configuration import Configuration, load_configfrom datetime import datetime
 import jsons
-from dataclasses import dataclass
 from collections import defaultdict
+from .Utils.UserWarning import UserWarning
 
-@dataclass
-class UserWarning:
-	time: datetime
-	reason: str = '[no reason given]'
-	strikes: int = 1
+get_cfg = lambda: {'general': [], 'server': ['confirm_reaction', 'chan_member_log']}
 
-
-class Warnings(commands.Cog):
-
+class Warning(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
-		self.confirmation_reaction = self.cfg.confirm_sent_reaction
 		self.guilds = self.load_warnings()
 		jsons.suppress_warnings()
 
@@ -28,7 +20,7 @@ class Warnings(commands.Cog):
 		member_log = await self.bot.fetch_channel(self.cfg.servers[ctx.guild.id].chan_member_log)
 		await member_log.send(f"{user.name} (id: {user.id}) was warned for '{reason}'")
 
-		await ctx.message.add_reaction(self.confirmation_reaction)
+		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].confirm_reaction)
 
 		self.add_warning(ctx.guild.id, user.id, reason, strikes)
 	

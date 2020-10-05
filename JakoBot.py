@@ -1,11 +1,9 @@
 from os import listdir
 from os.path import isfile, join
 import asyncio
-from datetime import datetime
 import discord
 from discord.ext import commands
 from Configuration import *
-from ServerCfg import *
 import GenerateConfig
 
 GenerateConfig.generate_all('fields.json')
@@ -26,10 +24,6 @@ async def on_ready():
 	print(f'Connected!')
 	print(f'Username: {bot.user.name}')
 	print(f'ID: {bot.user.id}')
-
-@bot.event
-async def on_message(message: discord.Message):
-	await bot.process_commands(message)
 
 
 bot.run(cfg.token)

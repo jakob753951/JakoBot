@@ -4,8 +4,9 @@ from discord.ext import commands
 from Configuration import Configuration, load_config
 from datetime import datetime, timedelta
 
-class Logging(commands.Cog):
+get_cfg = lambda: {'general': [], 'server': ['webhook_url']}
 
+class Logging(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')

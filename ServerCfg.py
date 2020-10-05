@@ -1,6 +1,9 @@
 class ServerCfg:
-	def __init__(self, role_lurker, days_inactivity_before_role, chan_truth_or_dare, webhook_url):
-		self.role_lurker = role_lurker
-		self.days_inactivity_before_role = days_inactivity_before_role
-		self.chan_truth_or_dare = chan_truth_or_dare
-		self.webhook_url = webhook_url
+	def __init__(self, cate_personal_vc, chan_personal_vc, chan_message_log, chan_member_log, role_remind, chan_remind, confirm_reaction):
+		self.cate_personal_vc = cate_personal_vc
+		self.chan_personal_vc = chan_personal_vc
+		self.chan_message_log = chan_message_log
+		self.chan_member_log = chan_member_log
+		self.role_remind = role_remind
+		self.chan_remind = chan_remind
+		self.confirm_reaction = confirm_reaction
