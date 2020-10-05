@@ -12,7 +12,7 @@ class ForwardDM(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
-		if not isinstance(ctx.channel, discord.channel.DMChannel):
+		if not isinstance(message.channel, discord.channel.DMChannel):
 			return
 
 		forward_channel = await self.bot.fetch_channel(self.cfg.chan_forward_dm)
