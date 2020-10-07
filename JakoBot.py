@@ -25,5 +25,33 @@ async def on_ready():
 	print(f'Username: {bot.user.name}')
 	print(f'ID: {bot.user.id}')
 
+is_owner = lambda ctx: ctx.author.id == cfg.owner_id
+
+@bot.command()
+@commands.check(is_owner)
+async def load(ctx, extension_name: str):
+	try:
+		bot.load_extension(f'{cogs_dir}.{extension_name}')
+		await ctx.send(f'Extension {extension_name} loaded')
+	except Exception as e:
+		await ctx.send(f'An error occurrred while loading: "{repr(e)}"')
+
+@bot.command()
+@commands.check(is_owner)
+async def unload(ctx, extension_name: str):
+	try:
+		bot.unload_extension(f'{cogs_dir}.{extension_name}')
+		await ctx.send(f'Extension {extension_name} unloaded')
+	except Exception as e:
+		await ctx.send(f'An error occurrred while unloading: "{repr(e)}"')
+
+@bot.command()
+@commands.check(is_owner)
+async def reload(ctx, extension_name: str):
+	try:
+		bot.reload_extension(f'{cogs_dir}.{extension_name}')
+		await ctx.send(f'Extension {extension_name} reloaded')
+	except Exception as e:
+		await ctx.send(f'An error occurrred while reloading: "{repr(e)}"')
 
 bot.run(cfg.token)

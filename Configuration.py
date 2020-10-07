@@ -2,12 +2,13 @@ import json
 from ServerCfg import ServerCfg
 
 class Configuration:
-	def __init__(self, token = '', prefix = '.', description = '', name = '', chan_forward_dm = '', servers = {}):
+	def __init__(self, token = '', prefix = '.', description = '', name = '', chan_forward_dm = '', owner_id = '', servers = {}):
 		self.token = token
 		self.prefix = prefix
 		self.description = description
 		self.name = name
 		self.chan_forward_dm = chan_forward_dm
+		self.owner_id = owner_id
 		self.servers = {}
 		for key, value in servers.items():
 			fields = ['cate_personal_vc', 'chan_personal_vc', 'chan_message_log', 'chan_member_log', 'role_remind', 'chan_remind', 'confirm_reaction']
@@ -25,6 +26,7 @@ def load_config(filename):
 		jsonfile['description'],
 		jsonfile['name'],
 		jsonfile['chan_forward_dm'],
+		jsonfile['owner_id'],
 		jsonfile['servers']
 	)
 
