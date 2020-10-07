@@ -46,7 +46,8 @@ class Warning(commands.Cog):
 			{
 				guild_id: defaultdict(list,
 				{
-					id:[
+					id:
+					[
 						Warning(warning['time'], warning['reason'], warning['strikes'])
 						for warning
 						in warning_list
