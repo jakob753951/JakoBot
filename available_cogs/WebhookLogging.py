@@ -4,7 +4,7 @@ from discord.ext import commands
 from Configuration import Configuration, load_config
 from datetime import datetime, timedelta
 
-get_cfg = lambda: {'general': [], 'server': ['chan_message_log', 'chan_member_log']}
+get_cfg = lambda: {'general': [], 'server': ['webhook_url']}
 
 class Logging(commands.Cog):
 	def __init__(self, bot):
@@ -22,20 +22,21 @@ class Logging(commands.Cog):
 		embed.add_field(name='After', value=f'{after.content}', inline=False)
 		embed.set_footer(text=f'User ID: {after.id}')
 		
-		log_channel = await self.bot.fetch_channel(self.cfg.servers[after.guild.id].chan_message_log)
-		await log_channel.send(embed=embed)
+		webhook = Webhook.from_url(self.cfg.servers[after.guild.id].webhook_url, adapter=RequestsWebhookAdapter())
+		webhook.send(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_raw_message_delete(self, payload):
+		webhook = Webhook.from_url(self.cfg.servers[payload.guild_id].webhook_url, adapter=RequestsWebhookAdapter())
+		
 		if not payload.cached_message:
 			channel = await self.bot.fetch_channel(payload.channel_id)
 
 			desc = f'**Message deleted in {channel.mention}**'
 			embed = discord.Embed(color=0xff0000, description=desc, timestamp=datetime.utcnow())
 			embed.set_footer(text=f'Message ID: {payload.message_id}')
-
-			log_channel = await self.bot.fetch_channel(self.cfg.servers[payload.guild_id].chan_message_log)
-			await log_channel.send(embed=embed)
+			
+			webhook.send(embed=embed)
 			return
 			
 		message = payload.cached_message
@@ -47,18 +48,18 @@ class Logging(commands.Cog):
 		embed = discord.Embed(color=0xff0000, description=desc, timestamp=datetime.utcnow())
 		embed.set_author(name=f'{message.author.name}#{message.author.discriminator}', icon_url=message.author.avatar_url)
 		embed.set_footer(text=f'Author: {message.author.id} | Message ID: {payload.message_id}')
-		
-		await log_channel.send(embed=embed)
+
+		webhook.send(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
 		desc = f'Has joined **{member.guild.name}**!'
-		embed = discord.Embed(color=0xff0000, description=desc, timestamp=datetime.utcnow())
+		embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
-		log_channel = await self.bot.fetch_channel(self.cfg.servers[member.guild.id].chan_member_log)
-		await log_channel.send(embed=embed)
+		webhook = Webhook.from_url(self.cfg.servers[message.guild.id].webhook_url, adapter=RequestsWebhookAdapter())
+		webhook.send(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
@@ -67,9 +68,8 @@ class Logging(commands.Cog):
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
-		log_channel = await self.bot.fetch_channel(self.cfg.servers[member.guild.id].chan_member_log)
-		await log_channel.send(embed=embed)
-
+		webhook = Webhook.from_url(self.cfg.servers[message.guild.id].webhook_url, adapter=RequestsWebhookAdapter())
+		webhook.send(embed=embed)
 
 def setup(bot):
 	bot.add_cog(Logging(bot))
