@@ -36,7 +36,7 @@ class PersonalVC(commands.Cog):
 
 		# If we reach this point, the user has connected to the 'Create personal VC' channel
 		# So we create the channels for them and move them to the VC
-		await create_channels()
+		await self.create_channels()
 
 	async def create_channels(self, member):
 		# Shorthand for later use
