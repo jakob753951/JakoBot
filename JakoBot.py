@@ -10,7 +10,10 @@ GenerateConfig.generate_all('fields.json')
 
 cfg = load_config('config.json')
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(cfg.prefix), description=cfg.description, pm_help=True)
+intents = discord.Intents.default()
+intents.members = True
+
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(cfg.prefix), description=cfg.description, intents=intents, pm_help=True)
 
 #load cogs from cogs_dir
 cogs_dir = "enabled_cogs"
