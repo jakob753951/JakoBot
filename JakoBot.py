@@ -3,10 +3,11 @@ from os.path import isfile, join
 import asyncio
 import discord
 from discord.ext import commands
-from Configuration import *
 import GenerateConfig
 
 GenerateConfig.generate_all('fields.json')
+
+from Configuration import *
 
 cfg = load_config('config.json')
 
