@@ -47,7 +47,7 @@ class Warning(commands.Cog):
 		self.save_warnings()
 
 	def load_warnings(self):
-		with open('Warning/warnings.json', 'r', encoding="utf8") as warning_file:
+		with open('data/Warning/warnings.json', 'r', encoding="utf8") as warning_file:
 			return defaultdict(lambda: defaultdict(list),
 			{
 				guild_id: defaultdict(list,
