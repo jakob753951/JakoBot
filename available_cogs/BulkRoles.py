@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-get_cfg = lambda: {'general': [], 'server': []}
+requirements = {'general': [], 'server': []}
 
 class Confessions(commands.Cog):
 	def __init__(self, bot):

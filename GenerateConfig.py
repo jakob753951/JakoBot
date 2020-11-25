@@ -8,7 +8,7 @@ def generate_all():
 	server = []
 	try:
 		for file in [''.join(f.split('.')[:-1]) for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
-			requirements = importlib.import_module(f'{cogs_dir}.{file}').get_cfg()
+			requirements = importlib.import_module(f'{cogs_dir}.{file}').requirements
 			general.extend(requirements['general'])
 			server.extend(requirements['server'])
 	except:

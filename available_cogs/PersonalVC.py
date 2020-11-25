@@ -1,7 +1,7 @@
 from discord.ext import commands
 from Configuration import *
 
-get_cfg = lambda: {'general': [], 'server': ['cate_personal_vc', 'chan_personal_vc']}
+requirements = {'general': [], 'server': ['cate_personal_vc', 'chan_personal_vc']}
 
 class PersonalVC(commands.Cog):
 	def __init__(self, bot):

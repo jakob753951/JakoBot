@@ -6,7 +6,7 @@ import jsons
 from collections import defaultdict
 from dataclasses import dataclass
 
-get_cfg = lambda: {'general': [], 'server': ['confirm_reaction', 'chan_member_log']}
+requirements = {'general': [], 'server': ['confirm_reaction', 'chan_member_log']}
 
 @dataclass
 class UserWarning:

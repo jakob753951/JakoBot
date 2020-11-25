@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from Configuration import load_config
 
-get_cfg = lambda: {'general': [], 'server': ['roles_can_verify', 'role_unverified', 'role_verified', 'chan_verify_rx']}
+requirements = {'general': [], 'server': ['roles_can_verify', 'role_unverified', 'role_verified', 'chan_verify_rx']}
 
 async def can_verify(ctx):
 	cfg = load_config('config.json')

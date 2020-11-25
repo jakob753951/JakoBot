@@ -2,7 +2,7 @@ from discord.ext import commands
 from Configuration import load_config
 import asyncio
 
-get_cfg = lambda: {'general': [], 'server': ['confirm_reaction', 'chan_remind', 'role_remind']}
+requirements = {'general': [], 'server': ['confirm_reaction', 'chan_remind', 'role_remind']}
 
 class Remind(commands.Cog):
 	def __init__(self, bot):

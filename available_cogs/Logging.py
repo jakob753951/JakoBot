@@ -4,7 +4,7 @@ from discord.ext import commands
 from Configuration import load_config
 from datetime import datetime
 
-get_cfg = lambda: {'general': [], 'server': ['msg_log_webhook_url', 'member_log_webhook_url']}
+requirements = {'general': [], 'server': ['msg_log_webhook_url', 'member_log_webhook_url']}
 
 class Logging(commands.Cog):
 	def __init__(self, bot):

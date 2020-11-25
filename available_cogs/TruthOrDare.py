@@ -3,7 +3,7 @@ from Configuration import load_config
 import json
 import random
 
-get_cfg = lambda: {'general': [], 'server': ['chan_truth_or_dare']}
+requirements = {'general': [], 'server': ['chan_truth_or_dare']}
 
 class TruthOrDare(commands.Cog):
 	def __init__(self, bot):

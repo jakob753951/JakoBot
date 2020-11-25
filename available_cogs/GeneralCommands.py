@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from Configuration import load_config
 
-get_cfg = lambda: {'general': [], 'server': ['confirm_reaction']}
+requirements = {'general': [], 'server': ['confirm_reaction']}
 
 class GeneralCommands(commands.Cog):
 	def __init__(self, bot):

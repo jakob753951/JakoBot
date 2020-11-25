@@ -3,7 +3,7 @@ from Configuration import *
 import json
 from datetime import datetime, timedelta
 
-get_cfg = lambda: {'general': [], 'server': ['role_lurker', 'days_inactivity_before_role']}
+requirements = {'general': [], 'server': ['role_lurker', 'days_inactivity_before_role']}
 
 class Inactivity(commands.Cog):
 	def __init__(self, bot):

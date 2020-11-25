@@ -2,7 +2,7 @@ from discord.ext import commands
 from Configuration import load_config
 import json
 
-get_cfg = lambda: {'general': [], 'server': ['chan_forward_dm']}
+requirements = {'general': [], 'server': ['chan_forward_dm']}
 
 class Support(commands.Cog):
 	def __init__(self, bot):

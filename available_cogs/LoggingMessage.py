@@ -3,7 +3,7 @@ from discord.ext import commands
 from Configuration import load_config
 from datetime import datetime
 
-get_cfg = lambda: {'general': [], 'server': ['chan_message_log', 'chan_member_log']}
+requirements = {'general': [], 'server': ['chan_message_log', 'chan_member_log']}
 
 class LoggingMessage(commands.Cog):
 	def __init__(self, bot):
