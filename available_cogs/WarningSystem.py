@@ -30,7 +30,7 @@ class WarningSystem(commands.Cog):
 		await ctx.message.add_reaction(self.cfg.confirmation_reaction)
 
 		self.add_warning(ctx.guild.id, user.id, reason, strikes)
-	
+
 	@commands.command(name='userwarnings', aliases=['userwarns'])
 	async def user_warnings(self, ctx, user: discord.User):
 		embed = discord.Embed(color=0x0000ff, description=f'**User {user.mention} has the following warnings:**', timestamp=datetime.utcnow())
