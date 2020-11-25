@@ -47,7 +47,7 @@ class Warning(commands.Cog):
 		self.save_warnings()
 
 	def load_warnings(self):
-		with open('data/Warning/warnings.json', 'r', encoding="utf8") as warning_file:
+		with open('data/Warning.json', 'r', encoding="utf8") as warning_file:
 			return defaultdict(lambda: defaultdict(list),
 			{
 				guild_id: defaultdict(list,
@@ -66,7 +66,7 @@ class Warning(commands.Cog):
 			})
 
 	def save_warnings(self):
-		with open('Warning/warnings.json', 'w', encoding="utf8") as warning_file:
+		with open('data/Warning.json', 'w', encoding="utf8") as warning_file:
 			warning_file.write(jsons.dumps(self.guilds, indent=4))
 
 def setup(bot):

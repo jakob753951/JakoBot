@@ -12,7 +12,7 @@ class Confessions(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
-		with open('data/Confessions/data.json', 'r', encoding="utf8") as question_file:
+		with open('data/Confessions.json', 'r', encoding="utf8") as question_file:
 			self.confessions = json.loads(question_file.read())
 
 	@commands.command(name='Confession', aliases=['confession', 'confess'])
@@ -31,7 +31,7 @@ class Confessions(commands.Cog):
 		existing = self.confessions.get(ctx.author.id, [])
 		existing.append(text)
 		self.confessions[ctx.author.id] = existing
-		with open('data/Confessions/data.json', 'w') as out_file:
+		with open('data/Confessions.json', 'w') as out_file:
 			out_file.write(json.dumps(self.confessions, indent=4))
 
 
