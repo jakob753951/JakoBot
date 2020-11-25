@@ -2,7 +2,7 @@ import json
 from ServerCfg import ServerCfg
 
 class Configuration:
-	def __init__(self, token = '', prefix = '.', description = '', name = '', chan_forward_dm = '', owner_id = '', servers = {}):
+	def __init__(self, token = None, prefix = '.', description = None, name = None, chan_forward_dm = None, owner_id = None, servers = {}):
 		self.token = token
 		self.prefix = prefix
 		self.description = description

@@ -17,7 +17,8 @@ import json
 from ServerCfg import ServerCfg
 
 class Configuration:
-\tdef __init__(self, {', '.join([f"{field} = '{'.' if field == 'prefix' else None}'" for field in general])}""")
+\tdef __init__(self, """)
+		cfg_file.write(', '.join([f"""{field} = {"'.'" if field == 'prefix' else None}""" for field in general]))
 		cfg_file.write(", servers = {}):\n")
 
 
