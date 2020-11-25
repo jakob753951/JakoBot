@@ -5,7 +5,7 @@ import discord
 from discord.ext import commands
 import GenerateConfig
 
-GenerateConfig.generate_all('fields.json')
+GenerateConfig.generate_all()
 
 from Configuration import *
 

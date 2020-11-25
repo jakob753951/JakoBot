@@ -1,14 +1,28 @@
-import json
-from functools import reduce
+from os import listdir
+from os.path import isfile, join
+import importlib
 
-def generate_all(file_name: str):
-	with open(file_name) as cfg_file:
-		fields = json.loads(cfg_file.read())
-		general = fields['general']
-		server = fields['server']
+def generate_all():
+	cogs_dir = "enabled_cogs"
+	general = ['token', 'prefix', 'description', 'name']
+	server = []
+	try:
+		for file in [''.join(f.split('.')[:-1]) for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
+			requirements = importlib.import_module(f'{cogs_dir}.{file}').get_cfg()
+			general.extend(requirements['general'])
+			server.extend(requirements['server'])
+	except:
+		generate_general_cfg(general, server)
+		generate_server_cfg(server)
+		generate_all()
+		return
+
+	general = list(set(general))
+	server = list(set(server))
 
 	generate_general_cfg(general, server)
-	generate_server_cfg(general, server)
+	generate_server_cfg(server)
+
 
 def generate_general_cfg(general, server):
 	with open('Configuration.py', 'w') as cfg_file:
@@ -18,9 +32,8 @@ from ServerCfg import ServerCfg
 
 class Configuration:
 \tdef __init__(self, """)
-		cfg_file.write(', '.join([f"""{field} = {"'.'" if field == 'prefix' else None}""" for field in general]))
-		cfg_file.write(", servers = {}):\n")
-
+		cfg_file.write(', '.join([*[f"""{field} = {"'.'" if field == 'prefix' else None}""" for field in general], "servers = {}"]))
+		cfg_file.write('):\n')
 
 		for field in general:
 			cfg_file.write(f'\t\tself.{field} = {field}\n')
@@ -40,16 +53,15 @@ def load_config(filename):
 	with open(filename) as cfg_file:
 		jsonfile = json.loads(cfg_file.read())
 
-	args = (
-		{sep.join([f"jsonfile['{field}']" for field in general])},
-		jsonfile['servers']
-	)
+	args = [
+		{sep.join([*[f"jsonfile['{field}']" for field in general], "jsonfile['servers']"])}
+	]
 
 	conf = Configuration(*args)
 	return conf
 """)
 
-def generate_server_cfg(general, server):
+def generate_server_cfg(server):
 	sep = '\n\t\t'
 	with open('ServerCfg.py', 'w') as cfg_file:
 		cfg_file.write(f"""\
@@ -57,7 +69,3 @@ class ServerCfg:
 	def __init__(self{''.join([', ' + prop for prop in server])}):
 		{sep.join([f"self.{prop} = {prop}" for prop in server]) if server else 'pass'}
 """)
-
-
-if __name__ == '__main__':
-    generate_all('fields.json')
