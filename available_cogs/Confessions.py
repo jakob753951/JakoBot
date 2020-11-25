@@ -31,7 +31,7 @@ class Confessions(commands.Cog):
 		existing.append(text)
 		self.confessions[ctx.author.id] = existing
 		with open('Confessions/data.json', 'w') as out_file:
-			out_file.write(json.dumps(self.confessions))
+			out_file.write(json.dumps(self.confessions, indent=4))
 
 
 def setup(bot):
