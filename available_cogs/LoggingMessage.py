@@ -1,12 +1,11 @@
 import discord
-from discord import Webhook, RequestsWebhookAdapter
 from discord.ext import commands
-from Configuration import Configuration, load_config
-from datetime import datetime, timedelta
+from Configuration import load_config
+from datetime import datetime
 
 get_cfg = lambda: {'general': [], 'server': ['chan_message_log', 'chan_member_log']}
 
-class Logging(commands.Cog):
+class LoggingMessage(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
@@ -77,4 +76,4 @@ class Logging(commands.Cog):
 
 
 def setup(bot):
-	bot.add_cog(Logging(bot))
+	bot.add_cog(LoggingMessage(bot))

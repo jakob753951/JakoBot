@@ -1,6 +1,5 @@
-import discord
 from discord.ext import commands
-from Configuration import *
+from Configuration import load_config
 
 get_cfg = lambda: {'general': [], 'server': ['chan_forward_dm']}
 

@@ -1,6 +1,5 @@
 import discord
 from discord.ext import commands
-from Configuration import Configuration, load_config
 
 get_cfg = lambda: {'general': [], 'server': []}
 
@@ -14,7 +13,7 @@ class Confessions(commands.Cog):
 		if isinstance(ctx.channel, discord.channel.DMChannel):
 			await ctx.send('This command cannot be used in DMs')
 			return
-		
+
 		perms = ctx.guild.roles[0].permissions
 
 		# Add roles

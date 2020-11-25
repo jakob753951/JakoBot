@@ -1,6 +1,5 @@
-import discord
-from discord.ext import commands, tasks
-from Configuration import *
+from discord.ext import commands
+from Configuration import load_config
 import json
 import random
 

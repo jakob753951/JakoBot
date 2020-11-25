@@ -1,7 +1,6 @@
 import discord
-from discord import Webhook, RequestsWebhookAdapter
 from discord.ext import commands
-from Configuration import Configuration, load_config
+from Configuration import load_config
 from datetime import datetime
 import random
 import json

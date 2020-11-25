@@ -1,6 +1,5 @@
-import discord
-from discord.ext import tasks, commands
-from Configuration import Configuration, load_config
+from discord.ext import commands
+from Configuration import load_config
 import asyncio
 
 get_cfg = lambda: {'general': [], 'server': ['confirm_reaction', 'chan_remind', 'role_remind']}
@@ -15,17 +14,17 @@ class Remind(commands.Cog):
 	async def on_message(self, message):
 		if self.is_waiting:
 			return
-		
+
 		if message.content.lower() != '!d bump':
 			return
-		
+
 		guild = message.guild
 		server_cfg = self.cfg.servers[guild.id]
 
 		if message.channel.id != server_cfg.chan_remind:
 			return
 
-		await message.add_reaction(server_cfg.confirm_reaction)		
+		await message.add_reaction(server_cfg.confirm_reaction)
 
 		self.is_waiting = True
 		await asyncio.sleep(2 * 60 * 60)

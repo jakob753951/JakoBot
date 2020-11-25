@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from Configuration import *
+from Configuration import load_config
 
 get_cfg = lambda: {'general': ['chan_forward_dm'], 'server': ['confirm_reaction']}
 

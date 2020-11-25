@@ -1,8 +1,8 @@
 import discord
 from discord import Webhook, RequestsWebhookAdapter
 from discord.ext import commands
-from Configuration import Configuration, load_config
-from datetime import datetime, timedelta
+from Configuration import load_config
+from datetime import datetime
 
 get_cfg = lambda: {'general': [], 'server': ['msg_log_webhook_url', 'member_log_webhook_url']}
 
