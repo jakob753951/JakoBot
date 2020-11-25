@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 from Configuration import *
 
-
 get_cfg = lambda: {'general': ['chan_forward_dm'], 'server': ['confirm_reaction']}
 
 class ForwardDM(commands.Cog):
