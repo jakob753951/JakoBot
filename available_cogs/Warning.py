@@ -4,9 +4,15 @@ from Configuration import Configuration, load_config
 from datetime import datetime
 import jsons
 from collections import defaultdict
-from .Utils.UserWarning import UserWarning
+from dataclasses import dataclass
 
 get_cfg = lambda: {'general': [], 'server': ['confirm_reaction', 'chan_member_log']}
+
+@dataclass
+class UserWarning:
+    time: datetime
+    reason: str = '[no reason given]'
+    strikes: int = 1
 
 class Warning(commands.Cog):
 	def __init__(self, bot):
