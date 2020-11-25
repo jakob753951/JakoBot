@@ -1,4 +1,4 @@
 {
-	"general": ["token", "prefix", "description", "name", "chan_forward_dm", "minutes_between_saves", "minutes_between_checks", "chan_confessions", "confirmation_reaction"],
-	"server": ["chan_member_log", "role_lurker", "days_inactivity_before_role", "chan_truth_or_dare", "webhook_url"]
+	"general": ["token", "prefix", "description", "name", "chan_forward_dm", "owner_id"],
+	"server": ["cate_personal_vc", "chan_personal_vc", "chan_message_log", "chan_member_log", "role_remind", "chan_remind", "confirm_reaction"]
 }

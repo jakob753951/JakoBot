@@ -6,8 +6,9 @@ from datetime import datetime
 import random
 import json
 
-class Confessions(commands.Cog):
+get_cfg = lambda: {'general': ['chan_confessions'], 'server': ['confirm_reaction']}
 
+class Confessions(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
