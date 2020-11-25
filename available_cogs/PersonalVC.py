@@ -2,8 +2,9 @@ import discord
 from discord.ext import commands
 from Configuration import *
 
-class PersonalVC(commands.Cog):
+get_cfg = lambda: {'general': [], 'server': ['cate_personal_vc', 'chan_personal_vc']}
 
+class PersonalVC(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
@@ -11,51 +12,52 @@ class PersonalVC(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_voice_state_update(self, member, before, after):
-		#if the left channel was a personal VC
+		# Left channel was a personal VC
 		if before.channel and before.channel.id in self.user_vc:
-			#and it is now empty
-			if len(before.channel.members) == 0:
-				#delete the channels and roles
+			# And it is now empty
+			if not before.channel.members:
+
+				# Delete the text-channel and the role
 				for chan in self.user_vc[before.channel.id]:
 					await chan.delete()
+				# Delete the vc
 				await before.channel.delete()
-				#remove from dict
+
+				# Remove from dict
 				self.user_vc.pop(before.channel.id)
 
+		# User disconnects
 		if not after.channel:
 			return
+
+		# User entered an irrelevant channel, so we don't care
 		if after.channel != await self.bot.fetch_channel(self.cfg.servers[member.guild.id].chan_personal_vc):
 			return
 
-		#shorthand for later use
+		# If we reach this point, the user has connected to the 'Create personal VC' channel
+		# So we create the channels for them and move them to the VC
+		await self.create_channels()
+
+	async def create_channels(self, member):
+		# Shorthand for later use
 		server = member.guild
 		username = member.display_name
 
-		#create role and add it to the user
+		# Create role and add it to the user
 		role = await server.create_role(name=username)
 		await member.add_roles(role)
 
-		overwrites = {
-			role: discord.PermissionOverwrite(
-				manage_messages = True,
-				manage_permissions = True,
-				mute_members = True,
-				deafen_members = True,
-				manage_channels = True
-			)
-		}
-
-		#get cate_personal_vc for the server
+		# Get cate_personal_vc for the server
 		cat = await self.bot.fetch_channel(self.cfg.servers[member.guild.id].cate_personal_vc)
 
 		channel_name = f"{username}'s channel"
-		vc = await cat.create_voice_channel(channel_name, overwrites = overwrites)
+		vc = await cat.create_voice_channel(channel_name)
 		await member.move_to(vc)
 
-		tc = await cat.create_text_channel(channel_name, overwrites = overwrites)
-		#add the vc as a key to user_vc, while setting the value to a tuple with tc and role
-		self.user_vc[vc.id] = (tc, role)
+		tc = await cat.create_text_channel(channel_name)
 
+		# Add the vc as a key to user_vc, while setting the value to a tuple with tc and role
+		self.user_vc[vc.id] = (tc, role)
 
 
 def setup(bot):

@@ -1,18 +1,19 @@
 from os import listdir
 from os.path import isfile, join
 import asyncio
-from datetime import datetime
 import discord
 from discord.ext import commands
 from Configuration import *
-from ServerCfg import *
 import GenerateConfig
 
 GenerateConfig.generate_all('fields.json')
 
 cfg = load_config('config.json')
 
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(cfg.prefix), description=cfg.description, pm_help=True)
+intents = discord.Intents.default()
+intents.members = True
+
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(cfg.prefix), description=cfg.description, intents=intents, pm_help=True)
 
 #load cogs from cogs_dir
 cogs_dir = "enabled_cogs"
@@ -27,9 +28,33 @@ async def on_ready():
 	print(f'Username: {bot.user.name}')
 	print(f'ID: {bot.user.id}')
 
-@bot.event
-async def on_message(message: discord.Message):
-	await bot.process_commands(message)
+is_owner = lambda ctx: ctx.author.id == cfg.owner_id
 
+@bot.command()
+@commands.check(is_owner)
+async def load(ctx, extension_name: str):
+	try:
+		bot.load_extension(f'{cogs_dir}.{extension_name}')
+		await ctx.send(f'Extension {extension_name} loaded')
+	except Exception as e:
+		await ctx.send(f'An error occurrred while loading: "{repr(e)}"')
+
+@bot.command()
+@commands.check(is_owner)
+async def unload(ctx, extension_name: str):
+	try:
+		bot.unload_extension(f'{cogs_dir}.{extension_name}')
+		await ctx.send(f'Extension {extension_name} unloaded')
+	except Exception as e:
+		await ctx.send(f'An error occurrred while unloading: "{repr(e)}"')
+
+@bot.command()
+@commands.check(is_owner)
+async def reload(ctx, extension_name: str):
+	try:
+		bot.reload_extension(f'{cogs_dir}.{extension_name}')
+		await ctx.send(f'Extension {extension_name} reloaded')
+	except Exception as e:
+		await ctx.send(f'An error occurrred while reloading: "{repr(e)}"')
 
 bot.run(cfg.token)

@@ -6,3 +6,6 @@
 /enabled_cogs/**
 /env
 Confessions/data.json
+Warning/warnings.json
+ServerCfg.py
+Configuration.py

@@ -6,8 +6,9 @@ from datetime import datetime
 import random
 import json
 
-class Confessions(commands.Cog):
+get_cfg = lambda: {'general': ['chan_confessions'], 'server': ['confirm_reaction']}
 
+class Confessions(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
@@ -18,7 +19,7 @@ class Confessions(commands.Cog):
 	async def confession(self, ctx, *, text):
 		if not isinstance(ctx.channel, discord.channel.DMChannel):
 			return
-		
+
 		random.seed(ctx.author.id)
 		user_id = random.randint(1, 10000000) * 15616156345675451 % 0xffffffff
 		color = user_id % 0xffffff
