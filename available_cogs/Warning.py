@@ -67,7 +67,7 @@ class Warning(commands.Cog):
 
 	def save_warnings(self):
 		with open('Warning/warnings.json', 'w', encoding="utf8") as warning_file:
-			warning_file.write(jsons.dumps(self.guilds))
+			warning_file.write(jsons.dumps(self.guilds, indent=4))
 
 def setup(bot):
 	bot.add_cog(Warning(bot))
