@@ -5,7 +5,8 @@
 **/__pycache__/**
 /enabled_cogs/**
 /env
-Confessions/data.json
+data/**
 Warning/warnings.json
 ServerCfg.py
 Configuration.py
+fields.json
