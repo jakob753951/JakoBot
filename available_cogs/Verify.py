@@ -64,6 +64,9 @@ class Verify(commands.Cog):
 		# If user doesn't have the role after, return
 		if verified not in after.roles:
 			return
+		
+		unverified = server.get_role(msg_cfg.role_unverified)
+		await after.remove_roles(unverified, reason="verification")
 
 		await self.post_welcome_message(after)
 
