@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from Configuration import load_config
 
-requirements = {'general': [], 'server': ['confirm_reaction']}
+requirements = {'general': [], 'server': ['react_confirm']}
 
 class GeneralCommands(commands.Cog):
 	def __init__(self, bot):
@@ -26,7 +26,7 @@ class GeneralCommands(commands.Cog):
 	@commands.command(name='say')
 	async def say(self, ctx, channel: discord.TextChannel, *, message):
 		await channel.send(message, files=ctx.message.attachments)
-		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].confirm_reaction)
+		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 
 
 def setup(bot):

@@ -6,7 +6,7 @@ import jsons
 from collections import defaultdict
 from dataclasses import dataclass
 
-requirements = {'general': [], 'server': ['confirm_reaction', 'chan_member_log']}
+requirements = {'general': [], 'server': ['react_confirm', 'chan_member_log']}
 
 @dataclass
 class UserWarning:
@@ -27,7 +27,7 @@ class Warning(commands.Cog):
 		member_log = await self.bot.fetch_channel(self.cfg.servers[ctx.guild.id].chan_member_log)
 		await member_log.send(f"{user.name} (id: {user.id}) was warned for '{reason}'")
 
-		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].confirm_reaction)
+		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 
 		self.add_warning(ctx.guild.id, user.id, reason, strikes)
 
