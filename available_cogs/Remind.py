@@ -2,7 +2,7 @@ from discord.ext import commands
 from Configuration import load_config
 import asyncio
 
-requirements = {'general': [], 'server': ['confirm_reaction', 'chan_remind', 'role_remind']}
+requirements = {'general': [], 'server': ['react_confirm', 'chan_remind', 'role_remind']}
 
 class Remind(commands.Cog):
 	def __init__(self, bot):
@@ -24,7 +24,7 @@ class Remind(commands.Cog):
 		if message.channel.id != server_cfg.chan_remind:
 			return
 
-		await message.add_reaction(server_cfg.confirm_reaction)
+		await message.add_reaction(server_cfg.react_confirm)
 
 		self.is_waiting = True
 		await asyncio.sleep(2 * 60 * 60)

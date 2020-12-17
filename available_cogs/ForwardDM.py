@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from Configuration import load_config
 
-requirements = {'general': ['chan_forward_dm'], 'server': ['confirm_reaction']}
+requirements = {'general': ['chan_forward_dm'], 'server': ['react_confirm']}
 
 class ForwardDM(commands.Cog):
 	def __init__(self, bot):
@@ -32,7 +32,7 @@ class ForwardDM(commands.Cog):
 	@commands.command(name='send_dm')
 	async def send_dm(self, ctx, recipient: discord.User, *, message):
 		await recipient.send(message)
-		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].confirm_reaction)
+		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 
 
 def setup(bot):

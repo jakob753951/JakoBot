@@ -5,7 +5,7 @@ from datetime import datetime
 import random
 import json
 
-requirements = {'general': ['chan_confessions'], 'server': ['confirm_reaction']}
+requirements = {'general': ['chan_confessions'], 'server': ['react_confirm']}
 
 class Confessions(commands.Cog):
 	def __init__(self, bot):
