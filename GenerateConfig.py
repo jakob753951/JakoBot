@@ -12,8 +12,8 @@ def generate_all():
 			general.extend(requirements['general'])
 			server.extend(requirements['server'])
 	except:
-		generate_general_cfg(general, server)
 		generate_server_cfg(server)
+		generate_general_cfg(general, server)
 		generate_all()
 		return
 
