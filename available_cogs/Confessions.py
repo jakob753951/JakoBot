@@ -5,7 +5,7 @@ from datetime import datetime
 import random
 import json
 
-requirements = {'general': ['chan_confessions'], 'server': ['confirm_reaction']}
+requirements = {'general': ['chan_confessions'], 'server': ['react_confirm']}
 
 class Confessions(commands.Cog):
 	def __init__(self, bot):
@@ -27,9 +27,9 @@ class Confessions(commands.Cog):
 		await chan.send(embed=embed)
 
 		await ctx.send(embed=discord.Embed(colour=discord.Colour.green(), title='Your confession has been sent'))
-		existing = self.confessions.get(ctx.author.id, [])
+		existing = self.confessions.get(str(ctx.author.id), [])
 		existing.append(text)
-		self.confessions[ctx.author.id] = existing
+		self.confessions[str(ctx.author.id)] = existing
 		with open('data/Confessions.json', 'w') as out_file:
 			out_file.write(json.dumps(self.confessions, indent=4))
 

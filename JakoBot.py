@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 import GenerateConfig
 
+print('Generating configs...')
 GenerateConfig.generate_all()
 
 from Configuration import *
@@ -58,4 +59,5 @@ async def reload(ctx, extension_name: str):
 	except Exception as e:
 		await ctx.send(f'An error occurrred while reloading: "{repr(e)}"')
 
+print('Starting bot...')
 bot.run(cfg.token)
