@@ -3,11 +3,11 @@ from typing import List, Tuple
 from CustomExceptions import *
 
 def load_data():
-    with open('data/MainData.json') as data_file:
+    with open('data/Balances.json') as data_file:
         return json.loads(data_file.read())
 
 def save_data(data):
-    with open('data/MainData.json', 'w') as data_file:
+    with open('data/Balances.json', 'w') as data_file:
         data_file.write(json.dumps(data, indent=4))
 
 async def getMemberBalance(guild_id, member_id) -> int:
@@ -17,7 +17,11 @@ async def getMemberBalance(guild_id, member_id) -> int:
     return data[str(guild_id)][str(member_id)]
 
 async def setMemberBalance(guild_id: int, member_id: int, new_balance: int) -> int:
+    if new_balance < 0:
+        raise NegativeBalanceException('Balance would go negative.', abs(new_balance))
     data = load_data()
+    if not str(guild_id) in data:
+        data[str(guild_id)] = {}
     data[str(guild_id)][str(member_id)] = new_balance
     save_data(data)
     return new_balance
@@ -34,14 +38,17 @@ async def getTopRichest(guild_id: int, limit: int = 10) -> List[Tuple[int, int]]
 async def addToMemberBalance(guild_id: int, member_id: int, amount: int) -> int:
     old_balance = await getMemberBalance(guild_id, member_id)
     new_balance = old_balance + amount
-    await setMemberBalance(guild_id, member_id, new_balance)
+    try:
+        await setMemberBalance(guild_id, member_id, new_balance)
+    except NegativeBalanceException as e:
+        raise NegativeBalanceException(f'Member balance would go negative. user only has {old_balance}', e.missing_funds)
+
     return new_balance
 
 async def transferBetweenMembers(guild_id: int, sender_id: int, receiver_id: int, amount: int) -> int:
-    sender_balance = await getMemberBalance(guild_id, sender_id)
-    if sender_balance - amount < 0:
-        missing_funds = 0 - (sender_balance - amount)
-        raise InsufficientFundsException(f'Sender is missing {missing_funds} funds', missing_funds)
-    sender_new_balance = await addToMemberBalance(guild_id, sender_id, amount * -1)
+    try:
+        sender_new_balance = await addToMemberBalance(guild_id, sender_id, amount * -1)
+    except NegativeBalanceException as e:
+        raise InsufficientFundsException(f'Insufficient funds. Sender is missing {e.missing_funds}', e.missing_funds)
     await addToMemberBalance(guild_id, receiver_id, amount)
     return sender_new_balance

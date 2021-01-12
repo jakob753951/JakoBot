@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 import json
 import discord
 from discord.ext import commands
-from discord.ext.commands.errors import CommandInvokeError
 from Configuration import *
 import CurrencyManager as currency
+from CustomExceptions import *
 
 requirements = {'general': [], 'server': ['react_confirm']}
 
@@ -169,7 +169,10 @@ class Drops(commands.Cog):
 
 		amount = drop['pick_value' if take_kind == 'pick' else 'run_value']
 
-		await currency.addToMemberBalance(ctx.guild.id, ctx.author.id, amount)
+		try:
+			await currency.addToMemberBalance(ctx.guild.id, ctx.author.id, amount)
+		except NegativeBalanceException:
+			await currency.setMemberBalance(ctx.guild.id, ctx.author.id, 0)
 
 		try:
 			drop_message = await ctx.channel.fetch_message(drop['message_id'])
