@@ -4,12 +4,22 @@ import importlib
 
 def generate_all():
 	cogs_dir = "enabled_cogs"
-	general = ['token', 'prefix', 'description', 'name']
+	general = ['token', 'prefix', 'description', 'name', 'owner_id']
 	server = []
-	for file in [''.join(f.split('.')[:-1]) for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
-		requirements = importlib.import_module(f'{cogs_dir}.{file}').requirements
-		general.extend(requirements['general'])
-		server.extend(requirements['server'])
+	try:
+		for file in [''.join(f.split('.')[:-1]) for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
+			requirements = importlib.import_module(f'{cogs_dir}.{file}').requirements
+			general.extend(requirements['general'])
+			server.extend(requirements['server'])
+	except Exception as e:
+		print(f'something went wrong: {e}\nContinue? [y/n]')
+		resp = input()
+		if resp != 'y':
+			return
+		generate_server_cfg(server)
+		generate_general_cfg(general, server)
+		generate_all()
+		return
 
 	general = list(set(general))
 	server = list(set(server))
@@ -44,7 +54,7 @@ class Configuration:
 		sep = ',\n\t\t'
 		cfg_file.write(f"""
 def load_config(filename):
-	with open(filename) as cfg_file:
+	with open(filename, encoding='utf8') as cfg_file:
 		jsonfile = json.loads(cfg_file.read())
 
 	args = [

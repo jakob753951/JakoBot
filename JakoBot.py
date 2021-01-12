@@ -10,13 +10,16 @@ GenerateConfig.generate_all()
 
 from Configuration import *
 
+print('Loading config...')
 cfg = load_config('config.json')
 
 intents = discord.Intents.default()
 intents.members = True
 
+print('making bot...')
 bot = commands.Bot(command_prefix=commands.when_mentioned_or(cfg.prefix), description=cfg.description, intents=intents, pm_help=True)
 
+print('loading cogs...')
 #load cogs from cogs_dir
 cogs_dir = "enabled_cogs"
 if __name__ == '__main__':
@@ -58,6 +61,7 @@ async def reload(ctx, extension_name: str):
 		await ctx.send(f'Extension {extension_name} reloaded')
 	except Exception as e:
 		await ctx.send(f'An error occurrred while reloading: "{repr(e)}"')
+
 
 print('Starting bot...')
 bot.run(cfg.token)
