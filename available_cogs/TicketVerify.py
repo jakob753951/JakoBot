@@ -36,7 +36,7 @@ class TicketVerify(commands.Cog):
 		overwrites = {
 			ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False),
 			role_staff: discord.PermissionOverwrite(read_messages=True),
-			verifying: discord.PermissionOverwrite(read_messages=True)
+			verifying: discord.PermissionOverwrite(read_messages=True, send_messages=True, attach_files=True)
 		}
 
 		created_channel = await category.create_text_channel(chan_name, overwrites=overwrites)
@@ -47,12 +47,12 @@ class TicketVerify(commands.Cog):
 	async def confirmverify(self, ctx):
 		server_cfg = self.cfg.servers[ctx.message.guild.id]
 
-		if ctx.channel.id not in self.verification_channels:
-			await self.send_delete_after_delay(ctx, 'This is not a verification channel.', 5)
-			return
-
 		if not self.can_member_verify(ctx.author, server_cfg.roles_can_verify):
 			await self.send_delete_after_delay(ctx, 'You do not have permission to verify.', 5)
+			return
+
+		if ctx.channel.id not in self.verification_channels:
+			await self.send_delete_after_delay(ctx, 'This is not a verification channel.', 5)
 			return
 
 		category = await self.bot.fetch_channel(server_cfg.cate_verify_storage)
