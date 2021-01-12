@@ -18,7 +18,6 @@ def pluralise(server_cfg, amount):
 	else:
 		return server_cfg.currency_name_plural
 
-
 class Drops(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -108,6 +107,12 @@ class Drops(commands.Cog):
 
 		self.save_data()
 
+
+	def is_admin(self, ctx):
+		role = ctx.guild.get_role(self.cfg.servers[ctx.guild.id].admin_role)
+		return role in ctx.author.roles
+
+	@commands.check(is_admin)
 	@commands.command(name='AddDrops', aliases=['adddrops', 'enabledrops', 'editdrops', 'changedrops', 'dropsadd', 'dropsenable', 'dropsedit', 'dropschange'])
 	async def add_drops(self, ctx, channel: discord.TextChannel = None, chance: float = 0.05, minutes_between = 10):
 		if not channel:
@@ -134,6 +139,7 @@ class Drops(commands.Cog):
 
 		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 
+	@commands.check(is_admin)
 	@commands.command(name='RemoveDrops', aliases=['removedrops', 'disabledrops'])
 	async def remove_drops(self, ctx, channel: discord.TextChannel = None):
 		if not channel:
@@ -179,9 +185,9 @@ class Drops(commands.Cog):
 		except Exception:
 			drop_message = None
 
-		await ctx.message.delete()
 		if drop_message:
 			await drop_message.delete()
+		await ctx.message.delete()
 
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
 		sent_msg = await ctx.send(text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount)))
