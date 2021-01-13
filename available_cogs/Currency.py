@@ -1,5 +1,5 @@
 from CustomExceptions import InsufficientFundsException
-import asyncio
+from datetime import datetime
 import discord
 from discord.errors import DiscordException
 from discord.ext import commands
@@ -45,15 +45,26 @@ class Currency(commands.Cog):
 	async def clear_currency(self, ctx, member: discord.Member):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await manager.setMemberBalance(ctx.guild.id, member.id, 0)
-		await self.transaction_log(ctx.guild.id, f"{ctx.author.mention} cleared {member.mention}'s balance.")
+		chan_rx = await self.bot.fetch_channel(msg_cfg.chan_transaction_history)
+		chan_rx.send(f'Cleared the balance of {member.mention}')
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
-	@commands.command(name='Give', aliases=['give', 'send'])
+	@commands.command(name='Give', aliases=['give', 'send', 'share'])
 	async def give(self, ctx, member: discord.Member, amount: int):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
+		if amount < 0:
+			sent_msg = await ctx.send("Nice try. You can't send negative money...")
+			await sent_msg.delete()
+			return
+		if amount == 0:
+			sent_msg = await ctx.send('You have to send *something*.')
+			await sent_msg.delete()
+			return
+
 		try:
 			sender_new_balance = await manager.transferBetweenMembers(ctx.guild.id, ctx.author.id, member.id, amount)
 			await ctx.send(f'Funds have been sent. Your new balance is {sender_new_balance} {pluralise(self.cfg.servers[ctx.guild.id], sender_new_balance)}')
+			await self.transaction_log(msg_cfg, member, amount, ctx.author)
 		except InsufficientFundsException as e:
 			await ctx.send(f"You don't have enough money to send. You're missing {e.missing_funds}")
 			return
@@ -67,10 +78,29 @@ class Currency(commands.Cog):
 
 		await ctx.send(f"{member.mention}'s current balance is {current_balance} {pluralise(self.cfg.servers[ctx.guild.id], current_balance)}")
 
-	async def transaction_log(self, guild_id, message):
-		msg_cfg = self.cfg.servers[guild_id]
+	@commands.command(name='Leaderboard', aliases=['leaderboard', 'lb', 'scoreboard'])
+	async def leaderboard(self, ctx, limit: int = 10):
+		guild = self.bot.get_guild(ctx.guild.id)
+		leaderboard = await manager.getTopRichest(guild.id)
+
+		await ctx.send('\n'.join([f'{guild.get_member(member[0]).display_name}: {member[1]}' for member in leaderboard]))
+
+
+	async def transaction_log(self, msg_cfg, recipient: discord.Member, amount: int, sender: discord.Member = None):
 		chan_rx = await self.bot.fetch_channel(msg_cfg.chan_transaction_history)
-		await chan_rx.send(message)
+
+		if sender:
+			desc = f'{sender.mention} sent {recipient.mention} {amount} {pluralise(msg_cfg, amount)}'
+		else:
+			desc = f"{recipient.mention} {'got' if amount >= 0 else 'lost'} {amount} {pluralise(msg_cfg, amount)}"
+
+		embed = discord.Embed(color=0x0000ff, title=f'User received money:', description=desc, timestamp=datetime.utcnow())
+		embed.set_author(name=f'{recipient.name}#{recipient.discriminator}', icon_url=recipient.avatar_url)
+		if sender:
+			embed.add_field(name='Sender: ', value=f'{sender.name}#{sender.discriminator}', inline=True)
+		embed.add_field(name='Amount: ', value=amount, inline=True)
+
+		await chan_rx.send(embed=embed)
 
 
 def setup(bot):

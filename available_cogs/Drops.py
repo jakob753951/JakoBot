@@ -4,11 +4,11 @@ from datetime import datetime, timedelta
 import json
 import discord
 from discord.ext import commands
-from discord.ext.commands.errors import CommandInvokeError
 from Configuration import *
 import CurrencyManager as currency
+from CustomExceptions import *
 
-requirements = {'general': [], 'server': ['react_confirm']}
+requirements = {'general': [], 'server': ['react_confirm', 'currency_name_singular', 'currency_name_plural', 'role_admin']}
 
 fmt = "%Y-%m-%dT%H:%M:%S"
 
@@ -17,7 +17,6 @@ def pluralise(server_cfg, amount):
 		return server_cfg.currency_name_singular
 	else:
 		return server_cfg.currency_name_plural
-
 
 class Drops(commands.Cog):
 	def __init__(self, bot):
@@ -37,6 +36,22 @@ class Drops(commands.Cog):
 	def save_data(self):
 		with open('data/DropChannels.json', 'w') as data_file:
 			data_file.write(json.dumps(self.data, indent=4))
+
+	async def transaction_log(self, msg_cfg, recipient: discord.Member, amount: int, sender: discord.Member = None):
+		chan_rx = await self.bot.fetch_channel(msg_cfg.chan_transaction_history)
+
+		if sender:
+			desc = f'{sender.mention} sent {recipient.mention} {amount} {pluralise(msg_cfg, amount)}'
+		else:
+			desc = f"{recipient.mention} {'got' if amount >= 0 else 'lost'} {abs(amount)} {pluralise(msg_cfg, amount)}"
+
+		embed = discord.Embed(color=0x0000ff, title=f'User received money:', description=desc, timestamp=datetime.utcnow())
+		embed.set_author(name=f'{recipient.name}#{recipient.discriminator}', icon_url=recipient.avatar_url)
+		if sender:
+			embed.add_field(name='Sender: ', value=f'{sender.name}#{sender.discriminator}', inline=True)
+		embed.add_field(name='Amount: ', value=amount, inline=True)
+
+		await chan_rx.send(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
@@ -96,7 +111,7 @@ class Drops(commands.Cog):
 			curr_name=pluralise(msg_cfg, drop['pick_value'])
 		)
 
-		embed = discord.Embed(color=0xff0000, title='A drop has appeared!', description=desc, timestamp=datetime.utcnow())	
+		embed = discord.Embed(color=0xff0000, title='A drop has appeared!', description=desc, timestamp=datetime.utcnow())
 		embed.set_image(url=f"https://ladegaardmoeller.dk/JakoBot/Drops/Images/{chosen_drop['drop_image']}")
 		sent_msg = await message.channel.send(embed=embed)
 
@@ -108,6 +123,12 @@ class Drops(commands.Cog):
 
 		self.save_data()
 
+
+	def is_admin(self, ctx):
+		role = ctx.guild.get_role(self.cfg.servers[ctx.guild.id].role_admin)
+		return role in ctx.author.roles
+
+	@commands.check(is_admin)
 	@commands.command(name='AddDrops', aliases=['adddrops', 'enabledrops', 'editdrops', 'changedrops', 'dropsadd', 'dropsenable', 'dropsedit', 'dropschange'])
 	async def add_drops(self, ctx, channel: discord.TextChannel = None, chance: float = 0.05, minutes_between = 10):
 		if not channel:
@@ -134,6 +155,7 @@ class Drops(commands.Cog):
 
 		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 
+	@commands.check(is_admin)
 	@commands.command(name='RemoveDrops', aliases=['removedrops', 'disabledrops'])
 	async def remove_drops(self, ctx, channel: discord.TextChannel = None):
 		if not channel:
@@ -169,16 +191,21 @@ class Drops(commands.Cog):
 
 		amount = drop['pick_value' if take_kind == 'pick' else 'run_value']
 
-		await currency.addToMemberBalance(ctx.guild.id, ctx.author.id, amount)
+		try:
+			await currency.addToMemberBalance(ctx.guild.id, ctx.author.id, amount)
+		except NegativeBalanceException:
+			await currency.setMemberBalance(ctx.guild.id, ctx.author.id, 0)
+
+		await self.transaction_log(msg_cfg, ctx.author, amount)
 
 		try:
 			drop_message = await ctx.channel.fetch_message(drop['message_id'])
 		except Exception:
 			drop_message = None
 
-		await ctx.message.delete()
 		if drop_message:
 			await drop_message.delete()
+		await ctx.message.delete()
 
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
 		sent_msg = await ctx.send(text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount)))
