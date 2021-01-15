@@ -1,5 +1,4 @@
 from CustomExceptions import InsufficientFundsException
-import asyncio
 import discord
 from discord.errors import DiscordException
 from discord.ext import commands
