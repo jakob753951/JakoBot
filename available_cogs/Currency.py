@@ -1,10 +1,11 @@
+import asyncio
 from CustomExceptions import InsufficientFundsException
 from datetime import datetime
 import discord
-from discord.errors import DiscordException
 from discord.ext import commands
 from Configuration import *
 import CurrencyManager as manager
+from CustomChecks import *
 
 requirements = {
 	'general': [],
@@ -27,6 +28,7 @@ class Currency(commands.Cog):
 		self.bot = bot
 		self.cfg = load_config('config.json')
 
+	@commands.check(is_admin)
 	@commands.command(name='AddCurrency', aliases=['addcurrency', 'awardcurrency', 'award'])
 	async def add_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
@@ -34,6 +36,7 @@ class Currency(commands.Cog):
 		await self.transaction_log(ctx.guild.id, f'{ctx.author.mention} added {amount} {pluralise(msg_cfg, amount)} to {member.mention}.{f" reason: " + reason if reason else ""}')
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
+	@commands.check(is_admin)
 	@commands.command(name='RemoveCurrency', aliases=['removecurrency'])
 	async def remove_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
@@ -41,6 +44,7 @@ class Currency(commands.Cog):
 		await self.transaction_log(ctx.guild.id, f'{ctx.author.mention} removed {amount} {pluralise(msg_cfg, amount)} from {member.mention}.{" reason: " + reason if reason else ""}')
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
+	@commands.check(is_admin)
 	@commands.command(name='ClearCurrency', aliases=['clearcurrency'])
 	async def clear_currency(self, ctx, member: discord.Member):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
@@ -54,11 +58,15 @@ class Currency(commands.Cog):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		if amount < 0:
 			sent_msg = await ctx.send("Nice try. You can't send negative money...")
+			await asyncio.sleep(5)
 			await sent_msg.delete()
+			await ctx.message.delete()
 			return
 		if amount == 0:
-			sent_msg = await ctx.send('You have to send *something*.')
+			sent_msg = await ctx.send('You have to send ***something***.')
+			await asyncio.sleep(5)
 			await sent_msg.delete()
+			await ctx.message.delete()
 			return
 
 		try:
@@ -81,9 +89,9 @@ class Currency(commands.Cog):
 	@commands.command(name='Leaderboard', aliases=['leaderboard', 'lb', 'scoreboard'])
 	async def leaderboard(self, ctx, limit: int = 10):
 		guild = self.bot.get_guild(ctx.guild.id)
-		leaderboard = await manager.getTopRichest(guild.id)
-
-		await ctx.send('\n'.join([f'{guild.get_member(member[0]).display_name}: {member[1]}' for member in leaderboard]))
+		leaderboard = await manager.getTopRichest(guild.id, limit)
+		place_strings = [f'{guild.get_member(member[0]).display_name}: {member[1]}' for member in leaderboard]
+		await ctx.send('\n'.join(place_strings))
 
 
 	async def transaction_log(self, msg_cfg, recipient: discord.Member, amount: int, sender: discord.Member = None):
