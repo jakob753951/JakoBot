@@ -3,11 +3,11 @@ from typing import List, Tuple
 from CustomExceptions import *
 
 def load_data():
-    with open('data/MainData.json') as data_file:
+    with open('data/Balances.json') as data_file:
         return json.loads(data_file.read())
 
 def save_data(data):
-    with open('data/MainData.json', 'w') as data_file:
+    with open('data/Balances.json', 'w') as data_file:
         data_file.write(json.dumps(data, indent=4))
 
 async def getMemberBalance(guild_id, member_id) -> int:
