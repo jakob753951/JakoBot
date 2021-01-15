@@ -7,6 +7,7 @@ from discord.ext import commands
 from Configuration import *
 import CurrencyManager as currency
 from CustomExceptions import *
+from CustomChecks import *
 
 requirements = {'general': [], 'server': ['react_confirm', 'currency_name_singular', 'currency_name_plural', 'role_admin']}
 
@@ -123,11 +124,6 @@ class Drops(commands.Cog):
 
 		self.save_data()
 
-
-	def is_admin(self, ctx):
-		role = ctx.guild.get_role(self.cfg.servers[ctx.guild.id].role_admin)
-		return role in ctx.author.roles
-
 	@commands.check(is_admin)
 	@commands.command(name='AddDrops', aliases=['adddrops', 'enabledrops', 'editdrops', 'changedrops', 'dropsadd', 'dropsenable', 'dropsedit', 'dropschange'])
 	async def add_drops(self, ctx, channel: discord.TextChannel = None, chance: float = 0.05, minutes_between = 10):
@@ -180,10 +176,7 @@ class Drops(commands.Cog):
 		self.load_data()
 
 		if not self.data[str(ctx.channel.id)]['active_drops']:
-			sent_msg = await ctx.send('Nothing to be picked!')
 			await ctx.message.delete()
-			await asyncio.sleep(5)
-			await sent_msg.delete()
 			return
 
 		drop = self.data[str(ctx.channel.id)]['active_drops'].pop()
