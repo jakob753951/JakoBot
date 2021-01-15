@@ -33,7 +33,7 @@ class Currency(commands.Cog):
 	async def add_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await manager.addToMemberBalance(ctx.guild.id, member.id, amount)
-		await self.transaction_log(ctx.guild.id, f'{ctx.author.mention} added {amount} {pluralise(msg_cfg, amount)} to {member.mention}.{f" reason: " + reason if reason else ""}')
+		await self.transaction_log(msg_cfg, f'{ctx.author.mention} added {amount} {pluralise(msg_cfg, amount)} to {member.mention}.{f" reason: " + reason if reason else ""}')
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
 	@commands.check(is_admin)
@@ -41,7 +41,7 @@ class Currency(commands.Cog):
 	async def remove_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await manager.addToMemberBalance(ctx.guild.id, member.id, amount * -1)
-		await self.transaction_log(ctx.guild.id, f'{ctx.author.mention} removed {amount} {pluralise(msg_cfg, amount)} from {member.mention}.{" reason: " + reason if reason else ""}')
+		await self.transaction_log(msg_cfg, f'{ctx.author.mention} removed {amount} {pluralise(msg_cfg, amount)} from {member.mention}.{" reason: " + reason if reason else ""}')
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
 	@commands.check(is_admin)
