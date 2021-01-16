@@ -96,7 +96,7 @@ class Drops(commands.Cog):
 			curr_name=pluralise(msg_cfg, drop['pick_value'])
 		)
 
-		embed = discord.Embed(color=0xff0000, title='A drop has appeared!', description=desc, timestamp=datetime.utcnow())	
+		embed = discord.Embed(color=0xff0000, title='A drop has appeared!', description=desc, timestamp=datetime.utcnow())
 		embed.set_image(url=f"https://ladegaardmoeller.dk/JakoBot/Drops/Images/{chosen_drop['drop_image']}")
 		sent_msg = await message.channel.send(embed=embed)
 
