@@ -1,3 +1,4 @@
+from CustomChecks import is_admin
 import asyncio
 import random
 from datetime import datetime, timedelta
@@ -108,8 +109,9 @@ class Drops(commands.Cog):
 
 		self.save_data()
 
+	@commands.check(is_admin)
 	@commands.command(name='AddDrops', aliases=['adddrops', 'enabledrops', 'editdrops', 'changedrops', 'dropsadd', 'dropsenable', 'dropsedit', 'dropschange'])
-	async def add_drops(self, ctx, channel: discord.TextChannel = None, chance: float = 0.05, minutes_between = 10):
+	async def add_drops(self, ctx, channel: discord.TextChannel = None, chance: float = 0.05, minutes_between = 2):
 		if not channel:
 			channel = ctx.channel
 
@@ -134,6 +136,7 @@ class Drops(commands.Cog):
 
 		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 
+	@commands.check(is_admin)
 	@commands.command(name='RemoveDrops', aliases=['removedrops', 'disabledrops'])
 	async def remove_drops(self, ctx, channel: discord.TextChannel = None):
 		if not channel:
