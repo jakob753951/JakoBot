@@ -72,7 +72,7 @@ class Rewards(commands.Cog):
 		cur_time = datetime.utcnow()
 		if not available_time < cur_time:
 			title = f'Reward not yet available.'
-			embed = discord.Embed(color=0x0000ff, title=title, timestamp=available_time)
+			embed = discord.Embed(color=0xff0000, title=title, timestamp=available_time)
 			embed.set_footer(text='Next reward will be available: ')
 			await ctx.send(embed=embed)
 			return
