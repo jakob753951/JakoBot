@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 import GenerateConfig
 
-print('Generating config...')
+print('Generating configs...')
 GenerateConfig.generate_all()
 
 from Configuration import *

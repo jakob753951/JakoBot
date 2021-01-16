@@ -58,7 +58,7 @@ class Logging(commands.Cog):
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
-		webhook = Webhook.from_url(self.cfg.servers[member.guild_id].member_log_webhook_url, adapter=RequestsWebhookAdapter())
+		webhook = Webhook.from_url(self.cfg.servers[member.guild.id].member_log_webhook_url, adapter=RequestsWebhookAdapter())
 		webhook.send(embed=embed)
 
 	@commands.Cog.listener()
@@ -69,7 +69,7 @@ class Logging(commands.Cog):
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
-		webhook = Webhook.from_url(self.cfg.servers[member.guild_id].member_log_webhook_url, adapter=RequestsWebhookAdapter())
+		webhook = Webhook.from_url(self.cfg.servers[member.guild.id].member_log_webhook_url, adapter=RequestsWebhookAdapter())
 		webhook.send(embed=embed)
 
 	def get_member_count(self, guild: discord.Guild):

@@ -9,8 +9,8 @@ class TruthOrDare(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
-		with open('data/TruthOrDare.json', 'r', encoding="utf8") as question_file:
-			self.questions = json.loads(question_file.read())
+		with open('data/TruthOrDare.json', 'r', encoding="utf8") as prompt_file:
+			self.questions = json.loads(prompt_file.read())
 
 	@commands.command(name='truth or dare', aliases=['tord', 'truthordare'])
 	async def truth_or_dare(self, ctx, *, category = 'sfw'):

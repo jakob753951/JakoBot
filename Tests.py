@@ -2,9 +2,9 @@ import CurrencyManager as cm
 import asyncio
 import random
 
-guild_id = 573247001672548353
-user_1 = 143784050815926272
-user_2 = 246479789706182656
+guild_id = 1
+user_1 = 1
+user_2 = 2
 
 async def setAndGetDataReturnsSetData():
     value_to_set = random.randint(0, 10000)
