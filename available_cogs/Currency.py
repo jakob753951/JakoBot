@@ -64,7 +64,9 @@ class Currency(commands.Cog):
 
 		current_balance = await manager.getMemberBalance(ctx.guild.id, member.id)
 
-		await ctx.send(f"{member.mention}'s current balance is {current_balance} {pluralise(self.cfg.servers[ctx.guild.id], current_balance)}")
+		balance_text = f"{member.mention}'s current balance is {current_balance} {pluralise(self.cfg.servers[ctx.guild.id], current_balance)}"
+		embed = discord.Embed(color=0x1111ff, description=balance_text)
+		await ctx.send(embed=embed)
 
 	async def transaction_log(self, guild_id, message):
 		msg_cfg = self.cfg.servers[guild_id]
