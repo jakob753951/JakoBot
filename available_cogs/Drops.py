@@ -57,7 +57,7 @@ class Drops(commands.Cog):
 		channel_data = self.data[str(message.channel.id)]
 
 		# Check that channel has not had a drop recently
-		last_message_time = datetime.strptime(channel_data['last_drop'], "%Y-%m-%dT%H:%M:%S")
+		last_message_time = datetime.strptime(channel_data['last_drop'], fmt)
 		available_time = last_message_time + timedelta(minutes=channel_data['minute_difference'])
 
 		cur_time = datetime.utcnow()
