@@ -26,7 +26,7 @@ class Currency(commands.Cog):
 		self.bot = bot
 		self.cfg = load_config('config.json')
 
-	@commands.command(name='AddCurrency', aliases=['addcurrency', 'awardcurrency', 'award'])
+	@commands.command(name='AddCurrency', aliases=['addcurrency'])
 	async def add_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await manager.addToMemberBalance(ctx.guild.id, member.id, amount)
