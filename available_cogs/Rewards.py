@@ -50,14 +50,15 @@ class Rewards(commands.Cog):
 
 		if not str(guild_id) in rewards:
 			raise ValueError('Rewards have not been registered for this server.')
-		if not str(reward_id) in rewards[str(guild_id)]:
+		reward_list = [reward for reward in rewards[str(guild_id)] if reward['id'] == reward_id]
+		if len(reward_list) != 1:
 			raise ValueError('Invalid reward id. Please try again with a correct one.')
 
-		return rewards[str(guild_id)][str(reward_id)]
+		return reward_list[0]
 
 	@commands.guild_only()
 	@commands.command(name='Reward', aliases=['reward', 'award'])
-	async def reward(self, ctx, member: discord.Member, reward_id: int):
+	async def reward(self, ctx, member: discord.Member, reward_id: str):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		try:
 			reward = self.get_reward(ctx.guild.id, reward_id)
@@ -84,6 +85,24 @@ class Rewards(commands.Cog):
 
 		await transaction_log(self.bot, msg_cfg, member, amount, title=f"User was rewarded by {ctx.author.name} for task number {reward_id}: {reward['name']}")
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
+
+	@commands.guild_only()
+	@commands.command(name='PostRewards', aliases=['postrewards', 'posttasks'])
+	async def post_rewards(self, ctx, channel: discord.TextChannel = None):
+		msg_cfg = self.cfg.servers[ctx.guild.id]
+		if not channel:
+			channel = ctx.channel
+
+		with open('data/Rewards.json') as rewards_file:
+			rewards = json.loads(rewards_file.read())
+		embed = discord.Embed(color=0x00ff00, title='Task list:', timestamp=datetime.utcnow())
+		embed.set_footer(text='Last updated at:')
+		for reward in rewards[str(ctx.guild.id)]:
+			nl = '\n'
+			desc = f"{reward['description']}{nl}{reward['amount']} {pluralise(msg_cfg, reward['amount'])}"
+			embed.add_field(name=reward['name'], value=desc, inline=False)
+
+		await channel.send(embed=embed)
 
 
 def setup(bot):
