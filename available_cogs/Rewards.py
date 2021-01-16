@@ -80,10 +80,10 @@ class Rewards(commands.Cog):
 
 		amount = reward['amount']
 
-		self.set_cooldown(ctx.guild.id, member.id, reward_id)
+		self.set_cooldown(ctx.guild.id, member.id, reward_id.lower())
 		await manager.addToMemberBalance(ctx.guild.id, member.id, amount)
 
-		await transaction_log(self.bot, guild_cfg, member, amount, title=f"User was rewarded by {ctx.author.name} for task number {reward_id}: {reward['name']}")
+		await transaction_log(self.bot, guild_cfg, member, amount, title=f"User was rewarded by {ctx.author.name} for task {reward_id.upper()}: {reward['name']}")
 		await ctx.message.add_reaction(guild_cfg.react_confirm)
 
 	@commands.guild_only()
@@ -99,8 +99,9 @@ class Rewards(commands.Cog):
 		embed.set_footer(text='Last updated at:')
 		for reward in rewards[str(ctx.guild.id)]:
 			nl = '\n'
+			title = f"{reward['id'].upper()}) {reward['name']}"
 			desc = f"{reward['description']}{nl}{reward['amount']} {pluralise(guild_cfg, reward['amount'])}"
-			embed.add_field(name=reward['name'], value=desc, inline=False)
+			embed.add_field(name=title, value=desc, inline=False)
 
 		await channel.send(embed=embed)
 
