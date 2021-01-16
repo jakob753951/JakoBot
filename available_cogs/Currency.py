@@ -1,6 +1,5 @@
 from CustomExceptions import InsufficientFundsException
 import discord
-from discord.errors import DiscordException
 from discord.ext import commands
 from Configuration import *
 import CurrencyManager as manager
