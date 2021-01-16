@@ -1,3 +1,4 @@
+from CustomChecks import is_admin
 import asyncio
 import random
 from datetime import datetime, timedelta
@@ -73,7 +74,7 @@ class Drops(commands.Cog):
 		channel_data = self.data[str(message.channel.id)]
 
 		# Check that channel has not had a drop recently
-		last_message_time = datetime.strptime(channel_data['last_drop'], "%Y-%m-%dT%H:%M:%S")
+		last_message_time = datetime.strptime(channel_data['last_drop'], fmt)
 		available_time = last_message_time + timedelta(minutes=channel_data['minute_difference'])
 
 		cur_time = datetime.utcnow()
@@ -126,7 +127,7 @@ class Drops(commands.Cog):
 
 	@commands.check(is_admin)
 	@commands.command(name='AddDrops', aliases=['adddrops', 'enabledrops', 'editdrops', 'changedrops', 'dropsadd', 'dropsenable', 'dropsedit', 'dropschange'])
-	async def add_drops(self, ctx, channel: discord.TextChannel = None, chance: float = 0.05, minutes_between = 10):
+	async def add_drops(self, ctx, channel: discord.TextChannel = None, chance: float = 0.05, minutes_between = 2):
 		if not channel:
 			channel = ctx.channel
 

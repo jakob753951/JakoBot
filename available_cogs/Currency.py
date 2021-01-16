@@ -1,6 +1,5 @@
 import asyncio
 from CustomExceptions import InsufficientFundsException
-from datetime import datetime
 import discord
 from discord.ext import commands
 from Configuration import *
@@ -24,7 +23,7 @@ class Currency(commands.Cog):
 		self.cfg = load_config('config.json')
 
 	@commands.check(is_admin)
-	@commands.command(name='AddCurrency', aliases=['addcurrency', 'awardcurrency', 'award'])
+	@commands.command(name='AddCurrency', aliases=['addcurrency'])
 	async def add_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await manager.addToMemberBalance(ctx.guild.id, member.id, amount)
@@ -79,7 +78,9 @@ class Currency(commands.Cog):
 
 		current_balance = await manager.getMemberBalance(ctx.guild.id, member.id)
 
-		await ctx.send(f"{member.mention}'s current balance is {current_balance} {pluralise(self.cfg.servers[ctx.guild.id], current_balance)}")
+		balance_text = f"{member.mention}'s current balance is {current_balance} {pluralise(self.cfg.servers[ctx.guild.id], current_balance)}"
+		embed = discord.Embed(color=0x1111ff, description=balance_text)
+		await ctx.send(embed=embed)
 
 	@commands.command(name='Leaderboard', aliases=['leaderboard', 'lb', 'scoreboard'])
 	async def leaderboard(self, ctx, limit: int = 10):
