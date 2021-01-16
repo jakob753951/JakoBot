@@ -59,7 +59,7 @@ class Rewards(commands.Cog):
 	@commands.guild_only()
 	@commands.command(name='Reward', aliases=['reward', 'award'])
 	async def reward(self, ctx, member: discord.Member, reward_id: str):
-		msg_cfg = self.cfg.servers[ctx.guild.id]
+		guild_cfg = self.cfg.servers[ctx.guild.id]
 		try:
 			reward = self.get_reward(ctx.guild.id, reward_id)
 		except ValueError as e:
@@ -83,13 +83,13 @@ class Rewards(commands.Cog):
 		self.set_cooldown(ctx.guild.id, member.id, reward_id)
 		await manager.addToMemberBalance(ctx.guild.id, member.id, amount)
 
-		await transaction_log(self.bot, msg_cfg, member, amount, title=f"User was rewarded by {ctx.author.name} for task number {reward_id}: {reward['name']}")
-		await ctx.message.add_reaction(msg_cfg.react_confirm)
+		await transaction_log(self.bot, guild_cfg, member, amount, title=f"User was rewarded by {ctx.author.name} for task number {reward_id}: {reward['name']}")
+		await ctx.message.add_reaction(guild_cfg.react_confirm)
 
 	@commands.guild_only()
 	@commands.command(name='PostRewards', aliases=['postrewards', 'posttasks'])
 	async def post_rewards(self, ctx, channel: discord.TextChannel = None):
-		msg_cfg = self.cfg.servers[ctx.guild.id]
+		guild_cfg = self.cfg.servers[ctx.guild.id]
 		if not channel:
 			channel = ctx.channel
 
@@ -99,7 +99,7 @@ class Rewards(commands.Cog):
 		embed.set_footer(text='Last updated at:')
 		for reward in rewards[str(ctx.guild.id)]:
 			nl = '\n'
-			desc = f"{reward['description']}{nl}{reward['amount']} {pluralise(msg_cfg, reward['amount'])}"
+			desc = f"{reward['description']}{nl}{reward['amount']} {pluralise(guild_cfg, reward['amount'])}"
 			embed.add_field(name=reward['name'], value=desc, inline=False)
 
 		await channel.send(embed=embed)
