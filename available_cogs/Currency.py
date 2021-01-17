@@ -27,7 +27,7 @@ class Currency(commands.Cog):
 	async def add_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await manager.addToMemberBalance(ctx.guild.id, member.id, amount)
-		await transaction_log(self.bot, msg_cfg, member, amount, title=f'{ctx.author.user} added currency to this user:')
+		await transaction_log(self.bot, msg_cfg, member, amount, title=f'{ctx.author.name} added currency to this user:')
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
 	@commands.check(is_admin)
@@ -35,7 +35,7 @@ class Currency(commands.Cog):
 	async def remove_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await manager.addToMemberBalance(ctx.guild.id, member.id, amount * -1)
-		await transaction_log(self.bot, msg_cfg, member, amount * -1, title=f'{ctx.author.user} removed currency from this user:')
+		await transaction_log(self.bot, msg_cfg, member, amount * -1, title=f'{ctx.author.name} removed currency from this user:')
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
 	@commands.check(is_admin)
