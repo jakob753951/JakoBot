@@ -1,9 +1,14 @@
 from Configuration import load_config
 
 def is_admin(ctx):
-    cfg = load_config('config.json')
-    role = ctx.guild.get_role(cfg.servers[ctx.guild.id].role_admin)
-    return role in ctx.author.roles
+	cfg = load_config('config.json')
+	role = ctx.guild.get_role(cfg.servers[ctx.guild.id].role_admin)
+	return role in ctx.author.roles
+
+def is_staff(ctx):
+	cfg = load_config('config.json')
+	role = ctx.guild.get_role(cfg.servers[ctx.guild.id].role_staff)
+	return role in ctx.author.roles
 
 def can_verify(ctx):
 	cfg = load_config('config.json')
