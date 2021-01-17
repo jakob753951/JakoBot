@@ -12,7 +12,8 @@ requirements = {
 		'react_confirm',
 		'chan_transaction_history',
 		'currency_name_singular',
-		'currency_name_plural'
+		'currency_name_plural',
+		'role_staff'
 	]
 }
 
@@ -57,6 +58,7 @@ class Rewards(commands.Cog):
 		return reward_list[0]
 
 	@commands.guild_only()
+	@commands.is_staff()
 	@commands.command(name='Reward', aliases=['reward', 'award'])
 	async def reward(self, ctx, member: discord.Member, reward_id: str):
 		guild_cfg = self.cfg.servers[ctx.guild.id]
