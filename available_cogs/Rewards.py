@@ -84,7 +84,9 @@ class Rewards(commands.Cog):
 		await manager.addToMemberBalance(ctx.guild.id, member.id, amount)
 
 		await transaction_log(self.bot, guild_cfg, member, amount, title=f"User was rewarded by {ctx.author.name} for task {reward_id.upper()}: {reward['name']}")
-		await ctx.message.add_reaction(guild_cfg.react_confirm)
+		desc=f"{member.mention} was rewarded for task number {reward_id.upper()}: {reward['name']}"
+		embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
+		await ctx.send(embed=embed)
 
 	@commands.guild_only()
 	@commands.command(name='PostRewards', aliases=['postrewards', 'posttasks'])
