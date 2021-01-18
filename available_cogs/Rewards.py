@@ -58,9 +58,12 @@ class Rewards(commands.Cog):
 		return reward_list[0]
 
 	@commands.guild_only()
-	@commands.is_staff()
+	@commands.check(is_staff)
 	@commands.command(name='Reward', aliases=['reward', 'award'])
 	async def reward(self, ctx, member: discord.Member, reward_id: str):
+		if ctx.author == member:
+			return
+
 		guild_cfg = self.cfg.servers[ctx.guild.id]
 		try:
 			reward = self.get_reward(ctx.guild.id, reward_id)
@@ -91,6 +94,7 @@ class Rewards(commands.Cog):
 		await ctx.send(embed=embed)
 
 	@commands.guild_only()
+	@commands.check(is_admin)
 	@commands.command(name='PostRewards', aliases=['postrewards', 'posttasks'])
 	async def post_rewards(self, ctx, channel: discord.TextChannel = None):
 		guild_cfg = self.cfg.servers[ctx.guild.id]
