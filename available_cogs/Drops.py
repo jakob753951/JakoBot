@@ -202,9 +202,7 @@ class Drops(commands.Cog):
 		await ctx.message.delete()
 
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
-		sent_msg = await ctx.send(text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount)))
-		await asyncio.sleep(5)
-		await sent_msg.delete()
+		await ctx.send(text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount)))
 
 def setup(bot):
 	bot.add_cog(Drops(bot))
