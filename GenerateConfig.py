@@ -6,20 +6,20 @@ def generate_all():
 	cogs_dir = "enabled_cogs"
 	general = ['token', 'prefix', 'description', 'name', 'owner_id']
 	server = []
-	try:
-		for file in [''.join(f.split('.')[:-1]) for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
+	for file in [''.join(f.split('.')[:-1]) for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
+		try:
 			requirements = importlib.import_module(f'{cogs_dir}.{file}').requirements
 			general.extend(requirements['general'])
 			server.extend(requirements['server'])
-	except Exception as e:
-		print(f'something went wrong: {e}\nTry generating again? [y/n]')
-		resp = input()
-		if resp != 'y':
+		except Exception as e:
+			print(f'something went wrong while generating {file}: {e}\nTry generating again? [y/n]')
+			resp = input()
+			if resp != 'y':
+				return
+			generate_server_cfg(server)
+			generate_general_cfg(general, server)
+			generate_all()
 			return
-		generate_server_cfg(server)
-		generate_general_cfg(general, server)
-		generate_all()
-		return
 
 	general = list(set(general))
 	server = list(set(server))
