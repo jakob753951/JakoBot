@@ -22,7 +22,7 @@ class Currency(commands.Cog):
 		self.bot = bot
 		self.cfg = load_config('config.json')
 
-	@commands.check(is_admin)
+	@is_admin()
 	@commands.command(name='AddCurrency', aliases=['addcurrency'])
 	async def add_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
@@ -30,7 +30,7 @@ class Currency(commands.Cog):
 		await transaction_log(self.bot, msg_cfg, member, amount, title=f'{ctx.author.name} added currency to this user:')
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
-	@commands.check(is_admin)
+	@is_admin()
 	@commands.command(name='RemoveCurrency', aliases=['removecurrency'])
 	async def remove_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
@@ -38,7 +38,7 @@ class Currency(commands.Cog):
 		await transaction_log(self.bot, msg_cfg, member, amount * -1, title=f'{ctx.author.name} removed currency from this user:')
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
-	@commands.check(is_admin)
+	@is_admin()
 	@commands.command(name='ClearCurrency', aliases=['clearcurrency'])
 	async def clear_currency(self, ctx, member: discord.Member):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
