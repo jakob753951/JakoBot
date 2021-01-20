@@ -12,7 +12,7 @@ def generate_all():
 			general.extend(requirements['general'])
 			server.extend(requirements['server'])
 	except Exception as e:
-		print(f'something went wrong: {e}\nContinue? [y/n]')
+		print(f'something went wrong: {e}\nRegenerate Configs? [y/n]')
 		resp = input()
 		if resp != 'y':
 			return
