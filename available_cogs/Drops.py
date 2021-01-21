@@ -8,6 +8,7 @@ from Configuration import *
 import CurrencyManager as currency
 from CustomExceptions import *
 from CustomChecks import *
+import asyncio
 
 requirements = {'general': [], 'server': ['react_confirm', 'currency_name_singular', 'currency_name_plural', 'role_admin']}
 
@@ -28,7 +29,7 @@ class Drops(commands.Cog):
 		except Exception as e:
 			print(f'Error when loading DropChannels.json: {e}')
 			self.data = {}
-			print('defaulting to "\{\}"')
+			print('defaulting to "{}"')
 
 	def load_data(self):
 		with open('data/DropChannels.json') as data_file:
@@ -196,13 +197,16 @@ class Drops(commands.Cog):
 		except Exception:
 			drop_message = None
 
-		if drop_message:
-			await drop_message.delete()
-		await ctx.message.delete()
-
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
-		await ctx.send(text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount)))
+		to_do = [
+			ctx.send(text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount))),
+			ctx.message.delete()
+		]
 
+		if drop_message:
+			to_do.append(drop_message.delete())
+
+		await asyncio.gather(*to_do)
 
 def setup(bot):
 	bot.add_cog(Drops(bot))
