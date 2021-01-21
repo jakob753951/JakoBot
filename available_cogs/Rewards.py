@@ -66,12 +66,12 @@ class Rewards(commands.Cog):
 
 		guild_cfg = self.cfg.servers[ctx.guild.id]
 		try:
-			reward = self.get_reward(ctx.guild.id, reward_id)
+			reward = self.get_reward(ctx.guild.id, reward_id.lower())
 		except ValueError as e:
 			await ctx.send(repr(e))
 			return
 
-		last_reward_time = self.get_cooldown(ctx.guild.id, member.id, reward_id)
+		last_reward_time = self.get_cooldown(ctx.guild.id, member.id, reward_id.lower())
 
 		available_time = last_reward_time + timedelta(hours=reward['cooldown_in_hours'])
 
