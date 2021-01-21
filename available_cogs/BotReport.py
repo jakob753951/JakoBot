@@ -1,5 +1,4 @@
 import discord
-from discord import member
 from discord.errors import InvalidArgument
 from discord.ext import commands
 from Configuration import load_config
