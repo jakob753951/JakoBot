@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from Configuration import load_config
 from datetime import datetime
-import jsons
+import json
 from collections import defaultdict
 from dataclasses import dataclass
 
@@ -19,7 +19,6 @@ class Warning(commands.Cog):
 		self.bot = bot
 		self.cfg = load_config('config.json')
 		self.guilds = self.load_warnings()
-		jsons.suppress_warnings()
 
 	@commands.command(name='warn')
 	async def warn(self, ctx, user: discord.User, *, reason = '[no reason given]', strikes = 1):
@@ -62,12 +61,13 @@ class Warning(commands.Cog):
 					in warnings.items()
 				})
 				for guild_id, warnings
-				in jsons.loads(warning_file.read()).items()
+				in json.loads(warning_file.read()).items()
 			})
 
 	def save_warnings(self):
 		with open('data/Warning.json', 'w', encoding="utf8") as warning_file:
-			warning_file.write(jsons.dumps(self.guilds, indent=4))
+			warning_file.write(json.dumps(self.guilds, indent=4))
+
 
 def setup(bot):
 	bot.add_cog(Warning(bot))

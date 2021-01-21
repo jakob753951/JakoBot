@@ -1,5 +1,4 @@
 import discord
-from discord import member
 from discord.errors import InvalidArgument
 from discord.ext import commands
 from Configuration import load_config
@@ -53,6 +52,7 @@ class ForwardDM(commands.Cog):
 		desc = f'{member.mention} has been reported for being a bot. Should they be banned?'
 		embed = discord.Embed(description=desc)
 		return embed
+
 
 def setup(bot):
 	bot.add_cog(ForwardDM(bot))

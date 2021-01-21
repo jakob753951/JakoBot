@@ -1,6 +1,5 @@
 from os import listdir
 from os.path import isfile, join
-import asyncio
 import discord
 from discord.ext import commands
 import GenerateConfig
@@ -41,26 +40,30 @@ async def load(ctx, extension_name: str):
 	try:
 		bot.load_extension(f'{cogs_dir}.{extension_name}')
 		await ctx.send(f'Extension {extension_name} loaded')
+		embed = discord.Embed(color=0x00ff00, title=f'Extension {extension_name} loaded')
 	except Exception as e:
-		await ctx.send(f'An error occurrred while loading: "{repr(e)}"')
+		embed = discord.Embed(color=0xff0000, title='An error occurrred while loading:', description=repr(e))
+	await ctx.send(embed=embed)
 
 @bot.command()
 @commands.check(is_owner)
 async def unload(ctx, extension_name: str):
 	try:
 		bot.unload_extension(f'{cogs_dir}.{extension_name}')
-		await ctx.send(f'Extension {extension_name} unloaded')
+		embed = discord.Embed(color=0x00ff00, title=f'Extension {extension_name} unloaded')
 	except Exception as e:
-		await ctx.send(f'An error occurrred while unloading: "{repr(e)}"')
+		embed = discord.Embed(color=0xff0000, title='An error occurrred while unloading:', description=repr(e))
+	await ctx.send(embed=embed)
 
 @bot.command()
 @commands.check(is_owner)
 async def reload(ctx, extension_name: str):
 	try:
 		bot.reload_extension(f'{cogs_dir}.{extension_name}')
-		await ctx.send(f'Extension {extension_name} reloaded')
+		embed = discord.Embed(color=0x00ff00, title=f'Extension {extension_name} reloaded')
 	except Exception as e:
-		await ctx.send(f'An error occurrred while reloading: "{repr(e)}"')
+		embed = discord.Embed(color=0xff0000, title='An error occurrred while reloading:', description=repr(e))
+	await ctx.send(embed=embed)
 
 
 print('Starting bot...')

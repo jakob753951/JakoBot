@@ -1,24 +1,17 @@
 import discord
 from discord.ext import commands
 from Configuration import load_config
+from CustomChecks import *
 
 requirements = {'general': [], 'server': ['roles_can_verify', 'role_unverified', 'role_verified', 'chan_verify_rx']}
 
-async def can_verify(ctx):
-	cfg = load_config('config.json')
-	for allowed in cfg.servers[ctx.guild.id].roles_can_verify:
-		if ctx.guild.get_role(allowed) in ctx.author.roles:
-			return True
-	return False
-
 class Verify(commands.Cog):
-
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
 		self.recently_verified = set()
 
-	@commands.check(can_verify)
+	@can_verify()
 	@commands.command()
 	async def verify(self, ctx, member: discord.Member, *, details = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
@@ -42,7 +35,6 @@ class Verify(commands.Cog):
 		self.recently_verified.remove(member.id)
 
 		await self.post_welcome_message(member, ctx.author, details)
-
 
 	@commands.Cog.listener()
 	async def on_member_update(self, before: discord.Member, after: discord.Member):

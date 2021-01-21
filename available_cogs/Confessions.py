@@ -5,20 +5,18 @@ from datetime import datetime
 import random
 import json
 
-requirements = {'general': ['chan_confessions'], 'server': ['react_confirm']}
+requirements = {'general': ['chan_confessions'], 'server': []}
 
 class Confessions(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')
-		with open('data/Confessions.json', 'r', encoding="utf8") as question_file:
-			self.confessions = json.loads(question_file.read())
+		with open('data/Confessions.json', 'r', encoding="utf8") as confessions_file:
+			self.confessions = json.loads(confessions_file.read())
 
+	@commands.dm_only()
 	@commands.command(name='Confession', aliases=['confession', 'confess'])
 	async def confession(self, ctx, *, text):
-		if not isinstance(ctx.channel, discord.channel.DMChannel):
-			return
-
 		random.seed(ctx.author.id)
 		user_id = random.randint(1, 10000000) * 15616156345675451 % 0xffffffff
 		color = user_id % 0xffffff
