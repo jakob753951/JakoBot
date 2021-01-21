@@ -203,5 +203,6 @@ class Drops(commands.Cog):
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
 		await ctx.send(text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount)))
 
+
 def setup(bot):
 	bot.add_cog(Drops(bot))

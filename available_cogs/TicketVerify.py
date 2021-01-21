@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 from Configuration import load_config
-from datetime import datetime
 import asyncio
 
 requirements = {'general': [], 'server': ['cate_verify', 'role_staff', 'roles_can_verify', 'role_unverified', 'role_verified', 'cate_verify_storage']}

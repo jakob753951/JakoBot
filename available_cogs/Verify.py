@@ -6,7 +6,6 @@ from CustomChecks import *
 requirements = {'general': [], 'server': ['roles_can_verify', 'role_unverified', 'role_verified', 'chan_verify_rx']}
 
 class Verify(commands.Cog):
-
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('config.json')

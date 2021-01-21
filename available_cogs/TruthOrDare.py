@@ -26,5 +26,6 @@ class TruthOrDare(commands.Cog):
 		# send random question in selected category
 		await ctx.send(random.choice(self.questions[category]))
 
+
 def setup(bot):
 	bot.add_cog(TruthOrDare(bot))

@@ -53,5 +53,6 @@ class ForwardDM(commands.Cog):
 		embed = discord.Embed(description=desc)
 		return embed
 
+
 def setup(bot):
 	bot.add_cog(ForwardDM(bot))
