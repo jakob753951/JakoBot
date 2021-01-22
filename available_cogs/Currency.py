@@ -51,13 +51,13 @@ class Currency(commands.Cog):
 	async def give(self, ctx, member: discord.Member, amount: int):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		if amount < 0:
-			sent_msg = await ctx.send("Nice try. You can't send negative money...")
+			sent_msg = await ctx.send(embed=discord.Embed(description="Nice try. You can't send negative money..."))
 			await asyncio.sleep(5)
 			await sent_msg.delete()
 			await ctx.message.delete()
 			return
 		if amount == 0:
-			sent_msg = await ctx.send('You have to send ***something***.')
+			sent_msg = await ctx.send(embed=discord.Embed(description='You have to send ***something***.'))
 			await asyncio.sleep(5)
 			await sent_msg.delete()
 			await ctx.message.delete()
@@ -65,10 +65,12 @@ class Currency(commands.Cog):
 
 		try:
 			sender_new_balance = await manager.transferBetweenMembers(ctx.guild.id, ctx.author.id, member.id, amount)
-			await ctx.send(f'Funds have been sent. Your new balance is {sender_new_balance} {pluralise(self.cfg.servers[ctx.guild.id], sender_new_balance)}')
+			embed = discord.Embed(description=f'Funds have been sent.')
+			embed.add_field(name='New balance:', value=f'{sender_new_balance} {pluralise(self.cfg.servers[ctx.guild.id], sender_new_balance)}')
+			await ctx.send(embed=embed)
 			await transaction_log(self.bot, msg_cfg, member, amount, ctx.author, 'Send command')
 		except InsufficientFundsException as e:
-			await ctx.send(f"You don't have enough money to send. You're missing {e.missing_funds}")
+			await ctx.send(embed=discord.Embed(description=f"You don't have enough money to send. You're missing {e.missing_funds}"))
 			return
 
 	@commands.command(name='Balance', aliases=['balance', 'bal', '$'])
