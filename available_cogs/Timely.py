@@ -57,11 +57,12 @@ class Timely(commands.Cog):
 			title = f"Timely isn't available yet."
 			embed = discord.Embed(color=0xff0000, title=title, timestamp=available_time)
 			embed.set_footer(text='Next timely will be available: ')
-			todo = [
+			responses: list = await asyncio.gather(
 				ctx.send(embed=embed),
 				ctx.message.delete()
-			]
-			await asyncio.gather(*todo)
+			)
+			await asyncio.sleep(5)
+			await responses[0].delete()
 			return
 
 		amount = guild_cfg.timely_amount
