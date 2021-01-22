@@ -1,3 +1,4 @@
+import asyncio
 import discord
 from discord.ext import commands
 from Configuration import load_config
@@ -22,9 +23,11 @@ class Confessions(commands.Cog):
 		color = user_id % 0xffffff
 		embed = discord.Embed(colour=color, description=text, timestamp=datetime.utcnow())
 		chan = await self.bot.fetch_channel(self.cfg.chan_confessions)
-		await chan.send(embed=embed)
-
-		await ctx.send(embed=discord.Embed(colour=discord.Colour.green(), title='Your confession has been sent'))
+		todo = [
+			chan.send(embed=embed),
+			ctx.send(embed=discord.Embed(colour=discord.Colour.green(), title='Your confession has been sent'))
+		]
+		await asyncio.gather(*todo)
 		existing = self.confessions.get(str(ctx.author.id), [])
 		existing.append(text)
 		self.confessions[str(ctx.author.id)] = existing
