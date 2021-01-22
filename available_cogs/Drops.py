@@ -192,19 +192,17 @@ class Drops(commands.Cog):
 
 		await self.transaction_log(msg_cfg, ctx.author, amount)
 
-		try:
-			drop_message = await ctx.channel.fetch_message(drop['message_id'])
-		except Exception:
-			drop_message = None
-
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
 		to_do = [
 			ctx.send(text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount))),
 			ctx.message.delete()
 		]
 
-		if drop_message:
+		try:
+			drop_message = await ctx.channel.fetch_message(drop['message_id'])
 			to_do.append(drop_message.delete())
+		except Exception:
+			pass
 
 		await asyncio.gather(*to_do)
 
