@@ -1,3 +1,4 @@
+import asyncio
 from datetime import timedelta
 import discord
 from discord.ext import commands
@@ -56,19 +57,27 @@ class Timely(commands.Cog):
 			title = f"Timely isn't available yet."
 			embed = discord.Embed(color=0xff0000, title=title, timestamp=available_time)
 			embed.set_footer(text='Next timely will be available: ')
-			await ctx.send(embed=embed)
+			todo = [
+				ctx.send(embed=embed),
+				ctx.message.delete()
+			]
+			await asyncio.gather(*todo)
 			return
 
 		amount = guild_cfg.timely_amount
 
 		set_cooldown(ctx.guild.id, ctx.author.id)
-		await manager.addToMemberBalance(ctx.guild.id, ctx.author.id, amount)
-
-		await transaction_log(self.bot, guild_cfg, ctx.author, amount, title=f"User claimed their timely.")
 		desc=f"{ctx.author.mention} You've claimed your {amount} {pluralise(guild_cfg, amount)}."
 		embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow() + timedelta(hours=guild_cfg.timely_cooldown_hours))
 		embed.set_footer(text='You can claim again:')
-		await ctx.send(embed=embed)
+		todo = [
+			manager.addToMemberBalance(ctx.guild.id, ctx.author.id, amount),
+			ctx.message.delete(),
+			transaction_log(self.bot, guild_cfg, ctx.author, amount, title=f"User claimed their timely."),
+			ctx.send(embed=embed)
+		]
+
+		await asyncio.gather(*todo)
 
 
 def setup(bot):
