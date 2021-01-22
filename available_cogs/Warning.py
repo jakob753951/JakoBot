@@ -1,3 +1,4 @@
+import asyncio
 import discord
 from discord.ext import commands
 from Configuration import load_config
@@ -22,11 +23,12 @@ class Warning(commands.Cog):
 
 	@commands.command(name='warn')
 	async def warn(self, ctx, user: discord.User, *, reason = '[no reason given]', strikes = 1):
-		await user.send(f"You have been warned in {ctx.guild.name} for the following reason:\n{reason}")
 		member_log = await self.bot.fetch_channel(self.cfg.servers[ctx.guild.id].chan_member_log)
-		await member_log.send(f"{user.name} (id: {user.id}) was warned for '{reason}'")
-
-		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+		await asyncio.gather(
+			user.send(f"You have been warned in {ctx.guild.name} for the following reason:\n{reason}"),
+			member_log.send(f"{user.name} (id: {user.id}) was warned for '{reason}'"),
+			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+		)
 
 		self.add_warning(ctx.guild.id, user.id, reason, strikes)
 
