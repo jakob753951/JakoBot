@@ -1,3 +1,4 @@
+import asyncio
 import discord
 from discord.ext import commands
 from Configuration import load_config
@@ -25,8 +26,10 @@ class GeneralCommands(commands.Cog):
 
 	@commands.command(name='say')
 	async def say(self, ctx, channel: discord.TextChannel, *, message):
-		await channel.send(message, files=ctx.message.attachments)
-		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+		await asyncio.gather(
+			channel.send(message, files=ctx.message.attachments),
+			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+		)
 
 
 def setup(bot):
