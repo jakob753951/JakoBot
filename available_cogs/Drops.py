@@ -1,6 +1,7 @@
-from CustomChecks import *
+from contextlib import suppress
 import random
 from datetime import datetime, timedelta
+import asyncio
 import json
 import discord
 from discord.ext import commands
@@ -8,7 +9,7 @@ from Configuration import *
 import CurrencyManager as currency
 from CustomExceptions import *
 from CustomChecks import *
-import asyncio
+from CustomChecks import *
 
 requirements = {'general': [], 'server': ['react_confirm', 'currency_name_singular', 'currency_name_plural', 'role_admin']}
 
@@ -190,19 +191,16 @@ class Drops(commands.Cog):
 		except NegativeBalanceException:
 			await currency.setMemberBalance(ctx.guild.id, ctx.author.id, 0)
 
-		await self.transaction_log(msg_cfg, ctx.author, amount)
-
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
 		to_do = [
+			self.transaction_log(msg_cfg, ctx.author, amount),
 			ctx.send(text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount))),
 			ctx.message.delete()
 		]
 
-		try:
+		with suppress(Exception):
 			drop_message = await ctx.channel.fetch_message(drop['message_id'])
 			to_do.append(drop_message.delete())
-		except Exception:
-			pass
 
 		await asyncio.gather(*to_do)
 
