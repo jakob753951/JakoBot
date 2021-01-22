@@ -192,9 +192,11 @@ class Drops(commands.Cog):
 			await currency.setMemberBalance(ctx.guild.id, ctx.author.id, 0)
 
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
+		desc = text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount))
+		embed = discord.embed(description=desc)
 		to_do = [
 			self.transaction_log(msg_cfg, ctx.author, amount),
-			ctx.send(text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount))),
+			ctx.send(embed=embed),
 			ctx.message.delete()
 		]
 
