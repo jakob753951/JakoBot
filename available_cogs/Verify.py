@@ -20,7 +20,7 @@ class Verify(commands.Cog):
 		verified = ctx.guild.get_role(msg_cfg.role_verified)
 
 		if verified in member.roles:
-			await ctx.send('Member is already verified!')
+			await ctx.send(embed=discord.Embed(description='Member is already verified!'))
 			return
 
 		self.recently_verified.add(member.id)
@@ -29,7 +29,7 @@ class Verify(commands.Cog):
 			await member.remove_roles(unverified, reason="verification")
 			await member.add_roles(verified, reason="verification")
 		except Exception:
-			await ctx.send('Sorry! Something went wrong. Please try again later')
+			await ctx.send(embed=discord.Embed(description='Something went wrong. Please try again later'))
 			return
 
 		self.recently_verified.remove(member.id)
@@ -76,7 +76,7 @@ class Verify(commands.Cog):
 		if details:
 			message += f' with info:\n"{details}"'
 
-		await verify_rx.send(message)
+		await verify_rx.send(embed=discord.Embed(description=message))
 		# welcome = server.get_channel(msg_cfg.chan_verify_welcome)
 		# await welcome.send(f'Welcome {member.mention} to the server! Please read the {msg_cfg.chan_rules.mention}, remember to get your {msg_cfg.chan_roles.mention}, and maybe make a profile in {msg_cfg.chan_create_profile.mention}.')
 
