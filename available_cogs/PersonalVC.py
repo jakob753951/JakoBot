@@ -1,3 +1,4 @@
+import asyncio
 from discord.ext import commands
 from Configuration import *
 
@@ -14,16 +15,15 @@ class PersonalVC(commands.Cog):
 		# Left channel was a personal VC
 		if before.channel and before.channel.id in self.user_vc:
 			# And it is now empty
-			if not before.channel.members:
-
-				# Delete the text-channel and the role
-				for chan in self.user_vc[before.channel.id]:
-					await chan.delete()
-				# Delete the vc
-				await before.channel.delete()
+			if not after.channel.members:
+				# Delete channels
+				await asyncio.gather(
+					*[chan.delete() for chan in self.user_vc[after.channel.id]],
+					await after.channel.delete()
+				)
 
 				# Remove from dict
-				self.user_vc.pop(before.channel.id)
+				self.user_vc.pop(after.channel.id)
 
 		# User disconnects
 		if not after.channel:
@@ -41,19 +41,21 @@ class PersonalVC(commands.Cog):
 		# Shorthand for later use
 		server = member.guild
 		username = member.display_name
-
-		# Create role and add it to the user
-		role = await server.create_role(name=username)
-		await member.add_roles(role)
+		channel_name = f"{username}'s channel"
 
 		# Get cate_personal_vc for the server
 		cat = await self.bot.fetch_channel(self.cfg.servers[member.guild.id].cate_personal_vc)
 
-		channel_name = f"{username}'s channel"
-		vc = await cat.create_voice_channel(channel_name)
-		await member.move_to(vc)
+		tc, vc, role = await asyncio.gather(
+			cat.create_text_channel(channel_name),
+			cat.create_voice_channel(channel_name),
+			server.create_role(name=username)
+		)
 
-		tc = await cat.create_text_channel(channel_name)
+		await asyncio.gather(
+			member.add_roles(role),
+			member.move_to(vc)
+		)
 
 		# Add the vc as a key to user_vc, while setting the value to a tuple with tc and role
 		self.user_vc[vc.id] = (tc, role)
