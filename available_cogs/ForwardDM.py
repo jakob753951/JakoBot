@@ -1,3 +1,4 @@
+import asyncio
 import discord
 from discord.ext import commands
 from Configuration import load_config
@@ -31,8 +32,10 @@ class ForwardDM(commands.Cog):
 
 	@commands.command(name='send_dm')
 	async def send_dm(self, ctx, recipient: discord.User, *, message):
-		await recipient.send(message)
-		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+		await asyncio.gather(
+			recipient.send(message),
+			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+		)
 
 
 def setup(bot):
