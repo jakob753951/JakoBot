@@ -71,14 +71,13 @@ class Timely(commands.Cog):
 		desc=f"{ctx.author.mention} You've claimed your {amount} {pluralise(guild_cfg, amount)}."
 		embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow() + timedelta(hours=guild_cfg.timely_cooldown_hours))
 		embed.set_footer(text='You can claim again:')
-		todo = [
+
+		await asyncio.gather(
 			manager.addToMemberBalance(ctx.guild.id, ctx.author.id, amount),
 			ctx.message.delete(),
 			transaction_log(self.bot, guild_cfg, ctx.author, amount, title=f"User claimed their timely."),
 			ctx.send(embed=embed)
-		]
-
-		await asyncio.gather(*todo)
+		)
 
 
 def setup(bot):
