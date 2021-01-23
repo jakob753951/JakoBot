@@ -23,14 +23,13 @@ class Confessions(commands.Cog):
 		color = user_id % 0xffffff
 		embed = discord.Embed(colour=color, description=text, timestamp=datetime.utcnow())
 		chan = await self.bot.fetch_channel(self.cfg.chan_confessions)
-		todo = [
+		await asyncio.gather(
 			chan.send(embed=embed),
 			ctx.send(embed=discord.Embed(colour=discord.Colour.green(), title='Your confession has been sent'))
-		]
-		await asyncio.gather(*todo)
-		existing = self.confessions.get(str(ctx.author.id), [])
-		existing.append(text)
-		self.confessions[str(ctx.author.id)] = existing
+		)
+		user_confessions = self.confessions.get(str(ctx.author.id), [])
+		user_confessions.append(text)
+		self.confessions[str(ctx.author.id)] = user_confessions
 		with open('data/Confessions.json', 'w') as out_file:
 			out_file.write(json.dumps(self.confessions, indent=4))
 
