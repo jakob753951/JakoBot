@@ -162,7 +162,7 @@ class Drops(commands.Cog):
 		del self.data[str(channel.id)]
 		self.save_data()
 
-	@commands.command(name='Pick', aliases=['pick', 'take'])
+	@commands.command(name='Pick', aliases=['pick', 'take', 'grab'])
 	async def pick(self, ctx):
 		await self.grab_drop(ctx, 'pick')
 
