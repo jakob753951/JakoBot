@@ -1,4 +1,5 @@
 import os
+from contextlib import suppress
 
 from_dir = 'available_cogs'
 to_dir = 'enabled_cogs'
@@ -7,4 +8,5 @@ for file_name in [name for name in os.listdir(to_dir) if os.path.isfile(f'{to_di
     to_path = f'{to_dir}/{file_name}'
     if os.path.exists(to_path):
         os.remove(to_path)
-    os.link(from_path, to_path)
+    with suppress(Exception):
+        os.link(from_path, to_path)
