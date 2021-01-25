@@ -10,7 +10,7 @@ GenerateConfig.generate_all()
 from Configuration import *
 
 print('Loading config...')
-cfg = load_config('config.json')
+cfg = load_config('Config.json')
 
 intents = discord.Intents.default()
 intents.members = True

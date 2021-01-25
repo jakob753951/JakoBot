@@ -22,7 +22,7 @@ fmt = "%Y-%m-%dT%H:%M:%S"
 class Rewards(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 
 	def get_cooldown(self, guild_id, user_id, reward_id):
 		with open('data/RewardCooldowns.json') as cooldowns_file:

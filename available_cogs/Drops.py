@@ -24,7 +24,7 @@ def pluralise(server_cfg, amount):
 class Drops(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 		try:
 			self.load_data()
 		except Exception as e:

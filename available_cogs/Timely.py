@@ -41,7 +41,7 @@ def set_cooldown(guild_id, user_id):
 class Timely(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 
 	@commands.guild_only()
 	@commands.command(name='Timely', aliases=['timely', 'daily', 'hourly'])

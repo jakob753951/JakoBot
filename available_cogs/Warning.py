@@ -18,7 +18,7 @@ class UserWarning:
 class Warning(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 		self.guilds = self.load_warnings()
 
 	@commands.command(name='warn')
