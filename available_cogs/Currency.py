@@ -1,4 +1,4 @@
-import asyncio
+from asyncio import gather, sleep
 from CustomExceptions import InsufficientFundsException
 import discord
 from discord.ext import commands
@@ -50,25 +50,30 @@ class Currency(commands.Cog):
 	@commands.command(name='Give', aliases=['give', 'send', 'share'])
 	async def give(self, ctx, member: discord.Member, amount: int):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
-		if amount < 0:
-			sent_msg = await ctx.send(embed=discord.Embed(description="Nice try. You can't send negative money..."))
-			await asyncio.sleep(5)
-			await sent_msg.delete()
-			await ctx.message.delete()
-			return
-		if amount == 0:
-			sent_msg = await ctx.send(embed=discord.Embed(description='You have to send ***something***.'))
-			await asyncio.sleep(5)
-			await sent_msg.delete()
-			await ctx.message.delete()
+		if amount < 1:
+			if amount == 0:
+				embed = discord.Embed(title='Try again, bud', color=0xff0000, description='You have to send ***something***.')
+			else:
+				embed = discord.Embed(title='Boo hoo.', color=0xff0000, description="Nice try. You can't send negative money...")
+
+			sent_msg, _ = await gather(
+				ctx.send(embed=embed),
+				sleep(5)
+			)
+			await gather(
+				sent_msg.delete(),
+				ctx.message.delete()
+			)
 			return
 
 		try:
 			sender_new_balance = await manager.transferBetweenMembers(ctx.guild.id, ctx.author.id, member.id, amount)
-			embed = discord.Embed(description=f'Funds have been sent.')
+			embed = discord.Embed(description=f'Funds have been sent.', color=0x00ff00)
 			embed.add_field(name='New balance:', value=f'{sender_new_balance} {pluralise(self.cfg.servers[ctx.guild.id], sender_new_balance)}')
-			await ctx.send(embed=embed)
-			await transaction_log(self.bot, msg_cfg, member, amount, ctx.author, 'Send command')
+			await gather(
+				ctx.send(embed=embed),
+				transaction_log(self.bot, msg_cfg, member, amount, ctx.author, 'Send command')
+			)
 		except InsufficientFundsException as e:
 			await ctx.send(embed=discord.Embed(description=f"You don't have enough money to send. You're missing {e.missing_funds}"))
 			return
@@ -88,8 +93,8 @@ class Currency(commands.Cog):
 	async def leaderboard(self, ctx, limit: int = 10):
 		guild = self.bot.get_guild(ctx.guild.id)
 		leaderboard = await manager.getTopRichest(guild.id, limit)
-		place_strings = [f'{guild.get_member(member[0]).display_name}: {member[1]}' for member in leaderboard]
-		await ctx.send('\n'.join(place_strings))
+		place_strings = [f'{guild.get_member(member[0]).mention}: {member[1]}' for member in leaderboard]
+		await ctx.send(embed=discord.Embed(description='\n'.join(place_strings)))
 
 
 def setup(bot):
