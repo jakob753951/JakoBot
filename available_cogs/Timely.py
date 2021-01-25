@@ -52,12 +52,7 @@ class Timely(commands.Cog):
 
 		if len(guild_cfg.chans_timely) != 0 and ctx.channel.id not in guild_cfg.chans_timely:
 			chans = [ctx.guild.get_channel(chan_id) for chan_id in guild_cfg.chans_timely]
-			if len(guild_cfg.chans_timely) == 1:
-				desc = f'Please go to {chans[0].mention} for all of your botting needs!'
-			else:
-				desc = f'Please go to one of the following channels for all of your botting needs:'
-				for chan in chans:
-					desc += '\n' + chan.mention
+			desc = f'Arr matey! To {chans[0].mention} you must go to claim your booty... yarr!'
 
 			sent_msg, _ = await gather(
 				ctx.send(embed=Embed(title='Incorrect channel', description=desc, color=0xff0000)),
