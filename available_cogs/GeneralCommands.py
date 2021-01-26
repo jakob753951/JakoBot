@@ -8,7 +8,7 @@ requirements = {'general': [], 'server': ['react_confirm']}
 class GeneralCommands(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 
 	@commands.command(name='areyouonline')
 	async def are_you_online(self, ctx):

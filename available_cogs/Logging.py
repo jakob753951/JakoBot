@@ -9,7 +9,7 @@ requirements = {'general': [], 'server': ['msg_log_webhook_url', 'member_log_web
 class Logging(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 
 	@commands.Cog.listener()
 	async def on_message_edit(self, before, after):

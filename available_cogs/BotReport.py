@@ -8,7 +8,7 @@ requirements = {'general': [], 'server': ['react_confirm', 'chan_reports', 'reac
 class ForwardDM(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 		self.reports = {}
 
 	@commands.command(name='Report', aliases=['report'])
