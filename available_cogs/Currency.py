@@ -21,11 +21,11 @@ requirements = {
 }
 
 def rank_string(rank: int):
-	if rank % 10 == 1 and rank != 11:
+	if rank % 10 == 1 and rank % 100 != 11:
 		place_string = 'st:'
-	elif rank % 10 == 2 and rank != 12:
+	elif rank % 10 == 2 and rank % 100 != 12:
 		place_string = 'nd:'
-	elif rank % 10 == 3 and rank != 13:
+	elif rank % 10 == 3 and rank % 100 != 13:
 		place_string = 'rd:'
 	else:
 		place_string = 'th:'
