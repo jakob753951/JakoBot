@@ -33,7 +33,7 @@ async def getAllMembersBalances(guild_id) -> List[Tuple[int, int]]:
 
 async def getTopRichest(guild_id: int, limit: int = 10) -> List[Tuple[int, int]]:
     member_dict = await getAllMembersBalances(guild_id)
-    all_members_sorted = sorted(member_dict, key=lambda e: e[1], reverse=True)[:10]
+    all_members_sorted = sorted(member_dict, key=lambda e: e[1], reverse=True)
     return all_members_sorted[:limit]
 
 async def addToMemberBalance(guild_id: int, member_id: int, amount: int, set_to_zero_if_result_negative: bool = False) -> int:
