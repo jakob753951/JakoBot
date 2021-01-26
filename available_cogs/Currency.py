@@ -41,26 +41,32 @@ class Currency(commands.Cog):
 	@commands.command(name='AddCurrency', aliases=['addcurrency'])
 	async def add_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
-		await manager.addToMemberBalance(ctx.guild.id, member.id, amount)
-		await transaction_log(self.bot, msg_cfg, member, amount, title=f'{ctx.author.name} added currency to this user:')
-		await ctx.message.add_reaction(msg_cfg.react_confirm)
+		await gather(
+			manager.addToMemberBalance(ctx.guild.id, member.id, amount),
+			transaction_log(self.bot, msg_cfg, member, amount, title=f'{ctx.author.name} added currency to this user:'),
+			ctx.message.add_reaction(msg_cfg.react_confirm)
+		)
 
 	@is_admin()
 	@commands.command(name='RemoveCurrency', aliases=['removecurrency'])
 	async def remove_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
-		await manager.addToMemberBalance(ctx.guild.id, member.id, amount * -1)
-		await transaction_log(self.bot, msg_cfg, member, amount * -1, title=f'{ctx.author.name} removed currency from this user:')
-		await ctx.message.add_reaction(msg_cfg.react_confirm)
+		await gather(
+			manager.addToMemberBalance(ctx.guild.id, member.id, amount * -1),
+			transaction_log(self.bot, msg_cfg, member, amount * -1, title=f'{ctx.author.name} removed currency from this user:'),
+			ctx.message.add_reaction(msg_cfg.react_confirm)
+		)
 
 	@is_admin()
 	@commands.command(name='ClearCurrency', aliases=['clearcurrency'])
 	async def clear_currency(self, ctx, member: discord.Member):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
-		await manager.setMemberBalance(ctx.guild.id, member.id, 0)
 		chan_rx = await self.bot.fetch_channel(msg_cfg.chan_transaction_history)
-		chan_rx.send(f'Cleared the balance of {member.mention}')
-		await ctx.message.add_reaction(msg_cfg.react_confirm)
+		await gather(
+			manager.setMemberBalance(ctx.guild.id, member.id, 0),
+			chan_rx.send(f'Cleared the balance of {member.mention}'),
+			ctx.message.add_reaction(msg_cfg.react_confirm)
+		)
 
 	@commands.command(name='Give', aliases=['give', 'send', 'share'])
 	async def give(self, ctx, member: discord.Member, amount: int):
@@ -109,10 +115,9 @@ class Currency(commands.Cog):
 		if limit > 16:
 			limit = 16
 		msg_cfg = self.cfg.servers[ctx.guild.id]
-		guild = self.bot.get_guild(ctx.guild.id)
 		Member = namedtuple('Member', ['rank', 'user', 'balance'])
-		members = await manager.getTopRichest(guild.id, limit)
-		leaderboard = [Member(rank+1, guild.get_member(mem_info[0]), mem_info[1]) for rank, mem_info in enumerate(members)]
+		members = await manager.getTopRichest(ctx.guild.id, limit)
+		leaderboard = [Member(rank+1, ctx.guild.get_member(mem_info[0]), mem_info[1]) for rank, mem_info in enumerate(members)]
 
 		embed = discord.Embed(title='Leaderboard')
 		for mem1, mem2 in zip_longest(leaderboard[::2], leaderboard[1::2]):
