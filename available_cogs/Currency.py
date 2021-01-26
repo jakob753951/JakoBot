@@ -21,11 +21,11 @@ requirements = {
 }
 
 def rank_string(rank: int):
-	if rank % 10 == 1:
+	if rank % 10 == 1 and rank != 11:
 		place_string = 'st:'
-	elif rank % 10 == 2:
+	elif rank % 10 == 2 and rank != 12:
 		place_string = 'nd:'
-	elif rank % 10 == 3:
+	elif rank % 10 == 3 and rank != 13:
 		place_string = 'rd:'
 	else:
 		place_string = 'th:'
@@ -106,6 +106,8 @@ class Currency(commands.Cog):
 
 	@commands.command(name='Leaderboard', aliases=['leaderboard', 'lb', 'scoreboard'])
 	async def leaderboard(self, ctx, limit: int = 10):
+		if limit > 16:
+			limit = 16
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		guild = self.bot.get_guild(ctx.guild.id)
 		Member = namedtuple('Member', ['rank', 'user', 'balance'])
