@@ -6,6 +6,9 @@ from Configuration import *
 import CurrencyManager as manager
 from CustomChecks import *
 from CurrencyUtils import *
+from itertools import zip_longest
+from collections import namedtuple
+
 
 requirements = {
 	'general': [],
@@ -16,6 +19,18 @@ requirements = {
 		'currency_name_plural'
 	]
 }
+
+def rank_string(rank: int):
+	if rank % 10 == 1:
+		place_string = 'st:'
+	elif rank % 10 == 2:
+		place_string = 'nd:'
+	elif rank % 10 == 3:
+		place_string = 'rd:'
+	else:
+		place_string = 'th:'
+
+	return str(rank) + place_string
 
 class Currency(commands.Cog):
 	def __init__(self, bot):
@@ -86,10 +101,21 @@ class Currency(commands.Cog):
 
 	@commands.command(name='Leaderboard', aliases=['leaderboard', 'lb', 'scoreboard'])
 	async def leaderboard(self, ctx, limit: int = 10):
+		msg_cfg = self.cfg.servers[ctx.guild.id]
 		guild = self.bot.get_guild(ctx.guild.id)
-		leaderboard = await manager.getTopRichest(guild.id, limit)
-		place_strings = [f'{guild.get_member(member[0]).display_name}: {member[1]}' for member in leaderboard]
-		await ctx.send('\n'.join(place_strings))
+		Member = namedtuple('Member', ['rank', 'user', 'balance'])
+		members = await manager.getTopRichest(guild.id, limit)
+		leaderboard = [Member(rank+1, guild.get_member(mem_info[0]), mem_info[1]) for rank, mem_info in enumerate(members)]
+
+		embed = discord.Embed(title='Leaderboard')
+		for mem1, mem2 in zip_longest(leaderboard[::2], leaderboard[1::2]):
+			if not mem2:
+				mem2 = Member(None, None, '\u200b')
+			embed.add_field(name=rank_string(mem1.rank), value=rank_string(mem2.rank) if mem2.user else '\u200b', inline=True)
+			embed.add_field(name=mem1.user.display_name, value=mem2.user.display_name if mem2.user else '\u200b', inline=True)
+			embed.add_field(name=f'{mem1.balance} {pluralise(msg_cfg, mem1.balance)}', value=f'{mem2.balance} {pluralise(msg_cfg, mem2.balance)}' if mem2.user else '\u200b', inline=True)
+
+		await ctx.send(embed=embed)
 
 
 def setup(bot):
