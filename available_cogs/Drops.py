@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 from Configuration import *
 import CurrencyManager as currency
+from CurrencyUtils import *
 from CustomExceptions import *
 from CustomChecks import *
 
@@ -97,7 +98,7 @@ class Drops(commands.Cog):
 			curr_name=pluralise(msg_cfg, drop['pick_value'])
 		)
 
-		embed = discord.Embed(color=0xff0000, title='A drop has appeared!', description=desc, timestamp=datetime.utcnow())
+		embed = discord.Embed(color=0x0000ff, title='A drop has appeared!', description=desc, timestamp=datetime.utcnow())
 		embed.set_image(url=f"https://ladegaardmoeller.dk/JakoBot/Drops/Images/{chosen_drop['drop_image']}")
 		sent_msg = await message.channel.send(embed=embed)
 
@@ -178,7 +179,7 @@ class Drops(commands.Cog):
 		desc = text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount))
 		embed = discord.Embed(description=desc)
 		to_do = [
-			self.transaction_log(msg_cfg, ctx.author, amount),
+			transaction_log(self.bot, msg_cfg, ctx.author, amount),
 			ctx.send(embed=embed),
 			ctx.message.delete()
 		]
