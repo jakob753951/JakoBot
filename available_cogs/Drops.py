@@ -9,7 +9,6 @@ from Configuration import *
 import CurrencyManager as currency
 from CustomExceptions import *
 from CustomChecks import *
-from CustomChecks import *
 
 requirements = {'general': [], 'server': ['react_confirm', 'currency_name_singular', 'currency_name_plural', 'role_admin']}
 
@@ -39,22 +38,6 @@ class Drops(commands.Cog):
 	def save_data(self):
 		with open('data/DropChannels.json', 'w') as data_file:
 			data_file.write(json.dumps(self.data, indent=4))
-
-	async def transaction_log(self, msg_cfg, recipient: discord.Member, amount: int, sender: discord.Member = None):
-		chan_rx = await self.bot.fetch_channel(msg_cfg.chan_transaction_history)
-
-		if sender:
-			desc = f'{sender.mention} sent {recipient.mention} {amount} {pluralise(msg_cfg, amount)}'
-		else:
-			desc = f"{recipient.mention} {'got' if amount >= 0 else 'lost'} {abs(amount)} {pluralise(msg_cfg, amount)}"
-
-		embed = discord.Embed(color=0x0000ff, title=f'User received money:', description=desc, timestamp=datetime.utcnow())
-		embed.set_author(name=f'{recipient.name}#{recipient.discriminator}', icon_url=recipient.avatar_url)
-		if sender:
-			embed.add_field(name='Sender: ', value=f'{sender.name}#{sender.discriminator}', inline=True)
-		embed.add_field(name='Amount: ', value=amount, inline=True)
-
-		await chan_rx.send(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
