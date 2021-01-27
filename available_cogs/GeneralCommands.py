@@ -1,5 +1,6 @@
 import asyncio
 import discord
+from discord import Embed
 from discord.ext import commands
 from Configuration import load_config
 
@@ -27,7 +28,7 @@ class GeneralCommands(commands.Cog):
 	@commands.command(name='say')
 	async def say(self, ctx, channel: discord.TextChannel, *, message):
 		await asyncio.gather(
-			channel.send(message, files=ctx.message.attachments),
+			channel.send(embed=Embed(description=message), files=ctx.message.attachments),
 			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 		)
 
