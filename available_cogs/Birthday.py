@@ -19,6 +19,7 @@ class Birthday(commands.Cog):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
 
+	@is_staff()
 	@commands.guild_only()
 	@commands.command(name='Birthday', aliases=['birthday', 'birthdaypresent', 'birthdaygift'])
 	async def birthday(self, ctx, member: discord.Member):
