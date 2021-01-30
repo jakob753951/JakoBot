@@ -48,7 +48,7 @@ class Gambling(commands.Cog):
 
 		if success:
 			winnings = int(bet * 0.95)
-			desc = f'{ctx.author.mention} You guessed it! You won {winnings} {pluralise(msg_cfg, winnings)}'
+			desc = f'{ctx.author.mention} You guessed it! You won {bet + winnings} {pluralise(msg_cfg, winnings)}'
 		else:
 			winnings = bet * -1
 			desc = f'{ctx.author.mention} Better luck next time'
