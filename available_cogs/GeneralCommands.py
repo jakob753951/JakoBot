@@ -10,7 +10,7 @@ class GeneralCommands(commands.Cog):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
 
-	@commands.command(name='areyouonline')
+	@commands.command(name='AreYouOnline')
 	async def are_you_online(self, ctx):
 		# Get male and female roles
 		male = discord.utils.find(lambda r: r.name == 'Male', ctx.guild.roles)
@@ -24,7 +24,7 @@ class GeneralCommands(commands.Cog):
 		else:
 			await ctx.send("Yea.")
 
-	@commands.command(name='say')
+	@commands.command(name='Say')
 	async def say(self, ctx, channel: discord.TextChannel, *, message):
 		await asyncio.gather(
 			channel.send(message, files=ctx.message.attachments),

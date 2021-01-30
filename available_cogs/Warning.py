@@ -21,7 +21,7 @@ class Warning(commands.Cog):
 		self.cfg = load_config('Config.json')
 		self.guilds = self.load_warnings()
 
-	@commands.command(name='warn')
+	@commands.command(name='Warn')
 	async def warn(self, ctx, user: discord.User, *, reason = '[no reason given]', strikes = 1):
 		member_log = await self.bot.fetch_channel(self.cfg.servers[ctx.guild.id].chan_member_log)
 		await asyncio.gather(
@@ -32,7 +32,7 @@ class Warning(commands.Cog):
 
 		self.add_warning(ctx.guild.id, user.id, reason, strikes)
 
-	@commands.command(name='userwarnings', aliases=['userwarns'])
+	@commands.command(name='UserWarnings', aliases=['UserWarns'])
 	async def user_warnings(self, ctx, user: discord.User):
 		embed = discord.Embed(color=0x0000ff, description=f'**User {user.mention} has the following warnings:**', timestamp=datetime.utcnow())
 		embed.set_author(name=f'{user.name}#{user.discriminator}', icon_url=user.avatar_url)

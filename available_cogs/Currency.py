@@ -38,7 +38,7 @@ class Currency(commands.Cog):
 		self.cfg = load_config('Config.json')
 
 	@is_admin()
-	@commands.command(name='AddCurrency', aliases=['addcurrency'])
+	@commands.command(name='AddCurrency')
 	async def add_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await manager.addToMemberBalance(ctx.guild.id, member.id, amount)
@@ -46,7 +46,7 @@ class Currency(commands.Cog):
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
 	@is_admin()
-	@commands.command(name='RemoveCurrency', aliases=['removecurrency'])
+	@commands.command(name='RemoveCurrency')
 	async def remove_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await manager.addToMemberBalance(ctx.guild.id, member.id, amount * -1)
@@ -54,7 +54,7 @@ class Currency(commands.Cog):
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
 	@is_admin()
-	@commands.command(name='ClearCurrency', aliases=['clearcurrency'])
+	@commands.command(name='ClearCurrency')
 	async def clear_currency(self, ctx, member: discord.Member):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await manager.setMemberBalance(ctx.guild.id, member.id, 0)
@@ -62,7 +62,7 @@ class Currency(commands.Cog):
 		chan_rx.send(f'Cleared the balance of {member.mention}')
 		await ctx.message.add_reaction(msg_cfg.react_confirm)
 
-	@commands.command(name='Give', aliases=['give', 'send', 'share'])
+	@commands.command(name='Give', aliases=['Send', 'Share'])
 	async def give(self, ctx, member: discord.Member, amount: int):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		if amount < 1:
@@ -93,7 +93,7 @@ class Currency(commands.Cog):
 			await ctx.send(embed=discord.Embed(description=f"You don't have enough money to send. You're missing {e.missing_funds}"))
 			return
 
-	@commands.command(name='Balance', aliases=['balance', 'bal', '$'])
+	@commands.command(name='Balance', aliases=['Bal', '$'])
 	async def balance(self, ctx, member: discord.Member = None):
 		if not member:
 			member = ctx.author
@@ -104,7 +104,7 @@ class Currency(commands.Cog):
 		embed = discord.Embed(color=0x1111ff, description=balance_text)
 		await ctx.send(embed=embed)
 
-	@commands.command(name='Leaderboard', aliases=['leaderboard', 'lb', 'scoreboard'])
+	@commands.command(name='Leaderboard', aliases=['LB', 'Scoreboard'])
 	async def leaderboard(self, ctx, limit: int = 10):
 		if limit > 16:
 			limit = 16

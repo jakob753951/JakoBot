@@ -46,7 +46,7 @@ class Timely(commands.Cog):
 		self.cfg = load_config('Config.json')
 
 	@commands.guild_only()
-	@commands.command(name='Timely', aliases=['timely', 'daily', 'hourly'])
+	@commands.command(name='Timely', aliases=['Daily', 'Hourly'])
 	async def timely(self, ctx):
 		guild_cfg = self.cfg.servers[ctx.guild.id]
 

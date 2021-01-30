@@ -20,7 +20,7 @@ class Birthday(commands.Cog):
 		self.cfg = load_config('Config.json')
 
 	@commands.guild_only()
-	@commands.command(name='Birthday', aliases=['birthday', 'birthdaypresent', 'birthdaygift'])
+	@commands.command(name='Birthday', aliases=['BirthdayPresent', 'BirthdayGift'])
 	async def brithday(self, ctx, member: discord.Member):
 		guild_cfg = self.cfg.servers[ctx.guild.id]
 

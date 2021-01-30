@@ -127,7 +127,7 @@ class Drops(commands.Cog):
 		self.save_data()
 
 	@is_admin()
-	@commands.command(name='AddDrops', aliases=['adddrops', 'enabledrops', 'editdrops', 'changedrops', 'dropsadd', 'dropsenable', 'dropsedit', 'dropschange'])
+	@commands.command(name='AddDrops', aliases=['EnableDrops', 'EditDrops', 'Changedrops', 'DropsAdd', 'DropsEnable', 'DropsEdit', 'DropsChange'])
 	async def add_drops(self, ctx, channel: discord.TextChannel = None, chance: float = 0.05, minutes_between = 2):
 		if not channel:
 			channel = ctx.channel
@@ -154,7 +154,7 @@ class Drops(commands.Cog):
 		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 
 	@is_admin()
-	@commands.command(name='RemoveDrops', aliases=['removedrops', 'disabledrops'])
+	@commands.command(name='RemoveDrops', aliases=['DisableDrops', 'DropsRemove', 'DropsDisable'])
 	async def remove_drops(self, ctx, channel: discord.TextChannel = None):
 		if not channel:
 			channel = ctx.channel
@@ -162,11 +162,11 @@ class Drops(commands.Cog):
 		del self.data[str(channel.id)]
 		self.save_data()
 
-	@commands.command(name='Pick', aliases=['pick', 'take', 'grab'])
+	@commands.command(name='Pick', aliases=['Take', 'Grab', 'Yoink', 'Collect', 'Fetch'])
 	async def pick(self, ctx):
 		await self.grab_drop(ctx, 'pick')
 
-	@commands.command(name='Run', aliases=['run', 'ignore'])
+	@commands.command(name='Run', aliases=['Ignore'])
 	async def run(self, ctx):
 		await self.grab_drop(ctx, 'run')
 

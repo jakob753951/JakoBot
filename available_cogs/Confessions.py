@@ -16,7 +16,7 @@ class Confessions(commands.Cog):
 			self.confessions = json.loads(confessions_file.read())
 
 	@commands.dm_only()
-	@commands.command(name='Confession', aliases=['confession', 'confess'])
+	@commands.command(name='Confession', aliases=['Confess'])
 	async def confession(self, ctx, *, text):
 		random.seed(ctx.author.id)
 		user_id = random.randint(1, 10000000) * 15616156345675451 % 0xffffffff
