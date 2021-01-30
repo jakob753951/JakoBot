@@ -1,4 +1,4 @@
-import asyncio
+from asyncio import gather
 import discord
 from discord.ext import commands
 from Configuration import *
@@ -19,6 +19,7 @@ class Birthday(commands.Cog):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
 
+	@is_staff()
 	@commands.guild_only()
 	@commands.command(name='Birthday', aliases=['BirthdayPresent', 'BirthdayGift'])
 	async def brithday(self, ctx, member: discord.Member):
@@ -30,7 +31,7 @@ class Birthday(commands.Cog):
 		embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
 		embed.set_footer(text='Happy birthday')
 
-		await asyncio.gather(
+		await gather(
 			manager.addToMemberBalance(ctx.guild.id, member.id, amount),
 			transaction_log(self.bot, guild_cfg, member, amount, title=f"User got a birthday present."),
 			member.send(embed=embed)
