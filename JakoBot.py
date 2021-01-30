@@ -16,7 +16,7 @@ intents = discord.Intents.default()
 intents.members = True
 
 print('making bot...')
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(cfg.prefix), description=cfg.description, intents=intents, pm_help=True)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(cfg.prefix), description=cfg.description, intents=intents, case_insensitive=True, pm_help=True)
 
 print('loading cogs...')
 #load cogs from cogs_dir

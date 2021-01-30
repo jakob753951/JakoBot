@@ -21,8 +21,8 @@ class Birthday(commands.Cog):
 
 	@is_staff()
 	@commands.guild_only()
-	@commands.command(name='Birthday', aliases=['birthday', 'birthdaypresent', 'birthdaygift'])
-	async def birthday(self, ctx, member: discord.Member):
+	@commands.command(name='Birthday', aliases=['BirthdayPresent', 'BirthdayGift'])
+	async def brithday(self, ctx, member: discord.Member):
 		guild_cfg = self.cfg.servers[ctx.guild.id]
 
 		amount = 500

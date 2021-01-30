@@ -59,7 +59,7 @@ class Rewards(commands.Cog):
 
 	@commands.guild_only()
 	@commands.check_any(is_admin(), is_staff())
-	@commands.command(name='Reward', aliases=['reward', 'award'])
+	@commands.command(name='Reward', aliases=['Award'])
 	async def reward(self, ctx, member: discord.Member, reward_id: str):
 		if ctx.author == member:
 			return
@@ -95,7 +95,7 @@ class Rewards(commands.Cog):
 
 	@commands.guild_only()
 	@is_admin()
-	@commands.command(name='PostRewards', aliases=['postrewards', 'posttasks'])
+	@commands.command(name='PostRewards', aliases=['PostTasks'])
 	async def post_rewards(self, ctx, channel: discord.TextChannel = None):
 		guild_cfg = self.cfg.servers[ctx.guild.id]
 		if not channel:

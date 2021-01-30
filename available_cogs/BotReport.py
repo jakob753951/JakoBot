@@ -11,7 +11,7 @@ class ForwardDM(commands.Cog):
 		self.cfg = load_config('Config.json')
 		self.reports = {}
 
-	@commands.command(name='Report', aliases=['report'])
+	@commands.command(name='Report', aliases=[])
 	async def report(self, ctx, member: discord.Member):
 		server_cfg = self.cfg.servers[ctx.guild.id]
 

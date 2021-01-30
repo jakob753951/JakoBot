@@ -1,7 +1,8 @@
 from datetime import datetime
 import discord
+import CurrencyManager as currency
 
-def pluralise(guild_cfg, amount):
+def pluralise(guild_cfg, amount: int):
 	if abs(amount) == 1:
 		return guild_cfg.currency_name_singular
 	else:
@@ -22,3 +23,13 @@ async def transaction_log(bot, guild_cfg, recipient: discord.Member, amount: int
 	embed.add_field(name='Amount: ', value=amount, inline=True)
 
 	await chan_rx.send(embed=embed)
+
+async def parse_amount(guild_id: int, member_id: int, amount: str):
+	if amount.lower() == 'all':
+		return await currency.getMemberBalance(guild_id, member_id)
+	if amount.lower() == 'half':
+		return (await currency.getMemberBalance(guild_id, member_id)) // 2
+	try:
+		return int(amount)
+	except:
+		raise ValueError

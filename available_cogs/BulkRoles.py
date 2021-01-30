@@ -9,7 +9,7 @@ class Confessions(commands.Cog):
 		self.bot = bot
 
 	@commands.guild_only()
-	@commands.command(name='Bulk Add Roles', aliases=['addroles', 'bulkaddroles'])
+	@commands.command(name='BulkAddRoles', aliases=['AddRoles'])
 	async def bulk_add_roles(self, ctx, *, role_names):
 		await asyncio.gather(
 			ctx.send(embed=discord.Embed(colour=discord.Colour.green(), title='Roles have been created')),

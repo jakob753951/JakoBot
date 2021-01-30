@@ -12,7 +12,7 @@ class Verify(commands.Cog):
 		self.recently_verified = set()
 
 	@can_verify()
-	@commands.command()
+	@commands.command(name='Verify')
 	async def verify(self, ctx, member: discord.Member, *, details = None):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 
