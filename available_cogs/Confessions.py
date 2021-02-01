@@ -6,7 +6,7 @@ from datetime import datetime
 import random
 import json
 
-requirements = {'general': ['chan_confessions'], 'server': []}
+requirements = {'general': ['chan_confessions', 'confession_seed'], 'server': []}
 
 class Confessions(commands.Cog):
 	def __init__(self, bot):
@@ -18,7 +18,7 @@ class Confessions(commands.Cog):
 	@commands.dm_only()
 	@commands.command(name='Confession', aliases=['Confess'])
 	async def confession(self, ctx, *, text):
-		random.seed(ctx.author.id)
+		random.seed(ctx.author.id + self.cfg.confession_seed)
 		user_id = random.randint(1, 10000000) * 15616156345675451 % 0xffffffff
 		color = user_id % 0xffffff
 		embed = discord.Embed(colour=color, description=text, timestamp=datetime.utcnow())
