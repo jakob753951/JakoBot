@@ -13,7 +13,9 @@ requirements = {
 	'server': [
 		'chan_transaction_history',
 		'currency_name_singular',
-		'currency_name_plural'
+		'currency_name_plural',
+		'coinflip_max_bet',
+		'return_percent'
 	]
 }
 
@@ -28,8 +30,13 @@ class Gambling(commands.Cog):
 
 		bet = await parse_amount(ctx.guild.id, ctx.author.id, amount)
 		if bet < 2:
-			await ctx.send(embed=Embed(title='Bet too low.'))
+			await ctx.send(embed=Embed(title='Bet too low. Minimum is 2.'))
 			return
+
+		if bet > msg_cfg.coinflip_max_bet:
+			await ctx.send(embed=Embed(title=f'Bet too large. Maximum is {msg_cfg.coinflip_max_bet}.'))
+			return
+
 		heads_stings = ['h', 'head', 'heads']
 		tails_stings = ['t', 'tail', 'tails']
 		if guess.lower() in heads_stings:
@@ -47,7 +54,7 @@ class Gambling(commands.Cog):
 		success = result == int_guess
 
 		if success:
-			winnings = int(bet * 0.95)
+			winnings = int(bet * (msg_cfg.return_percent / 100))
 			desc = f'{ctx.author.mention} You guessed it! You won {bet + winnings} {pluralise(msg_cfg, winnings)}'
 		else:
 			winnings = bet * -1
