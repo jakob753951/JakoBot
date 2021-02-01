@@ -24,11 +24,13 @@ async def transaction_log(bot, guild_cfg, recipient: discord.Member, amount: int
 
 	await chan_rx.send(embed=embed)
 
-async def parse_amount(guild_id: int, member_id: int, amount: str):
+async def parse_amount(guild_id: int, member_id: int, amount: str, max_amount: int = None):
 	if amount.lower() == 'all':
 		return await currency.getMemberBalance(guild_id, member_id)
 	if amount.lower() == 'half':
 		return (await currency.getMemberBalance(guild_id, member_id)) // 2
+	if amount.lower() == 'max' and max_amount:
+		return max_amount
 	try:
 		return int(amount)
 	except:

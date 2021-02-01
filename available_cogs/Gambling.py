@@ -1,4 +1,4 @@
-from asyncio import gather, sleep
+from asyncio import gather
 from discord import Embed
 from discord.ext import commands
 from Configuration import *
@@ -28,13 +28,13 @@ class Gambling(commands.Cog):
 	async def bet_flip(self, ctx, amount, guess: str):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 
-		bet = await parse_amount(ctx.guild.id, ctx.author.id, amount)
+		bet = await parse_amount(ctx.guild.id, ctx.author.id, amount, max_amount=msg_cfg.coinflip_max_bet)
 		if bet < 2:
-			await ctx.send(embed=Embed(title='Bet too low. Minimum is 2.'))
+			await ctx.send(embed=Embed(title='Bet too small. Minimum is 2.', color=0xff0000))
 			return
 
 		if bet > msg_cfg.coinflip_max_bet:
-			await ctx.send(embed=Embed(title=f'Bet too large. Maximum is {msg_cfg.coinflip_max_bet}.'))
+			await ctx.send(embed=Embed(title=f'Bet too large. Maximum is {msg_cfg.coinflip_max_bet}.', color=0xff0000))
 			return
 
 		heads_stings = ['h', 'head', 'heads']
@@ -44,11 +44,11 @@ class Gambling(commands.Cog):
 		elif guess.lower() in tails_stings:
 			int_guess = 0
 		else:
-			await ctx.send(embed=Embed(title='Invalid Guess! >:['))
+			await ctx.send(embed=Embed(title='Invalid Guess! >:[', color=0xff0000))
 			return
 
 		if await currency.getMemberBalance(ctx.guild.id, ctx.author.id) < bet:
-			await ctx.send(embed=Embed(title="You don't have enough money to do that"))
+			await ctx.send(embed=Embed(title="You don't have enough money to do that", color=0xff0000))
 
 		result = random.getrandbits(1)
 		success = result == int_guess
@@ -60,7 +60,7 @@ class Gambling(commands.Cog):
 			winnings = bet * -1
 			desc = f'{ctx.author.mention} Better luck next time'
 
-		embed = Embed(description=desc)
+		embed = Embed(description=desc, color=0xffff00)
 		image_url = f"https://ladegaardmoeller.dk/JakoBot/Gambling/Images/{'Heads' if result else 'Tails'}.png"
 		embed.set_image(url=image_url)
 		gather(
