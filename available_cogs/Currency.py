@@ -8,6 +8,7 @@ from CustomChecks import *
 from CurrencyUtils import *
 from itertools import zip_longest
 from collections import namedtuple
+from discord import Embed
 
 
 requirements = {
@@ -73,9 +74,9 @@ class Currency(commands.Cog):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		if amount < 1:
 			if amount == 0:
-				embed = discord.Embed(title='Try again, bud', color=0xff0000, description='You have to send ***something***.')
+				embed = Embed(title='Try again, bud', color=0xff0000, description='You have to send ***something***.')
 			else:
-				embed = discord.Embed(title='Boo hoo.', color=0xff0000, description="Nice try. You can't send negative money...")
+				embed = Embed(title='Boo hoo.', color=0xff0000, description="Nice try. You can't send negative money...")
 
 			sent_msg, _ = await gather(
 				ctx.send(embed=embed),
@@ -89,14 +90,14 @@ class Currency(commands.Cog):
 
 		try:
 			sender_new_balance = await manager.transferBetweenMembers(ctx.guild.id, ctx.author.id, member.id, amount)
-			embed = discord.Embed(description=f'Funds have been sent.', color=0x00ff00)
+			embed = Embed(description=f'Funds have been sent.', color=0x00ff00)
 			embed.add_field(name='New balance:', value=f'{sender_new_balance} {pluralise(self.cfg.servers[ctx.guild.id], sender_new_balance)}')
 			await gather(
 				ctx.send(embed=embed),
 				transaction_log(self.bot, msg_cfg, member, amount, ctx.author, 'Send command')
 			)
 		except InsufficientFundsException as e:
-			await ctx.send(embed=discord.Embed(description=f"You don't have enough money to send. You're missing {e.missing_funds}"))
+			await ctx.send(embed=Embed(description=f"You don't have enough money to send. You're missing {e.missing_funds}"))
 			return
 
 	@commands.command(name='Balance', aliases=['Bal', '$'])
@@ -107,7 +108,7 @@ class Currency(commands.Cog):
 		current_balance = await manager.getMemberBalance(ctx.guild.id, member.id)
 
 		balance_text = f"{member.mention}'s current balance is {current_balance} {pluralise(self.cfg.servers[ctx.guild.id], current_balance)}"
-		embed = discord.Embed(color=0x1111ff, description=balance_text)
+		embed = Embed(color=0x1111ff, description=balance_text)
 		await ctx.send(embed=embed)
 
 	@commands.command(name='Leaderboard', aliases=['LB', 'Scoreboard'])
@@ -119,7 +120,7 @@ class Currency(commands.Cog):
 		members = await manager.getTopRichest(ctx.guild.id, limit)
 		leaderboard = [Member(rank+1, ctx.guild.get_member(mem_info[0]), mem_info[1]) for rank, mem_info in enumerate(members)]
 
-		embed = discord.Embed(title='Leaderboard')
+		embed = Embed(title='Leaderboard')
 		for mem1, mem2 in zip_longest(leaderboard[::2], leaderboard[1::2]):
 			if not mem2:
 				mem2 = Member(None, None, '\u200b')
