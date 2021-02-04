@@ -120,12 +120,12 @@ class Currency(commands.Cog):
 		members = await manager.getTopRichest(ctx.guild.id, limit)
 		leaderboard = [Member(rank+1, ctx.guild.get_member(mem_info[0]), mem_info[1]) for rank, mem_info in enumerate(members)]
 
-		embed = Embed(title='Leaderboard')
+		embed = Embed(title='Leaderboard', color=0x0000ff)
 		for mem1, mem2 in zip_longest(leaderboard[::2], leaderboard[1::2]):
 			if not mem2:
 				mem2 = Member(None, None, '\u200b')
 			embed.add_field(name=rank_string(mem1.rank), value=rank_string(mem2.rank) if mem2.user else '\u200b', inline=True)
-			embed.add_field(name=mem1.user.display_name, value=mem2.user.display_name if mem2.user else '\u200b', inline=True)
+			embed.add_field(name=mem1.user.display_name if mem1.user else '\u200b', value=mem2.user.display_name if mem2.user else '\u200b', inline=True)
 			embed.add_field(name=f'{mem1.balance} {pluralise(msg_cfg, mem1.balance)}', value=f'{mem2.balance} {pluralise(msg_cfg, mem2.balance)}' if mem2.user else '\u200b', inline=True)
 
 		await ctx.send(embed=embed)

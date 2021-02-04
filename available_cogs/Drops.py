@@ -177,7 +177,7 @@ class Drops(commands.Cog):
 
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
 		desc = text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount))
-		embed = discord.Embed(description=desc)
+		embed = discord.Embed(description=desc, color=(0x00ff00 if amount > 0 else 0xff0000))
 		to_do = [
 			transaction_log(self.bot, msg_cfg, ctx.author, amount),
 			ctx.send(embed=embed),
