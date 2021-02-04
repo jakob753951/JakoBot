@@ -88,7 +88,7 @@ class Rewards(commands.Cog):
 
 		self.set_cooldown(ctx.guild.id, member.id, reward_id.lower())
 
-		desc=f"{member.mention} was rewarded for task number {reward_id.upper()}: {reward['name']}"
+		desc=f"{member.mention} was rewarded {amount} {pluralise(guild_cfg, amount)} for task number {reward_id.upper()}: {reward['name']}"
 		embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
 		await gather(
 			manager.addToMemberBalance(ctx.guild.id, member.id, amount),
