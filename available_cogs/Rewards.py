@@ -5,6 +5,7 @@ from Configuration import *
 import CurrencyManager as manager
 from CurrencyUtils import *
 from CustomChecks import *
+from asyncio import gather
 
 requirements = {
 	'general': [],
@@ -86,12 +87,14 @@ class Rewards(commands.Cog):
 		amount = reward['amount']
 
 		self.set_cooldown(ctx.guild.id, member.id, reward_id.lower())
-		await manager.addToMemberBalance(ctx.guild.id, member.id, amount)
 
-		await transaction_log(self.bot, guild_cfg, member, amount, title=f"User was rewarded by {ctx.author.name} for task {reward_id.upper()}: {reward['name']}")
 		desc=f"{member.mention} was rewarded for task number {reward_id.upper()}: {reward['name']}"
 		embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
-		await ctx.send(embed=embed)
+		await gather(
+			manager.addToMemberBalance(ctx.guild.id, member.id, amount),
+			transaction_log(self.bot, guild_cfg, member, amount, title=f"User was rewarded by {ctx.author.name} for task {reward_id.upper()}: {reward['name']}"),
+			ctx.send(embed=embed)
+		)
 
 	@commands.guild_only()
 	@is_admin()
@@ -111,7 +114,10 @@ class Rewards(commands.Cog):
 			desc = f"{reward['description']}{nl}{reward['amount']} {pluralise(guild_cfg, reward['amount'])}"
 			embed.add_field(name=title, value=desc, inline=False)
 
-		await channel.send(embed=embed)
+		await gather(
+			channel.send(embed=embed),
+			ctx.message.delete()
+		)
 
 
 def setup(bot):
