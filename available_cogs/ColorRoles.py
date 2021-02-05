@@ -57,7 +57,7 @@ def get_role_menu(guild: discord.Guild, role_index: int) -> Embed:
 class ColorRoles(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 		self.menus = {}
 		self.examine_messages = {}
 		self.confirms = {}
