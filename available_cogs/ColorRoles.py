@@ -35,7 +35,7 @@ def get_preset_role_info(guild: discord.Guild, role_index: int) -> dict:
 		'price': guild_data['preset_cost']
 	}
 
-def get_role_menu(guild: discord.Guild, role_index: int) -> Embed:
+def get_role_embed(guild: discord.Guild, role_index: int) -> Embed:
 	with open('data/ColorRoles.json') as color_roles_file:
 		color_roles = json.loads(color_roles_file.read())
 
@@ -54,6 +54,18 @@ def get_role_menu(guild: discord.Guild, role_index: int) -> Embed:
 
 	return embed
 
+def get_menu_embed(guild: discord.Guild, page: int) -> Embed:
+	preset_roles = get_preset_roles(guild.id)
+
+	numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
+	desc = '\n'.join([
+		f"{numbers[i]} : {guild.get_role(role_id).name}"
+		for i, role_id
+		in enumerate(preset_roles[page*10:page*10+10])
+	])
+
+	return Embed(title='Preset Color Roles:', description=desc)
+
 class ColorRoles(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -64,21 +76,14 @@ class ColorRoles(commands.Cog):
 
 	async def display_menu(self, guild: discord.Guild, channel: discord.abc.Messageable, page: int):
 		preset_roles = get_preset_roles(guild.id)
-
 		numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
-		desc = '\n'.join([
-			f"{numbers[i]} : {guild.get_role(role_id).name}"
-			for i, role_id
-			in enumerate(preset_roles[page*10:page*10+10])
-		])
-
-		sent_msg = await channel.send(embed=Embed(title='Preset Color Roles:', description=desc))
+		sent_msg = await channel.send(embed=get_menu_embed(guild, page))
 		self.menus[sent_msg.id] = 0
 		emojis = ['◀', '▶', *numbers]
 		await gather(*(sent_msg.add_reaction(emoji) for emoji in emojis[:len(preset_roles)+2]))
 
 	async def display_examine(self, guild: discord.Guild, channel: discord.abc.Messageable, role_index: int):
-		embed = get_role_menu(guild, role_index)
+		embed = get_role_embed(guild, role_index)
 
 		sent_msg = await channel.send(embed=embed)
 
@@ -118,7 +123,7 @@ class ColorRoles(commands.Cog):
 				page = page % ((len(get_preset_roles(guild.id)) // 10) + 1)
 
 				self.menus[message.id] = page
-				await message.edit(embed=self.display_menu(guild, channel, page))
+				await message.edit(embed=get_menu_embed(guild, page))
 				return
 
 			numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
@@ -126,7 +131,7 @@ class ColorRoles(commands.Cog):
 			selection = numbers.index(reaction.emoji)
 			index = 10*page+selection
 
-			await message.edit(embed=get_role_menu(guild, index))
+			await message.edit(embed=get_role_embed(guild, index))
 			await message.clear_reactions()
 			await gather(*(message.add_reaction(emoji) for emoji in ['◀', '💰', '▶']))
 			del self.menus[message.id]
@@ -160,7 +165,7 @@ class ColorRoles(commands.Cog):
 				page += 1
 			self.examine_messages[message.id] = page
 
-			await message.edit(embed=get_role_menu(guild, page))
+			await message.edit(embed=get_role_embed(guild, page))
 
 
 		if message.id in self.confirms:
@@ -169,6 +174,7 @@ class ColorRoles(commands.Cog):
 				return
 
 			if reaction.emoji == '❎':
+				del self.confirms[message.id]
 				await message.delete()
 
 			if reaction.emoji == '✅':
