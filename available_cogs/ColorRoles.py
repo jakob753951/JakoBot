@@ -49,7 +49,7 @@ def get_role_menu(guild: discord.Guild, role_index: int) -> Embed:
 	embed = Embed(
 		title=role.name,
 		color=role.color,
-		description=guild_data['instructions']
+		description=guild_data['instructions'].format(amount=guild_data['preset_cost'])
 	)
 
 	return embed
