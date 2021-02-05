@@ -67,12 +67,12 @@ class ColorRoles(commands.Cog):
 
 		numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
 		desc = '\n'.join([
-			f"**{numbers[i]} : {guild.get_role(role_id).name}**"
+			f"{numbers[i]} : {guild.get_role(role_id).name}"
 			for i, role_id
 			in enumerate(preset_roles[page*10:page*10+10])
 		])
 
-		sent_msg = await channel.send(embed=Embed(description=desc))
+		sent_msg = await channel.send(embed=Embed(title='Preset Color Roles:', description=desc))
 		self.menus[sent_msg.id] = 0
 		emojis = ['◀', '▶', *numbers]
 		await gather(*(sent_msg.add_reaction(emoji) for emoji in emojis[:len(preset_roles)+2]))
@@ -117,8 +117,8 @@ class ColorRoles(commands.Cog):
 
 				page = page % ((len(get_preset_roles(guild.id)) // 10) + 1)
 
-				self.examine_messages[message.id] = page
-				await message.edit(embed=get_role_menu(guild, page))
+				self.menus[message.id] = page
+				await message.edit(embed=self.display_menu(guild, channel, page))
 				return
 
 			numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
