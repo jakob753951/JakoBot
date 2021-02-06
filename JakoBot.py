@@ -34,7 +34,7 @@ async def on_ready():
 
 is_owner = lambda ctx: ctx.author.id == cfg.owner_id
 
-@bot.command()
+@bot.command(name='Load', aliases=['Enable'])
 @commands.check(is_owner)
 async def load(ctx, extension_name: str):
 	try:
@@ -44,7 +44,7 @@ async def load(ctx, extension_name: str):
 		embed = discord.Embed(color=0xff0000, title='An error occurrred while loading:', description=repr(e))
 	await ctx.send(embed=embed)
 
-@bot.command()
+@bot.command(name='Unload', aliases=['Disable'])
 @commands.check(is_owner)
 async def unload(ctx, extension_name: str):
 	try:
