@@ -53,7 +53,7 @@ class Configuration:
 
 		sep = ',\n\t\t'
 		cfg_file.write(f"""
-def load_config(filename):
+def load_config(filename = 'Config.json'):
 	with open(filename, encoding='utf8') as cfg_file:
 		jsonfile = json.loads(cfg_file.read())
 
