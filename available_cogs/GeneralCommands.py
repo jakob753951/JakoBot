@@ -32,6 +32,13 @@ class GeneralCommands(commands.Cog):
 			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 		)
 
+	@commands.command(name='SayNoEmbed', aliases=['NoEmbedSay'])
+	async def say_no_embed(self, ctx, channel: discord.TextChannel, *, message):
+		await asyncio.gather(
+			channel.send(message, files=ctx.message.attachments),
+			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+		)
+
 
 def setup(bot):
 	bot.add_cog(GeneralCommands(bot))
