@@ -25,18 +25,6 @@ class PlayFile(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
-	@commands.Cog.listener()
-	async def on_message(self, message):
-		if message.author.id != 250667785368109056:
-			return
-
-		idea_strings = ['i have an idea', 'i have got an idea', 'i gots an idea', 'i has an idea', 'i got an idea', 'ive got an idea', "i've got an idea"]
-		if any(s in message.content.lower() for s in idea_strings):
-			await gather(
-				play_file(message.author.voice.channel, 'https://ladegaardmoeller.dk/audio/OhNo.mp3', .5),
-				message.channel.send('https://tenor.com/view/idea-light-bulb-lightbulb-gif-5187169')
-			)
-
 	@commands.command(name='Play', aliases=['P'])
 	async def play(self, ctx, url: str, volume: float = .5):
 		await gather(
