@@ -1,3 +1,4 @@
+from Configuration import load_config
 import discord
 from discord.ext import commands
 import asyncio
@@ -24,6 +25,7 @@ async def play_file(channel, filename, volume = 1):
 class PlayFile(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
+		self.cfg = load_config()
 
 	@commands.command(name='Play', aliases=['P'])
 	async def play(self, ctx, url: str, volume: float = .5):
