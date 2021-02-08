@@ -61,40 +61,41 @@ class Rewards(commands.Cog):
 	@commands.guild_only()
 	@commands.check_any(is_admin(), is_staff())
 	@commands.command(name='Reward', aliases=['Award'])
-	async def reward(self, ctx, member: discord.Member, reward_id: str):
+	async def reward(self, ctx, member: discord.Member, *reward_ids):
 		if ctx.author == member:
 			return
 
 		guild_cfg = self.cfg.servers[ctx.guild.id]
-		try:
-			reward = self.get_reward(ctx.guild.id, reward_id.lower())
-		except ValueError as e:
-			await ctx.send(repr(e))
-			return
+		for reward_id in reward_ids:
+			try:
+				reward = self.get_reward(ctx.guild.id, reward_id.lower())
+			except ValueError as e:
+				await ctx.send(repr(e))
+				return
 
-		last_reward_time = self.get_cooldown(ctx.guild.id, member.id, reward_id.lower())
+			last_reward_time = self.get_cooldown(ctx.guild.id, member.id, reward_id.lower())
 
-		available_time = last_reward_time + timedelta(hours=reward['cooldown_in_hours'])
+			available_time = last_reward_time + timedelta(hours=reward['cooldown_in_hours'])
 
-		cur_time = datetime.utcnow()
-		if not available_time < cur_time:
-			title = f'Reward not yet available.'
-			embed = discord.Embed(color=0xff0000, title=title, timestamp=available_time)
-			embed.set_footer(text='Next reward will be available: ')
-			await ctx.send(embed=embed)
-			return
+			cur_time = datetime.utcnow()
+			if not available_time < cur_time:
+				title = f"Reward {reward['name']} not yet available."
+				embed = discord.Embed(color=0xff0000, title=title, timestamp=available_time)
+				embed.set_footer(text='Next reward will be available: ')
+				await ctx.send(embed=embed)
+				return
 
-		amount = reward['amount']
+			amount = reward['amount']
 
-		self.set_cooldown(ctx.guild.id, member.id, reward_id.lower())
+			self.set_cooldown(ctx.guild.id, member.id, reward_id.lower())
 
-		desc=f"{member.mention} was rewarded {amount} {pluralise(guild_cfg, amount)} for task number {reward_id.upper()}: {reward['name']}"
-		embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
-		await gather(
-			manager.addToMemberBalance(ctx.guild.id, member.id, amount),
-			transaction_log(self.bot, guild_cfg, member, amount, title=f"User was rewarded by {ctx.author.name} for task {reward_id.upper()}: {reward['name']}"),
-			ctx.send(embed=embed)
-		)
+			desc=f"{member.mention} was rewarded {amount} {pluralise(guild_cfg, amount)} for task number {reward_id.upper()}: {reward['name']}"
+			embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
+			await gather(
+				manager.addToMemberBalance(ctx.guild.id, member.id, amount),
+				transaction_log(self.bot, guild_cfg, member, amount, title=f"User was rewarded by {ctx.author.name} for task {reward_id.upper()}: {reward['name']}"),
+				ctx.send(embed=embed)
+			)
 
 	@commands.guild_only()
 	@is_admin()
