@@ -13,11 +13,11 @@ def after(error):
 		print(error)
 	stop_event.set()
 
-async def play_file(channel, filename, volume = 1):
+async def play_file(channel, source_uri, volume = 1):
 	voice = channel.guild.voice_client
 	if not voice:
 		voice = await channel.connect()
-	audio = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(filename), volume)
+	audio = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(source_uri), volume)
 	voice.play(audio, after=after)
 	await stop_event.wait()
 	await voice.disconnect()
@@ -28,11 +28,15 @@ class PlayFile(commands.Cog):
 		self.cfg = load_config()
 
 	@commands.command(name='Play', aliases=['P'])
-	async def play(self, ctx, url: str, volume: float = .5):
+	async def play(self, ctx, source: str, volume: float = .5):
 		await gather(
-			play_file(ctx.author.voice.channel, url, volume),
+			play_file(ctx.author.voice.channel, source, volume),
 			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 		)
+
+	@commands.command(name='Stop', aliases=['DC'])
+	async def stop(self, ctx):
+		await ctx.guild.voice_client.disconnect()
 
 
 def setup(bot):
