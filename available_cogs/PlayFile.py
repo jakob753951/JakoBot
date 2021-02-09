@@ -13,7 +13,7 @@ def after(error):
 		print(error)
 	stop_event.set()
 
-async def play_file(channel, source_uri, volume = 1):
+async def play_file(channel: discord.VoiceChannel, source_uri: str, volume: float = .5):
 	voice = channel.guild.voice_client
 	if not voice:
 		voice = await channel.connect()
