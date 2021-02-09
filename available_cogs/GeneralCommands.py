@@ -2,6 +2,7 @@ import asyncio
 import discord
 from discord import Embed
 from discord.ext import commands
+from discord.ext.commands.converter import TextChannelConverter
 from Configuration import load_config
 
 requirements = {'general': [], 'server': ['react_confirm']}
@@ -26,18 +27,38 @@ class GeneralCommands(commands.Cog):
 			await ctx.send("Yea.")
 
 	@commands.command(name='Say')
-	async def say(self, ctx, channel: discord.TextChannel, *, message):
-		await asyncio.gather(
-			channel.send(embed=Embed(description=message), files=ctx.message.attachments),
-			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
-		)
+	async def say(self, ctx, *args):
+		try:
+			to_convert = args[0]
+			cvt = TextChannelConverter()
+			channel = await cvt.convert(ctx, to_convert)
+			message = ' '.join(args[1:])
+			await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+		except Exception as e:
+			channel = ctx.channel
+			message = ' '.join(args)
+			await ctx.message.delete()
+
+		message = message.replace('\\n', '\n')
+
+		await channel.send(embed=Embed(description=message, color=0xff8000), files=ctx.message.attachments)
 
 	@commands.command(name='SayNoEmbed', aliases=['NoEmbedSay'])
-	async def say_no_embed(self, ctx, channel: discord.TextChannel, *, message):
-		await asyncio.gather(
-			channel.send(message, files=ctx.message.attachments),
-			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
-		)
+	async def say_no_embed(self, ctx, *args):
+		try:
+			to_convert = args[0]
+			cvt = TextChannelConverter()
+			channel = await cvt.convert(ctx, to_convert)
+			message = ' '.join(args[1:])
+			await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+		except Exception as e:
+			channel = ctx.channel
+			message = ' '.join(args)
+			await ctx.message.delete()
+
+		message = message.replace('\\n', '\n')
+
+		await channel.send(message, files=ctx.message.attachments)
 
 
 def setup(bot):
