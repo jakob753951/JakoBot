@@ -12,9 +12,9 @@ async def transaction_log(bot, guild_cfg, recipient: discord.Member, amount: int
 	chan_rx = await bot.fetch_channel(guild_cfg.chan_transaction_history)
 
 	if sender:
-		desc = f'{sender.mention} sent {recipient.mention} {amount} {pluralise(guild_cfg, amount)}'
+		desc = f'{sender.mention} sent {recipient.mention} {abs(amount)} {pluralise(guild_cfg, amount)}'
 	else:
-		desc = f"{recipient.mention} {'got' if amount >= 0 else 'lost'} {amount} {pluralise(guild_cfg, amount)}"
+		desc = f"{recipient.mention} {'got' if amount >= 0 else 'lost'} {abs(amount)} {pluralise(guild_cfg, amount)}"
 
 	embed = discord.Embed(color=0x0000ff, title=title, description=desc, timestamp=datetime.utcnow())
 	embed.set_author(name=f'{recipient.name}#{recipient.discriminator}', icon_url=recipient.avatar_url)
