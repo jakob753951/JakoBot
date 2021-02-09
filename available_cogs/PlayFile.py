@@ -14,6 +14,8 @@ def after(error):
 	stop_event.set()
 
 async def play_file(channel: discord.VoiceChannel, source_uri: str, volume: float):
+	if not (source_uri.startswith('https://') or source_uri.startswith('http://')):
+		source_uri = f'/mnt/volume_fra1_01/Music/{source_uri}.mp3'
 	voice = channel.guild.voice_client
 	if not voice:
 		voice = await channel.connect()
@@ -29,7 +31,7 @@ class PlayFile(commands.Cog):
 		self.cfg = load_config()
 
 	@commands.command(name='Play', aliases=['P'])
-	async def play(self, ctx, source: str, volume_percent: int = 25):
+	async def play(self, ctx, source: str, volume_percent: int = 10):
 		await gather(
 			play_file(ctx.author.voice.channel, source, min(1, volume_percent/100)),
 			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
