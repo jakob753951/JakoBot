@@ -18,12 +18,18 @@ class Logging(commands.Cog):
 
 		embed = discord.Embed(color=0x0000ff, description=f'**Message edited in {after.channel.mention}**', timestamp=datetime.utcnow())
 		embed.set_author(name=f'{after.author.name}#{after.author.discriminator}', icon_url=after.author.avatar_url)
-		embed.add_field(name='Before', value=f'{before.content}', inline=False)
-		embed.add_field(name='After', value=f'{after.content}', inline=False)
+		embed.add_field(name='Before', value=f'{before.content or "[No content]"}', inline=False)
+		embed.add_field(name='After', value=f'{after.content or "[No content]"}', inline=False)
 		embed.set_footer(text=f'User ID: {after.id}')
 
 		webhook = Webhook.from_url(self.cfg.servers[after.guild.id].msg_log_webhook_url, adapter=RequestsWebhookAdapter())
-		webhook.send(embed=embed)
+		try:
+			webhook.send(embed=embed)
+		except Exception as err:
+			print(f'err: {err}')
+			print(f'before.content: {before.content}')
+			print(f'after.content: {after.content}')
+
 
 	@commands.Cog.listener()
 	async def on_raw_message_delete(self, payload):
