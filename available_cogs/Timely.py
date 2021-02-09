@@ -68,8 +68,8 @@ class Timely(commands.Cog):
 
 		cur_time = datetime.utcnow()
 		if not available_time < cur_time:
-			title = f"Timely isn't available yet."
-			embed = Embed(color=0xff0000, title=title, timestamp=available_time)
+			desc = f"**{ctx.author.mention} Timely isn't available yet.**"
+			embed = Embed(color=0xff0000, description=desc, timestamp=available_time)
 			embed.set_footer(text='Next timely will be available: ')
 			responses: list = await gather(
 				ctx.send(embed=embed),
