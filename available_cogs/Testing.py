@@ -11,9 +11,9 @@ class GeneralCommands(commands.Cog):
 
 	@is_admin()
 	@commands.command(name='embed')
-	async def embed(self, ctx, *, embed):
+	async def embed(self, ctx):
 		with open('data/Embed.json') as embed_file:
-			embed_dict = json.loads(embed_file.read)
+			embed_dict = json.loads(embed_file.read())
 		embed = discord.Embed.from_dict(embed_dict)
 		await ctx.send(embed=embed)
 		await ctx.message.delete()
