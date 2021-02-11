@@ -18,8 +18,7 @@ fmt = "%Y-%m-%dT%H:%M:%S"
 def pluralise(server_cfg, amount):
 	if abs(amount) == 1:
 		return server_cfg.currency_name_singular
-	else:
-		return server_cfg.currency_name_plural
+	return server_cfg.currency_name_plural
 
 class Drops(commands.Cog):
 	def __init__(self, bot):
