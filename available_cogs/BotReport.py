@@ -16,10 +16,11 @@ class ForwardDM(commands.Cog):
 		server_cfg = self.cfg.servers[ctx.guild.id]
 
 		was_report_created = await self.try_create_report(member)
-		if was_report_created:
-			await ctx.message.add_reaction(server_cfg.react_confirm)
-		else:
+		if not was_report_created:
 			await ctx.send('this user has already been reported')
+			return
+
+		await ctx.message.add_reaction(server_cfg.react_confirm)
 
 	async def try_create_report(self, reported_member: discord.Member):
 		try:
