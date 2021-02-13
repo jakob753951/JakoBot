@@ -21,43 +21,43 @@ requirements = {
 
 fmt = "%Y-%m-%dT%H:%M:%S"
 
+def get_cooldown(guild_id, user_id, reward_id):
+	with open('data/RewardCooldowns.json') as cooldowns_file:
+		cooldowns = json.loads(cooldowns_file.read())
+
+	try:
+		time_string = cooldowns[str(guild_id)][str(user_id)][str(reward_id)]
+		return datetime.strptime(time_string, fmt)
+	except:
+		return datetime.min
+
+def set_cooldown(guild_id, user_id, reward_id):
+	with open('data/RewardCooldowns.json') as cooldowns_file:
+		cooldowns = json.loads(cooldowns_file.read())
+	if str(guild_id) not in cooldowns:
+		cooldowns[str(guild_id)] = {}
+	if str(user_id) not in cooldowns[str(guild_id)]:
+		cooldowns[str(guild_id)][str(user_id)] = {}
+	cooldowns[str(guild_id)][str(user_id)][str(reward_id)] = datetime.strftime(datetime.utcnow(), fmt)
+	with open('data/RewardCooldowns.json', 'w') as cooldowns_file:
+		cooldowns_file.write(json.dumps(cooldowns, indent=4))
+
+def get_reward(guild_id, reward_id):
+	with open('data/Rewards.json') as rewards_file:
+		rewards = json.loads(rewards_file.read())
+
+	if not str(guild_id) in rewards:
+		raise ValueError('Rewards have not been registered for this server.')
+	reward_list = [reward for reward in rewards[str(guild_id)] if reward['id'] == reward_id]
+	if len(reward_list) != 1:
+		raise ValueError('Invalid reward id. Please try again with a correct one.')
+
+	return reward_list[0]
+
 class Rewards(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
-
-	def get_cooldown(self, guild_id, user_id, reward_id):
-		with open('data/RewardCooldowns.json') as cooldowns_file:
-			cooldowns = json.loads(cooldowns_file.read())
-
-		try:
-			time_string = cooldowns[str(guild_id)][str(user_id)][str(reward_id)]
-			return datetime.strptime(time_string, fmt)
-		except:
-			return datetime.min
-
-	def set_cooldown(self, guild_id, user_id, reward_id):
-		with open('data/RewardCooldowns.json') as cooldowns_file:
-			cooldowns = json.loads(cooldowns_file.read())
-		if str(guild_id) not in cooldowns:
-			cooldowns[str(guild_id)] = {}
-		if str(user_id) not in cooldowns[str(guild_id)]:
-			cooldowns[str(guild_id)][str(user_id)] = {}
-		cooldowns[str(guild_id)][str(user_id)][str(reward_id)] = datetime.strftime(datetime.utcnow(), fmt)
-		with open('data/RewardCooldowns.json', 'w') as cooldowns_file:
-			cooldowns_file.write(json.dumps(cooldowns, indent=4))
-
-	def get_reward(self, guild_id, reward_id):
-		with open('data/Rewards.json') as rewards_file:
-			rewards = json.loads(rewards_file.read())
-
-		if not str(guild_id) in rewards:
-			raise ValueError('Rewards have not been registered for this server.')
-		reward_list = [reward for reward in rewards[str(guild_id)] if reward['id'] == reward_id]
-		if len(reward_list) != 1:
-			raise ValueError('Invalid reward id. Please try again with a correct one.')
-
-		return reward_list[0]
 
 	@commands.guild_only()
 	@commands.check_any(is_admin(), is_staff())
@@ -69,12 +69,12 @@ class Rewards(commands.Cog):
 		guild_cfg = self.cfg.servers[ctx.guild.id]
 		for reward_id in reward_ids:
 			try:
-				reward = self.get_reward(ctx.guild.id, reward_id.lower())
+				reward = get_reward(ctx.guild.id, reward_id.lower())
 			except ValueError as e:
 				await ctx.send(repr(e))
 				return
 
-			last_reward_time = self.get_cooldown(ctx.guild.id, member.id, reward_id.lower())
+			last_reward_time = get_cooldown(ctx.guild.id, member.id, reward_id.lower())
 
 			available_time = last_reward_time + timedelta(hours=reward['cooldown_in_hours'])
 
@@ -88,7 +88,7 @@ class Rewards(commands.Cog):
 
 			amount = reward['amount']
 
-			self.set_cooldown(ctx.guild.id, member.id, reward_id.lower())
+			set_cooldown(ctx.guild.id, member.id, reward_id.lower())
 
 			desc=f"{member.mention} was rewarded {amount} {pluralise(guild_cfg, amount)} for task number {reward_id.upper()}: {reward['name']}"
 			embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
