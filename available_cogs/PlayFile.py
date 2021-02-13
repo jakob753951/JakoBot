@@ -29,18 +29,18 @@ class PlayFile(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config()
-		self.volume = .1
+		self.player_volume = .1
 
 	@commands.command(name='Play', aliases=['P'])
 	async def play(self, ctx, *, source: str):
 		await gather(
-			play_file(ctx.author.voice.channel, source, self.volume),
+			play_file(ctx.author.voice.channel, source, self.player_volume),
 			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 		)
 
 	@commands.command(name='Volume', aliases=['Vol'])
 	async def volume(self, ctx, new_volume: int):
-		self.volume = new_volume/100
+		self.player_volume = new_volume/100
 
 	@commands.command(name='Stop', aliases=['DC'])
 	async def stop(self, ctx):
