@@ -15,10 +15,10 @@ def get_rewards(service, sheet_id) -> list:
 	rewards = []
 
 	for row in values:
-		id, name, description, amount, cooldown_in_hours, active = row
+		reward_id, name, description, amount, cooldown_in_hours, active = row
 		if active.lower() == 'yes':
 			rewards.append({
-				'id': id,
+				'id': reward_id,
 				'name': name,
 				'description': description,
 				'amount': int(amount),
