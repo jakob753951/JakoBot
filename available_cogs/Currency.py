@@ -2,7 +2,7 @@ from asyncio import gather, sleep
 from CustomExceptions import InsufficientFundsException
 import discord
 from discord.ext import commands
-from Configuration import *
+from Configuration import load_config
 import CurrencyManager as manager
 from CustomChecks import *
 from CurrencyUtils import *
@@ -90,7 +90,7 @@ class Currency(commands.Cog):
 
 		try:
 			sender_new_balance = await manager.transferBetweenMembers(ctx.guild.id, ctx.author.id, member.id, amount)
-			embed = Embed(description=f'Funds have been sent.', color=0x00ff00)
+			embed = Embed(description='Funds have been sent.', color=0x00ff00)
 			embed.add_field(name='New balance:', value=f'{sender_new_balance} {pluralise(self.cfg.servers[ctx.guild.id], sender_new_balance)}')
 			await gather(
 				ctx.send(embed=embed),
