@@ -9,6 +9,29 @@ from dataclasses import dataclass
 
 requirements = {'general': [], 'server': ['react_confirm', 'chan_member_log']}
 
+def load_warnings():
+	with open('data/Warning.json', 'r', encoding="utf8") as warning_file:
+		return defaultdict(lambda: defaultdict(list),
+		{
+			guild_id: defaultdict(list,
+			{
+				id:
+				[
+					Warning(warning['time'], warning['reason'], warning['strikes'])
+					for warning
+					in warning_list
+				]
+				for id, warning_list
+				in warnings.items()
+			})
+			for guild_id, warnings
+			in json.loads(warning_file.read()).items()
+		})
+
+def save_warnings(guilds):
+	with open('data/Warning.json', 'w', encoding="utf8") as warning_file:
+		warning_file.write(json.dumps(guilds, indent=4))
+
 @dataclass
 class UserWarning:
     time: datetime
@@ -45,30 +68,7 @@ class Warning(commands.Cog):
 
 	def add_warning(self, guild_id, user_id, reason, strikes):
 		self.guilds[str(guild_id)][str(user_id)].append(UserWarning(time=datetime.now(), reason=reason, strikes=strikes))
-		self.save_warnings()
-
-	def load_warnings(self):
-		with open('data/Warning.json', 'r', encoding="utf8") as warning_file:
-			return defaultdict(lambda: defaultdict(list),
-			{
-				guild_id: defaultdict(list,
-				{
-					id:
-					[
-						Warning(warning['time'], warning['reason'], warning['strikes'])
-						for warning
-						in warning_list
-					]
-					for id, warning_list
-					in warnings.items()
-				})
-				for guild_id, warnings
-				in json.loads(warning_file.read()).items()
-			})
-
-	def save_warnings(self):
-		with open('data/Warning.json', 'w', encoding="utf8") as warning_file:
-			warning_file.write(json.dumps(self.guilds, indent=4))
+		save_warnings(self.guilds)
 
 
 def setup(bot):
