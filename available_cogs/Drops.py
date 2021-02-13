@@ -5,7 +5,7 @@ import asyncio
 import json
 import discord
 from discord.ext import commands
-from Configuration import *
+from Configuration import load_config
 import CurrencyManager as currency
 from CurrencyUtils import *
 from CustomExceptions import *

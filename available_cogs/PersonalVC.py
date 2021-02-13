@@ -1,6 +1,6 @@
 import asyncio
 from discord.ext import commands
-from Configuration import *
+from Configuration import load_config
 
 requirements = {'general': [], 'server': ['cate_personal_vc', 'chan_personal_vc']}
 
