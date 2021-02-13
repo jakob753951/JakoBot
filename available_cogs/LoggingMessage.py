@@ -5,6 +5,9 @@ from datetime import datetime
 
 requirements = {'general': [], 'server': ['chan_message_log', 'chan_member_log']}
 
+def get_member_count(guild: discord.Guild):
+	return len([member for member in guild.members if not member.bot])
+
 class LoggingMessage(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -70,9 +73,6 @@ class LoggingMessage(commands.Cog):
 
 		log_channel = await self.bot.fetch_channel(self.cfg.servers[member.guild.id].chan_member_log)
 		await log_channel.send(embed=embed)
-
-	def get_member_count(self, guild: discord.Guild):
-		return len([member for member in guild.members if not member.bot])
 
 
 def setup(bot):

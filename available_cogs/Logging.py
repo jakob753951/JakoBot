@@ -6,6 +6,9 @@ from datetime import datetime
 
 requirements = {'general': [], 'server': ['msg_log_webhook_url', 'member_log_webhook_url']}
 
+def get_member_count(guild: discord.Guild):
+	return len([member for member in guild.members if not member.bot])
+
 class Logging(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -77,9 +80,6 @@ class Logging(commands.Cog):
 
 		webhook = Webhook.from_url(self.cfg.servers[member.guild.id].member_log_webhook_url, adapter=RequestsWebhookAdapter())
 		webhook.send(embed=embed)
-
-	def get_member_count(self, guild: discord.Guild):
-		return len([member for member in guild.members if not member.bot])
 
 
 def setup(bot):
