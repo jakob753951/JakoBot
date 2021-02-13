@@ -1,6 +1,5 @@
 from asyncio import gather, sleep
 from datetime import timedelta
-import discord
 from discord import Embed
 from discord.ext import commands
 from Configuration import *
@@ -28,7 +27,7 @@ def get_cooldown(guild_id, user_id):
 		try:
 			time_string = cooldowns[str(guild_id)][str(user_id)]
 			return datetime.strptime(time_string, fmt)
-		except:
+		except Exception:
 			return datetime.min
 
 def set_cooldown(guild_id, user_id):
