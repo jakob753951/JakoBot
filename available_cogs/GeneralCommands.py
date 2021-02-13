@@ -1,4 +1,3 @@
-import asyncio
 import discord
 from discord import Embed
 from discord.ext import commands
@@ -29,10 +28,13 @@ class GeneralCommands(commands.Cog):
 	@commands.command(name='Say')
 	async def say(self, ctx, *args):
 		try:
+			# If this conversion succeeds, the user specified a channel
+			# If an exception is raised, the user didn't specify a channel,
+			# and we send the message to the currency channel
 			channel = await TextChannelConverter().convert(ctx, args[0])
 			args = args[1:]
 			await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
-		except Exception as e:
+		except Exception:
 			channel = ctx.channel
 			await ctx.message.delete()
 
