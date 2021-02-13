@@ -28,7 +28,7 @@ def get_cooldown(guild_id, user_id, reward_id):
 	try:
 		time_string = cooldowns[str(guild_id)][str(user_id)][str(reward_id)]
 		return datetime.strptime(time_string, fmt)
-	except:
+	except Exception:
 		return datetime.min
 
 def set_cooldown(guild_id, user_id, reward_id):
