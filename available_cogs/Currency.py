@@ -90,7 +90,7 @@ class Currency(commands.Cog):
 
 		try:
 			sender_new_balance = await manager.transferBetweenMembers(ctx.guild.id, ctx.author.id, member.id, amount)
-			embed = Embed(description=f'Funds have been sent.', color=0x00ff00)
+			embed = Embed(description='Funds have been sent.', color=0x00ff00)
 			embed.add_field(name='New balance:', value=f'{sender_new_balance} {pluralise(self.cfg.servers[ctx.guild.id], sender_new_balance)}')
 			await gather(
 				ctx.send(embed=embed),
