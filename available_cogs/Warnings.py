@@ -17,7 +17,11 @@ def load_warnings():
 			{
 				id:
 				[
-					Warning(warning['time'], warning['reason'], warning['strikes'])
+					MemberWarning(
+						time=warning['time'],
+						reason=warning['reason'],
+						strikes=warning['strikes']
+					)
 					for warning
 					in warning_list
 				]
@@ -33,12 +37,12 @@ def save_warnings(guilds):
 		warning_file.write(json.dumps(guilds, indent=4))
 
 @dataclass
-class UserWarning:
+class MemberWarning:
     time: datetime
     reason: str = '[no reason given]'
     strikes: int = 1
 
-class Warning(commands.Cog):
+class Warnings(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
@@ -67,9 +71,9 @@ class Warning(commands.Cog):
 		ctx.send(embed=embed)
 
 	def add_warning(self, guild_id, user_id, reason, strikes):
-		self.guilds[str(guild_id)][str(user_id)].append(UserWarning(time=datetime.now(), reason=reason, strikes=strikes))
+		self.guilds[str(guild_id)][str(user_id)].append(MemberWarning(time=datetime.now(), reason=reason, strikes=strikes))
 		save_warnings(self.guilds)
 
 
 def setup(bot):
-	bot.add_cog(Warning(bot))
+	bot.add_cog(Warnings(bot))
