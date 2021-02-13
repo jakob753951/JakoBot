@@ -45,7 +45,7 @@ class ForwardDM(commands.Cog):
 
 		to_channel = await self.bot.fetch_channel(server_cfg.chan_reports)
 
-		embed = self.get_report_embed(reported_member)
+		embed = get_report_embed(reported_member)
 
 		msg = await to_channel.send(embed=embed)
 		# await msg.add_reaction(server_cfg.react_positive)
