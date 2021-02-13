@@ -5,6 +5,10 @@ from Configuration import load_config
 
 requirements = {'general': [], 'server': ['react_confirm', 'chan_reports', 'react_positive', 'react_negative']}
 
+def get_report_embed(member: discord.Member):
+	desc = f'{member.mention} has been reported for being a bot. Should they be banned?'
+	return discord.Embed(description=desc)
+
 class ForwardDM(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -49,10 +53,7 @@ class ForwardDM(commands.Cog):
 
 		return msg.id
 
-	def get_report_embed(self, member: discord.Member):
-		desc = f'{member.mention} has been reported for being a bot. Should they be banned?'
-		embed = discord.Embed(description=desc)
-		return embed
+
 
 
 def setup(bot):
