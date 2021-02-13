@@ -6,6 +6,18 @@ from Configuration import load_config
 
 requirements = {'general': [], 'server': ['react_confirm']}
 
+async def parse_args(ctx, args, react_confirm):
+	try:
+		channel = await TextChannelConverter().convert(ctx, args[0])
+		args = args[1:]
+		await ctx.message.add_reaction(react_confirm)
+	except Exception:
+		channel = ctx.channel
+		await ctx.message.delete()
+
+	message = ' '.join(args).replace('\\n', '\n')
+	return (channel, message)
+
 class GeneralCommands(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -27,31 +39,12 @@ class GeneralCommands(commands.Cog):
 
 	@commands.command(name='Say')
 	async def say(self, ctx, *args):
-		try:
-			# If this conversion succeeds, the user specified a channel
-			# If an exception is raised, the user didn't specify a channel,
-			# and we send the message to the currency channel
-			channel = await TextChannelConverter().convert(ctx, args[0])
-			args = args[1:]
-			await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
-		except Exception:
-			channel = ctx.channel
-			await ctx.message.delete()
-
-		message = ' '.join(args).replace('\\n', '\n')
+		channel, message = parse_args(ctx, args, self.cfg.servers[ctx.guild.id].react_confirm)
 		await channel.send(embed=Embed(description=message, color=0xff8000), files=ctx.message.attachments)
 
 	@commands.command(name='SayNoEmbed', aliases=['NoEmbedSay'])
 	async def say_no_embed(self, ctx, *args):
-		try:
-			channel = await TextChannelConverter().convert(ctx, args[0])
-			args = args[1:]
-			await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
-		except Exception as e:
-			channel = ctx.channel
-			await ctx.message.delete()
-
-		message = ' '.join(args).replace('\\n', '\n')
+		channel, message = parse_args(ctx, args, self.cfg.servers[ctx.guild.id].react_confirm)
 		await channel.send(message, files=ctx.message.attachments)
 
 
