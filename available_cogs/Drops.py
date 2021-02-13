@@ -15,11 +15,6 @@ requirements = {'general': [], 'server': ['react_confirm', 'currency_name_singul
 
 fmt = "%Y-%m-%dT%H:%M:%S"
 
-def pluralise(server_cfg, amount):
-	if abs(amount) == 1:
-		return server_cfg.currency_name_singular
-	return server_cfg.currency_name_plural
-
 class Drops(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
