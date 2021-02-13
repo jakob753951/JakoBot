@@ -6,6 +6,7 @@ import CurrencyManager as manager
 from CurrencyUtils import *
 from CustomChecks import *
 from asyncio import gather
+import json
 
 requirements = {
 	'general': [],
