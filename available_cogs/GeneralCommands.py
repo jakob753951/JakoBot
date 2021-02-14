@@ -39,12 +39,12 @@ class GeneralCommands(commands.Cog):
 
 	@commands.command(name='Say')
 	async def say(self, ctx, *args):
-		channel, message = parse_args(ctx, args, self.cfg.servers[ctx.guild.id].react_confirm)
+		channel, message = await parse_args(ctx, args, self.cfg.servers[ctx.guild.id].react_confirm)
 		await channel.send(embed=Embed(description=message, color=0xff8000), files=ctx.message.attachments)
 
 	@commands.command(name='SayNoEmbed', aliases=['NoEmbedSay'])
 	async def say_no_embed(self, ctx, *args):
-		channel, message = parse_args(ctx, args, self.cfg.servers[ctx.guild.id].react_confirm)
+		channel, message = await parse_args(ctx, args, self.cfg.servers[ctx.guild.id].react_confirm)
 		await channel.send(message, files=ctx.message.attachments)
 
 
