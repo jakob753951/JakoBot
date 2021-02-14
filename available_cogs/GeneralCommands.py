@@ -9,13 +9,14 @@ requirements = {'general': [], 'server': ['react_confirm']}
 async def parse_args(ctx, args, react_confirm):
 	try:
 		channel = await TextChannelConverter().convert(ctx, args[0])
-		args = args[1:]
 		await ctx.message.add_reaction(react_confirm)
+		start_index = 2
 	except Exception:
 		channel = ctx.channel
+		start_index = 1
 		await ctx.message.delete()
 
-	message = ' '.join(args).replace('\\n', '\n')
+	message = ' '.join(ctx.message.content.split(' ')[start_index:])
 	return (channel, message)
 
 class GeneralCommands(commands.Cog):
