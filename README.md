@@ -1,0 +1,2 @@
+# JakoBot
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8e81d2ee5131443c933a699f2c644cb2)](https://app.codacy.com/gh/jakob753951/JakoBot?utm_source=github.com&utm_medium=referral&utm_content=jakob753951/JakoBot&utm_campaign=Badge_Grade)
