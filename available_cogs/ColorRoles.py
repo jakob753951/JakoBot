@@ -1,4 +1,6 @@
+from CustomExceptions import InsufficientFundsException
 from asyncio import gather, sleep
+import asyncio
 import discord
 from discord import Embed
 from discord.ext import commands
@@ -6,6 +8,7 @@ from Configuration import load_config
 import json
 from CurrencyUtils import *
 import CurrencyManager as currency
+import re
 
 requirements = {'general': [], 'server': ['react_confirm']}
 
@@ -66,6 +69,48 @@ def get_menu_embed(guild: discord.Guild, page: int) -> Embed:
 
 	return Embed(title='Preset Color Roles:', description=desc)
 
+def hex_to_int(hex):
+	return int(hex.strip('#'), 16)
+
+def parse_args(args):
+	pattern = re.compile(r'#?[0-9a-f]{6}$')
+	if pattern.match(args[-1]):
+		return ' '.join(args[:-1]), hex_to_int(args[-1])
+	return ' '.join(args), None
+
+async def currency_check(guild_id, member_id, minimum_balance):
+	member_balance = await currency.getMemberBalance(guild_id, member_id)
+	if member_balance < minimum_balance:
+		return False
+	return True
+
+async def handle_insufficient_funds(ctx, exception: InsufficientFundsException = None):
+	await ctx.send(embed=Embed(title='Insufficient Funds.'))
+
+class ConfirmAwaiter(commands.Cog):
+	def __init__(self, bot, user, msg_id, positive, negative):
+		self.bot = bot
+		self.msg_id = msg_id
+		self.user = user
+		self.positive = positive
+		self.negative = negative
+		self.on_confirm = asyncio.Event()
+
+	@commands.Cog.listener()
+	async def on_reaction_add(self, reaction, user):
+		if reaction.message.id != self.msg_id:
+			return
+
+		if user != self.user:
+			return
+
+		if reaction.emoji not in [self.positive, self.negative]:
+			return
+
+		self.did_confirm = reaction.emoji == self.positive
+
+		self.on_confirm.set()
+
 class ColorRoles(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
@@ -94,6 +139,61 @@ class ColorRoles(commands.Cog):
 	@commands.command(name='Shop', aliases=['Store', 'ColorRoles'])
 	async def shop(self, ctx, page = 0):
 		await self.display_menu(ctx.guild, ctx.channel, page)
+
+	@commands.command(name='CustomRole', aliases=['CustomColor'])
+	async def custom_role(self, ctx, *args):
+		role_name, role_color = parse_args(args)
+		role_price = 10000 if role_color else 2000
+		role = await ctx.guild.create_role(name=role_name)
+
+		await ctx.message.delete()
+
+		if not await currency_check(ctx.guild.id, ctx.author.id, role_price):
+			await handle_insufficient_funds(ctx)
+			return
+
+		if role_color:
+			await role.edit(color=role_color)
+			embed = Embed(title='Do you want this to be your **Visible** color?')
+			if await self.get_confirmation(ctx, embed):
+				await self.give_role_priority(role)
+
+		embed = Embed(
+			title=f'Are you sure you want to buy a role with the name {role_name} for {role_price} {pluralise(ctx.guild.id, role_price)}?'
+		)
+		if not await self.get_confirmation(ctx, embed):
+			await role.delete()
+			return
+
+		try:
+			await currency.addToMemberBalance(ctx.guild.id, ctx.author.id, -role_price)
+		except InsufficientFundsException as e:
+			await handle_insufficient_funds(ctx, e)
+			return
+
+		await gather(
+			ctx.author.add_roles(role),
+			ctx.send(embed=Embed(title=f'Congrats on your new role.\nYou have been charged {role_price}.'))
+		)
+
+	async def get_confirmation(self, ctx, message: Embed, positive: str = '👍', negative: str = '👎'):
+		sent_msg = await ctx.send(embed=message)
+		await gather(
+			sent_msg.add_reaction(positive),
+			sent_msg.add_reaction(negative)
+		)
+		cog = ConfirmAwaiter(
+			self.bot,
+			ctx.author,
+			sent_msg.id,
+			positive=positive,
+			negative=negative
+		)
+
+		self.bot.add_cog(cog)
+		await cog.on_confirm.wait()
+		await sent_msg.delete()
+		return cog.did_confirm
 
 	@commands.Cog.listener()
 	async def on_reaction_add(self, reaction, user):
@@ -148,7 +248,7 @@ class ColorRoles(commands.Cog):
 					return
 				await message.edit(embed=Embed(
 					title='Confirmation',
-					description=f"{user.mention} are you sure you want to buy {role['name']} for **{role['price']}** {pluralise(msg_cfg, role['price'])}?"
+					description=f"{user.mention} are you sure you want to buy {role['name']} for **{role['price']}** {pluralise(user.guild.id, role['price'])}?"
 				))
 				await message.clear_reactions()
 				await gather(
@@ -187,10 +287,10 @@ class ColorRoles(commands.Cog):
 
 				await user.remove_roles(*roles, reason='Purchased new role')
 				await user.add_roles(role, reason='Purchased role')
-				await transaction_log(self.bot, msg_cfg, user, -role_data['price'], title='User bought a Color role.')
+				await transaction_log(self.bot, user.guild.id, user, -role_data['price'], title='User bought a Color role.')
 				await message.channel.send(embed=Embed(
 					title='Congrats!',
-					description=f'New balance: {new_balance} {pluralise(msg_cfg, new_balance)}'
+					description=f'New balance: {new_balance} {pluralise(user.guild.id, new_balance)}'
 				))
 				await message.delete()
 
