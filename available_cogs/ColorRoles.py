@@ -1,3 +1,4 @@
+from discord import guild
 from CustomExceptions import InsufficientFundsException
 from asyncio import gather, sleep
 import asyncio
@@ -12,25 +13,27 @@ import re
 
 requirements = {'general': [], 'server': ['react_confirm']}
 
-def get_preset_roles(guild_id):
+def get_guild_data(guild_id):
 	with open('data/ColorRoles.json') as color_roles_file:
 		color_roles = json.loads(color_roles_file.read())
 
-	guild_data = color_roles[str(guild_id)]
+	return color_roles[str(guild_id)]
 
-	return guild_data['preset_roles']
+def get_preset_roles(guild_id):
+	return get_guild_data(guild_id)['preset_roles']
+
+def get_id_by_index(guild_id, index):
+	preset_roles = get_preset_roles(guild_id)
+	return preset_roles[index % len(preset_roles)]
+
+def get_preset_role_by_index(guild: discord.guild, index: int):
+	role_id = get_id_by_index(guild.id, index)
+	return guild.get_role(role_id)
 
 def get_preset_role_info(guild: discord.Guild, role_index: int) -> dict:
-	with open('data/ColorRoles.json') as color_roles_file:
-		color_roles = json.loads(color_roles_file.read())
-
-	guild_data = color_roles[str(guild.id)]
-
-	preset_roles = guild_data['preset_roles']
-
-	role_id = preset_roles[role_index % len(preset_roles)]
-
-	role = guild.get_role(role_id)
+	guild_data = get_guild_data(guild.id)
+	role_id = get_id_by_index(guild.id, role_index)
+	role = get_preset_role_by_index(guild, role_index)
 
 	return {
 		'id': role_id,
@@ -39,15 +42,10 @@ def get_preset_role_info(guild: discord.Guild, role_index: int) -> dict:
 	}
 
 def get_role_embed(guild: discord.Guild, role_index: int) -> Embed:
-	with open('data/ColorRoles.json') as color_roles_file:
-		color_roles = json.loads(color_roles_file.read())
+	guild_data = get_guild_data(guild.id)
 
-	guild_data = color_roles[str(guild.id)]
+	role = get_preset_role_by_index(guild, role_index)
 
-	preset_roles = guild_data['preset_roles']
-
-	role_id = preset_roles[role_index % len(preset_roles)]
-	role = guild.get_role(role_id)
 
 	embed = Embed(
 		title=role.name,
@@ -101,7 +99,7 @@ class ConfirmAwaiter(commands.Cog):
 		if reaction.message.id != self.msg_id:
 			return
 
-		if user != self.user:
+		if user == self.user:
 			return
 
 		if reaction.emoji not in [self.positive, self.negative]:
@@ -153,13 +151,13 @@ class ColorRoles(commands.Cog):
 		if role_color:
 			await role.edit(color=role_color)
 			embed = Embed(title='Do you want this to be your **Visible** color?')
-			if await self.get_confirmation(ctx, embed):
+			if await self.get_confirmation(ctx.channel, ctx.author, embed):
 				await self.give_role_priority(role)
 
 		embed = Embed(
 			title=f'Are you sure you want to buy a role with the name {role_name} for {role_price} {pluralise(ctx.guild.id, role_price)}?'
 		)
-		if not await self.get_confirmation(ctx, embed):
+		if not await self.get_confirmation(ctx.channel, ctx.author, embed):
 			await role.delete()
 			return
 
@@ -174,15 +172,15 @@ class ColorRoles(commands.Cog):
 			ctx.send(embed=Embed(title=f'Congrats on your new role.\nYou have been charged {role_price}.'))
 		)
 
-	async def get_confirmation(self, ctx, message: Embed, positive: str = '👍', negative: str = '👎'):
-		sent_msg = await ctx.send(embed=message)
+	async def get_confirmation(self, channel: discord.abc.Messageable, user: discord.User, message: Embed, positive: str = '👍', negative: str = '👎'):
+		sent_msg = await channel.send(embed=message)
 		await gather(
 			sent_msg.add_reaction(positive),
 			sent_msg.add_reaction(negative)
 		)
 		cog = ConfirmAwaiter(
 			self.bot,
-			ctx.author,
+			user,
 			sent_msg.id,
 			positive=positive,
 			negative=negative
@@ -237,22 +235,34 @@ class ColorRoles(commands.Cog):
 		if message.id in self.examine_messages:
 			page = self.examine_messages[message.id]
 			if reaction.emoji == '💰':
-				role = get_preset_role_info(guild, page)
-				if await currency.getMemberBalance(guild.id, user.id) < role['price']:
+				role_data = get_preset_role_info(guild, page)
+				if await currency.getMemberBalance(guild.id, user.id) < role_data['price']:
 					sent_msg = await channel.send(embed=Embed(description=f"{user.mention} you do not have enough money to buy that.", color=0xff0000))
 					await sleep(5)
 					await sent_msg.delete()
 					return
-				sent_msg = await message.send(embed=Embed(
+
+				embed = Embed(
 					title='Confirmation',
-					description=f"{user.mention} are you sure you want to buy {role['name']} for **{role['price']}** {pluralise(user.guild.id, role['price'])}?"
-				))
-				await message.clear_reactions()
-				await gather(
-					message.add_reaction('✅'),
-					message.add_reaction('❎')
+					description=f"{user.mention} are you sure you want to buy {role_data['name']} for **{role_data['price']}** {pluralise(user.guild.id, role_data['price'])}?"
 				)
-				self.confirms[sent_msg.id] = (user.id, role)
+
+				did_confirm = await self.get_confirmation(message.channel, message.author, embed)
+				if not did_confirm:
+					return
+
+				new_balance = await currency.addToMemberBalance(guild.id, user.id, -role_data['price'])
+
+				role = guild.get_role(role_data['id'])
+				roles = [guild.get_role(id) for id in get_preset_roles(guild.id) if id != role_data['id']]
+
+				await user.remove_roles(*roles, reason='Purchased new role')
+				await user.add_roles(role, reason='Purchased role')
+				await transaction_log(self.bot, user.guild.id, user, -role_data['price'], title='User bought a Color role.')
+				await message.channel.send(embed=Embed(
+					title='Congrats!',
+					description=f'New balance: {new_balance} {pluralise(user.guild.id, new_balance)}'
+				))
 				return
 
 			if reaction.emoji == '◀':
@@ -262,33 +272,6 @@ class ColorRoles(commands.Cog):
 			self.examine_messages[message.id] = page
 
 			await message.edit(embed=get_role_embed(guild, page))
-
-
-		if message.id in self.confirms:
-			confirm_data = self.confirms[message.id]
-			if user.id != confirm_data[0]:
-				return
-
-			if reaction.emoji == '❎':
-				del self.confirms[message.id]
-				await message.delete()
-
-			if reaction.emoji == '✅':
-				role_data = confirm_data[1]
-				new_balance = await currency.addToMemberBalance(guild.id, user.id, -role_data['price'])
-
-				role = guild.get_role(role_data['id'])
-				roles = [guild.get_role(id) for id in get_preset_roles(guild.id)]
-				roles.remove(role)
-
-				await user.remove_roles(*roles, reason='Purchased new role')
-				await user.add_roles(role, reason='Purchased role')
-				await transaction_log(self.bot, user.guild.id, user, -role_data['price'], title='User bought a Color role.')
-				await message.channel.send(embed=Embed(
-					title='Congrats!',
-					description=f'New balance: {new_balance} {pluralise(user.guild.id, new_balance)}'
-				))
-				await message.delete()
 
 
 def setup(bot):
