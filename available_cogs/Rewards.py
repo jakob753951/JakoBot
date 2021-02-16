@@ -101,7 +101,6 @@ class Rewards(commands.Cog):
 	@is_admin()
 	@commands.command(name='PostRewards', aliases=['PostTasks'])
 	async def post_rewards(self, ctx, channel: discord.TextChannel = None):
-		guild_cfg = self.cfg.servers[ctx.guild.id]
 		if not channel:
 			channel = ctx.channel
 

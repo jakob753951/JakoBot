@@ -114,7 +114,6 @@ class Currency(commands.Cog):
 	async def leaderboard(self, ctx, limit: int = 10):
 		if limit > 16:
 			limit = 16
-		msg_cfg = self.cfg.servers[ctx.guild.id]
 		Member = namedtuple('Member', ['rank', 'user', 'balance'])
 		members = await manager.getTopRichest(ctx.guild.id, limit)
 		leaderboard = [Member(rank+1, ctx.guild.get_member(mem_info[0]), mem_info[1]) for rank, mem_info in enumerate(members)]

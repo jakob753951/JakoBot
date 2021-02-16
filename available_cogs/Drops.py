@@ -47,8 +47,6 @@ class Drops(commands.Cog):
 		if message.content.startswith('.'):
 			return
 
-		msg_cfg = self.cfg.servers[message.guild.id]
-
 		# Get the data for the channel the message was sent in
 		channel_data = self.data[str(message.channel.id)]
 
