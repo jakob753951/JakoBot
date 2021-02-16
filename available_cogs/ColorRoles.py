@@ -1,4 +1,3 @@
-from discord import guild
 from CustomExceptions import InsufficientFundsException
 from asyncio import gather, sleep
 import asyncio
@@ -13,20 +12,20 @@ import re
 
 requirements = {'general': [], 'server': ['react_confirm']}
 
-def get_guild_data(guild_id):
+def get_guild_data(guild_id: int):
 	with open('data/ColorRoles.json') as color_roles_file:
 		color_roles = json.loads(color_roles_file.read())
 
 	return color_roles[str(guild_id)]
 
-def get_preset_roles(guild_id):
+def get_preset_roles(guild_id: int):
 	return get_guild_data(guild_id)['preset_roles']
 
-def get_id_by_index(guild_id, index):
+def get_id_by_index(guild_id: int, index: int) -> int:
 	preset_roles = get_preset_roles(guild_id)
 	return preset_roles[index % len(preset_roles)]
 
-def get_preset_role_by_index(guild: discord.guild, index: int):
+def get_preset_role_by_index(guild: discord.Guild, index: int) -> discord.Role:
 	role_id = get_id_by_index(guild.id, index)
 	return guild.get_role(role_id)
 
@@ -178,6 +177,7 @@ class ColorRoles(commands.Cog):
 			sent_msg.add_reaction(positive),
 			sent_msg.add_reaction(negative)
 		)
+
 		cog = ConfirmAwaiter(
 			self.bot,
 			user,
