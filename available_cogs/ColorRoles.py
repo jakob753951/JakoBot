@@ -146,8 +146,6 @@ class ColorRoles(commands.Cog):
 		role_price = 10000 if role_color else 2000
 		role = await ctx.guild.create_role(name=role_name)
 
-		await ctx.message.delete()
-
 		if not await currency_check(ctx.guild.id, ctx.author.id, role_price):
 			await handle_insufficient_funds(ctx)
 			return

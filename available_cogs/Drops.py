@@ -147,13 +147,13 @@ class Drops(commands.Cog):
 		await self.grab_drop(ctx, 'run')
 
 	async def grab_drop(self, ctx, take_kind):
+		self.load_data()
 		if str(ctx.channel.id) not in self.data:
 			return
 
-		self.load_data()
+		await ctx.message.delete()
 
 		if not self.data[str(ctx.channel.id)]['active_drops']:
-			await ctx.message.delete()
 			return
 
 		drop = self.data[str(ctx.channel.id)]['active_drops'].pop()
@@ -171,8 +171,7 @@ class Drops(commands.Cog):
 		embed = discord.Embed(description=desc, color=(0x00ff00 if amount > 0 else 0xff0000))
 		to_do = [
 			transaction_log(self.bot, ctx.guild.id, ctx.author, amount),
-			ctx.send(embed=embed),
-			ctx.message.delete()
+			ctx.send(embed=embed)
 		]
 
 		with suppress(Exception):

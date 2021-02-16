@@ -87,7 +87,6 @@ class Timely(commands.Cog):
 
 		await gather(
 			manager.addToMemberBalance(ctx.guild.id, ctx.author.id, amount),
-			ctx.message.delete(),
 			transaction_log(self.bot, ctx.guild.id, ctx.author, amount, title=f"User claimed their timely."),
 			ctx.send(embed=embed)
 		)
