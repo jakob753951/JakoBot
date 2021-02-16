@@ -69,8 +69,8 @@ def get_menu_embed(guild: discord.Guild, page: int) -> Embed:
 
 	return Embed(title='Preset Color Roles:', description=desc)
 
-def hex_to_int(hex):
-	return int(hex.strip('#'), 16)
+def hex_to_int(hex_code):
+	return int(hex_code.strip('#'), 16)
 
 def parse_args(args):
 	pattern = re.compile(r'#?[0-9a-f]{6}$')
