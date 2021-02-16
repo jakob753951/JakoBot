@@ -254,7 +254,6 @@ class ColorRoles(commands.Cog):
 					message.add_reaction('✅'),
 					message.add_reaction('❎')
 				)
-				self.examine_messages[message.id]
 				self.confirms[sent_msg.id] = (user.id, role)
 				return
 
