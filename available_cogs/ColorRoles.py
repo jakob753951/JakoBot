@@ -210,7 +210,6 @@ class ColorRoles(commands.Cog):
 		message = reaction.message
 		channel = message.channel
 		guild = message.guild
-		msg_cfg = self.cfg.servers[guild.id]
 
 		if message.id in self.menus:
 			page = self.menus[message.id]
@@ -246,7 +245,7 @@ class ColorRoles(commands.Cog):
 					await sleep(5)
 					await sent_msg.delete()
 					return
-				await message.edit(embed=Embed(
+				sent_msg = await message.send(embed=Embed(
 					title='Confirmation',
 					description=f"{user.mention} are you sure you want to buy {role['name']} for **{role['price']}** {pluralise(user.guild.id, role['price'])}?"
 				))
@@ -255,8 +254,8 @@ class ColorRoles(commands.Cog):
 					message.add_reaction('✅'),
 					message.add_reaction('❎')
 				)
-				del self.examine_messages[message.id]
-				self.confirms[message.id] = (user.id, role)
+				self.examine_messages[message.id]
+				self.confirms[sent_msg.id] = (user.id, role)
 				return
 
 			if reaction.emoji == '◀':
