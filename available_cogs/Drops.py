@@ -89,7 +89,7 @@ class Drops(commands.Cog):
 			name=chosen_drop['name'],
 			amount=drop['pick_value'],
 			abs_amount=abs(drop['pick_value']),
-			curr_name=pluralise(msg_cfg, drop['pick_value'])
+			curr_name=pluralise(message.guild.id, drop['pick_value'])
 		)
 
 		embed = discord.Embed(color=0x0000ff, title='A drop has appeared!', description=desc, timestamp=datetime.utcnow())
@@ -149,7 +149,6 @@ class Drops(commands.Cog):
 		await self.grab_drop(ctx, 'run')
 
 	async def grab_drop(self, ctx, take_kind):
-		msg_cfg = self.cfg.servers[ctx.guild.id]
 		if str(ctx.channel.id) not in self.data:
 			return
 
@@ -170,10 +169,10 @@ class Drops(commands.Cog):
 			await currency.setMemberBalance(ctx.guild.id, ctx.author.id, 0)
 
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
-		desc = text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount))
+		desc = text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(ctx.guild.id, amount))
 		embed = discord.Embed(description=desc, color=(0x00ff00 if amount > 0 else 0xff0000))
 		to_do = [
-			transaction_log(self.bot, msg_cfg, ctx.author, amount),
+			transaction_log(self.bot, ctx.guild.id, ctx.author, amount),
 			ctx.send(embed=embed),
 			ctx.message.delete()
 		]

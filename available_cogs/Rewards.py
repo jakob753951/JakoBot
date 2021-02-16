@@ -66,7 +66,6 @@ class Rewards(commands.Cog):
 		if ctx.author == member:
 			return
 
-		guild_cfg = self.cfg.servers[ctx.guild.id]
 		for reward_id in reward_ids:
 			try:
 				reward = get_reward(ctx.guild.id, reward_id.lower())
@@ -90,11 +89,11 @@ class Rewards(commands.Cog):
 
 			set_cooldown(ctx.guild.id, member.id, reward_id.lower())
 
-			desc=f"{member.mention} was rewarded {amount} {pluralise(guild_cfg, amount)} for task number {reward_id.upper()}: {reward['name']}"
+			desc=f"{member.mention} was rewarded {amount} {pluralise(ctx.guild.id, amount)} for task number {reward_id.upper()}: {reward['name']}"
 			embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
 			await gather(
 				manager.addToMemberBalance(ctx.guild.id, member.id, amount),
-				transaction_log(self.bot, guild_cfg, member, amount, title=f"User was rewarded by {ctx.author.name} for task {reward_id.upper()}: {reward['name']}"),
+				transaction_log(self.bot, ctx.guild.id, member, amount, title=f"User was rewarded by {ctx.author.name} for task {reward_id.upper()}: {reward['name']}"),
 				ctx.send(embed=embed)
 			)
 
@@ -113,7 +112,7 @@ class Rewards(commands.Cog):
 		for reward in rewards[str(ctx.guild.id)]:
 			nl = '\n'
 			title = f"{reward['id'].upper()}) {reward['name']}"
-			desc = f"{reward['description']}{nl}{reward['amount']} {pluralise(guild_cfg, reward['amount'])}"
+			desc = f"{reward['description']}{nl}{reward['amount']} {pluralise(ctx.guild.id, reward['amount'])}"
 			embed.add_field(name=title, value=desc, inline=False)
 
 		await gather(

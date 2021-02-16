@@ -55,7 +55,7 @@ class Gambling(commands.Cog):
 
 		if success:
 			winnings = int(bet * (msg_cfg.return_percent / 100))
-			desc = f'{ctx.author.mention} You guessed it! You won {bet + winnings} {pluralise(msg_cfg, winnings)}'
+			desc = f'{ctx.author.mention} You guessed it! You won {bet + winnings} {pluralise(ctx.guild.id, winnings)}'
 		else:
 			winnings = bet * -1
 			desc = f'{ctx.author.mention} Better luck next time'
@@ -66,7 +66,7 @@ class Gambling(commands.Cog):
 		gather(
 			ctx.send(embed=embed),
 			currency.addToMemberBalance(ctx.guild.id, ctx.author.id, winnings),
-			transaction_log(self.bot, msg_cfg, ctx.author, winnings, title=f"{ctx.author.name} {'won' if success else 'lost'} a BetFlip")
+			transaction_log(self.bot, ctx.guild.id, ctx.author, winnings, title=f"{ctx.author.name} {'won' if success else 'lost'} a BetFlip")
 		)
 
 

@@ -23,17 +23,15 @@ class Birthday(commands.Cog):
 	@commands.guild_only()
 	@commands.command(name='Birthday', aliases=['BirthdayPresent', 'BirthdayGift'])
 	async def birthday(self, ctx, member: discord.Member):
-		guild_cfg = self.cfg.servers[ctx.guild.id]
-
 		amount = 500
 
-		desc=f"Here's your birthday present. We hope you like it!\nIt's **{amount}** {pluralise(guild_cfg, amount)}!!!"
+		desc=f"Here's your birthday present. We hope you like it!\nIt's **{amount}** {pluralise(ctx.guild.id, amount)}!!!"
 		embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
 		embed.set_footer(text='Happy birthday')
 
 		await gather(
 			manager.addToMemberBalance(ctx.guild.id, member.id, amount),
-			transaction_log(self.bot, guild_cfg, member, amount, title=f"User got a birthday present."),
+			transaction_log(self.bot, ctx.guild.id, member, amount, title=f"User got a birthday present."),
 			member.send(embed=embed)
 		)
 

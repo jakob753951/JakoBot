@@ -44,7 +44,7 @@ class Currency(commands.Cog):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await gather(
 			manager.addToMemberBalance(ctx.guild.id, member.id, amount),
-			transaction_log(self.bot, msg_cfg, member, amount, title=f'{ctx.author.name} added currency to this user:'),
+			transaction_log(self.bot, ctx.guild.id, member, amount, title=f'{ctx.author.name} added currency to this user:'),
 			ctx.message.add_reaction(msg_cfg.react_confirm)
 		)
 
@@ -54,7 +54,7 @@ class Currency(commands.Cog):
 		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await gather(
 			manager.addToMemberBalance(ctx.guild.id, member.id, amount * -1),
-			transaction_log(self.bot, msg_cfg, member, amount * -1, title=f'{ctx.author.name} removed currency from this user:'),
+			transaction_log(self.bot, ctx.guild.id, member, amount * -1, title=f'{ctx.author.name} removed currency from this user:'),
 			ctx.message.add_reaction(msg_cfg.react_confirm)
 		)
 
@@ -71,7 +71,6 @@ class Currency(commands.Cog):
 
 	@commands.command(name='Give', aliases=['Send', 'Share'])
 	async def give(self, ctx, member: discord.Member, amount: int):
-		msg_cfg = self.cfg.servers[ctx.guild.id]
 		if amount < 1:
 			if amount == 0:
 				embed = Embed(title='Try again, bud', color=0xff0000, description='You have to send ***something***.')
@@ -91,10 +90,10 @@ class Currency(commands.Cog):
 		try:
 			sender_new_balance = await manager.transferBetweenMembers(ctx.guild.id, ctx.author.id, member.id, amount)
 			embed = Embed(description='Funds have been sent.', color=0x00ff00)
-			embed.add_field(name='New balance:', value=f'{sender_new_balance} {pluralise(self.cfg.servers[ctx.guild.id], sender_new_balance)}')
+			embed.add_field(name='New balance:', value=f'{sender_new_balance} {pluralise(ctx.guild.id, sender_new_balance)}')
 			await gather(
 				ctx.send(embed=embed),
-				transaction_log(self.bot, msg_cfg, member, amount, ctx.author, 'Send command')
+				transaction_log(self.bot, ctx.guild.id, member, amount, ctx.author, 'Send command')
 			)
 		except InsufficientFundsException as e:
 			await ctx.send(embed=Embed(description=f"You don't have enough money to send. You're missing {e.missing_funds}"))
@@ -107,7 +106,7 @@ class Currency(commands.Cog):
 
 		current_balance = await manager.getMemberBalance(ctx.guild.id, member.id)
 
-		balance_text = f"{member.mention}'s current balance is {current_balance} {pluralise(self.cfg.servers[ctx.guild.id], current_balance)}"
+		balance_text = f"{member.mention}'s current balance is {current_balance} {pluralise(ctx.guild.id, current_balance)}"
 		embed = Embed(color=0x1111ff, description=balance_text)
 		await ctx.send(embed=embed)
 
@@ -126,7 +125,7 @@ class Currency(commands.Cog):
 				mem2 = Member(None, None, '\u200b')
 			embed.add_field(name=rank_string(mem1.rank), value=rank_string(mem2.rank) if mem2.user else '\u200b', inline=True)
 			embed.add_field(name=mem1.user.display_name if mem1.user else '\u200b', value=mem2.user.display_name if mem2.user else '\u200b', inline=True)
-			embed.add_field(name=f'{mem1.balance} {pluralise(msg_cfg, mem1.balance)}', value=f'{mem2.balance} {pluralise(msg_cfg, mem2.balance)}' if mem2.user else '\u200b', inline=True)
+			embed.add_field(name=f'{mem1.balance} {pluralise(ctx.guild.id, mem1.balance)}', value=f'{mem2.balance} {pluralise(ctx.guild.id, mem2.balance)}' if mem2.user else '\u200b', inline=True)
 
 		await ctx.send(embed=embed)
 

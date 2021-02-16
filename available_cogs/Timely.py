@@ -81,14 +81,14 @@ class Timely(commands.Cog):
 		amount = guild_cfg.timely_amount
 
 		set_cooldown(ctx.guild.id, ctx.author.id)
-		desc=f"{ctx.author.mention} You've claimed your {amount} {pluralise(guild_cfg, amount)}."
+		desc=f"{ctx.author.mention} You've claimed your {amount} {pluralise(ctx.guild.id, amount)}."
 		embed = Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow() + timedelta(hours=guild_cfg.timely_cooldown_hours))
 		embed.set_footer(text='You can claim again:')
 
 		await gather(
 			manager.addToMemberBalance(ctx.guild.id, ctx.author.id, amount),
 			ctx.message.delete(),
-			transaction_log(self.bot, guild_cfg, ctx.author, amount, title=f"User claimed their timely."),
+			transaction_log(self.bot, ctx.guild.id, ctx.author, amount, title=f"User claimed their timely."),
 			ctx.send(embed=embed)
 		)
 
