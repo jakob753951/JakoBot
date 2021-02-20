@@ -88,7 +88,7 @@ class ConfirmAwaiter(commands.Cog):
 	def __init__(self, bot, user, msg_id, positive, negative):
 		self.bot = bot
 		self.msg_id = msg_id
-		self.user = user
+		self.confirmer = user
 		self.positive = positive
 		self.negative = negative
 		self.on_confirm = asyncio.Event()
@@ -98,7 +98,7 @@ class ConfirmAwaiter(commands.Cog):
 		if reaction.message.id != self.msg_id:
 			return
 
-		if user == self.user:
+		if user != self.confirmer:
 			return
 
 		if reaction.emoji not in [self.positive, self.negative]:
@@ -188,8 +188,10 @@ class ColorRoles(commands.Cog):
 
 		self.bot.add_cog(cog)
 		await cog.on_confirm.wait()
+		did_confirm = cog.did_confirm
+		self.bot.remove_cog(cog)
 		await sent_msg.delete()
-		return cog.did_confirm
+		return did_confirm
 
 	@commands.Cog.listener()
 	async def on_reaction_add(self, reaction, user):
