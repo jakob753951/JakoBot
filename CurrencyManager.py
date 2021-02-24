@@ -26,6 +26,11 @@ async def setMemberBalance(guild_id: int, member_id: int, new_balance: int) -> i
     save_data(data)
     return new_balance
 
+async def removeMemberData(guild_id: int, member_id: int):
+    data = load_data()
+    del data[str(guild_id)][str(member_id)]
+    save_data(data)
+
 async def getAllMembersBalances(guild_id) -> List[Tuple[int, int]]:
     data = load_data()
     users = data[str(guild_id)]
