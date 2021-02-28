@@ -249,7 +249,7 @@ class ColorRoles(commands.Cog):
 					description=f"{user.mention} are you sure you want to buy {role_data['name']} for **{role_data['price']}** {pluralise(user.guild.id, role_data['price'])}?"
 				)
 
-				did_confirm = await self.get_confirmation(message.channel, message.author, embed)
+				did_confirm = await self.get_confirmation(message.channel, user, embed)
 				if not did_confirm:
 					return
 
