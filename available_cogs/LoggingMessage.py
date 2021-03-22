@@ -5,10 +5,13 @@ from datetime import datetime
 
 requirements = {'general': [], 'server': ['chan_message_log', 'chan_member_log']}
 
+def get_member_count(guild: discord.Guild):
+	return len([member for member in guild.members if not member.bot])
+
 class LoggingMessage(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 
 	@commands.Cog.listener()
 	async def on_message_edit(self, before, after):
@@ -52,7 +55,7 @@ class LoggingMessage(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
 		title = f'{member.mention} has joined **{member.guild.name}**!'
-		desc = f'New member count: {self.get_member_count(member.guild)}'
+		desc = f'New member count: {get_member_count(member.guild)}'
 		embed = discord.Embed(color=0x00ff00, title=title, description=desc, timestamp=datetime.utcnow())
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
@@ -63,16 +66,13 @@ class LoggingMessage(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
 		title = f'Has left **{member.guild.name}**!'
-		desc = f'New member count: {self.get_member_count(member.guild)}'
+		desc = f'New member count: {get_member_count(member.guild)}'
 		embed = discord.Embed(color=0xff0000, title=title, description=desc, timestamp=datetime.utcnow())
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
 		log_channel = await self.bot.fetch_channel(self.cfg.servers[member.guild.id].chan_member_log)
 		await log_channel.send(embed=embed)
-
-	def get_member_count(self, guild: discord.Guild):
-		return len([member for member in guild.members if not member.bot])
 
 
 def setup(bot):

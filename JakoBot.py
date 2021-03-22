@@ -10,13 +10,13 @@ GenerateConfig.generate_all()
 from Configuration import *
 
 print('Loading config...')
-cfg = load_config('config.json')
+cfg = load_config('Config.json')
 
 intents = discord.Intents.default()
 intents.members = True
 
 print('making bot...')
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(cfg.prefix), description=cfg.description, intents=intents, pm_help=True)
+bot = commands.Bot(command_prefix=commands.when_mentioned_or(cfg.prefix), description=cfg.description, intents=intents, case_insensitive=True, pm_help=True)
 
 print('loading cogs...')
 #load cogs from cogs_dir
@@ -34,18 +34,17 @@ async def on_ready():
 
 is_owner = lambda ctx: ctx.author.id == cfg.owner_id
 
-@bot.command()
+@bot.command(name='Load', aliases=['Enable'])
 @commands.check(is_owner)
 async def load(ctx, extension_name: str):
 	try:
 		bot.load_extension(f'{cogs_dir}.{extension_name}')
-		await ctx.send(f'Extension {extension_name} loaded')
 		embed = discord.Embed(color=0x00ff00, title=f'Extension {extension_name} loaded')
 	except Exception as e:
 		embed = discord.Embed(color=0xff0000, title='An error occurrred while loading:', description=repr(e))
 	await ctx.send(embed=embed)
 
-@bot.command()
+@bot.command(name='Unload', aliases=['Disable'])
 @commands.check(is_owner)
 async def unload(ctx, extension_name: str):
 	try:

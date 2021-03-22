@@ -6,10 +6,13 @@ from datetime import datetime
 
 requirements = {'general': [], 'server': ['msg_log_webhook_url', 'member_log_webhook_url']}
 
+def get_member_count(guild: discord.Guild):
+	return len([member for member in guild.members if not member.bot])
+
 class Logging(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 
 	@commands.Cog.listener()
 	async def on_message_edit(self, before, after):
@@ -18,12 +21,18 @@ class Logging(commands.Cog):
 
 		embed = discord.Embed(color=0x0000ff, description=f'**Message edited in {after.channel.mention}**', timestamp=datetime.utcnow())
 		embed.set_author(name=f'{after.author.name}#{after.author.discriminator}', icon_url=after.author.avatar_url)
-		embed.add_field(name='Before', value=f'{before.content}', inline=False)
-		embed.add_field(name='After', value=f'{after.content}', inline=False)
+		embed.add_field(name='Before', value=f'{before.content or "[No content]"}', inline=False)
+		embed.add_field(name='After', value=f'{after.content or "[No content]"}', inline=False)
 		embed.set_footer(text=f'User ID: {after.id}')
 
 		webhook = Webhook.from_url(self.cfg.servers[after.guild.id].msg_log_webhook_url, adapter=RequestsWebhookAdapter())
-		webhook.send(embed=embed)
+		try:
+			webhook.send(embed=embed)
+		except Exception as err:
+			print(f'err: {err}')
+			print(f'before.content: {before.content}')
+			print(f'after.content: {after.content}')
+
 
 	@commands.Cog.listener()
 	async def on_raw_message_delete(self, payload):
@@ -53,7 +62,7 @@ class Logging(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
 		title = f'Has joined **{member.guild.name}**!'
-		desc = f'New member count: {self.get_member_count(member.guild)}'
+		desc = f'New member count: {get_member_count(member.guild)}'
 		embed = discord.Embed(color=0x00ff00, title=title, description=desc, timestamp=datetime.utcnow())
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
@@ -64,16 +73,13 @@ class Logging(commands.Cog):
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
 		title = f'Has left **{member.guild.name}**!'
-		desc = f'New member count: {self.get_member_count(member.guild)}'
+		desc = f'New member count: {get_member_count(member.guild)}'
 		embed = discord.Embed(color=0xff0000, title=title, description=desc, timestamp=datetime.utcnow())
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
 		webhook = Webhook.from_url(self.cfg.servers[member.guild.id].member_log_webhook_url, adapter=RequestsWebhookAdapter())
 		webhook.send(embed=embed)
-
-	def get_member_count(self, guild: discord.Guild):
-		return len([member for member in guild.members if not member.bot])
 
 
 def setup(bot):

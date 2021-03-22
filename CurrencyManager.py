@@ -26,6 +26,11 @@ async def setMemberBalance(guild_id: int, member_id: int, new_balance: int) -> i
     save_data(data)
     return new_balance
 
+async def removeMemberData(guild_id: int, member_id: int):
+    data = load_data()
+    del data[str(guild_id)][str(member_id)]
+    save_data(data)
+
 async def getAllMembersBalances(guild_id) -> List[Tuple[int, int]]:
     data = load_data()
     users = data[str(guild_id)]
@@ -33,15 +38,17 @@ async def getAllMembersBalances(guild_id) -> List[Tuple[int, int]]:
 
 async def getTopRichest(guild_id: int, limit: int = 10) -> List[Tuple[int, int]]:
     member_dict = await getAllMembersBalances(guild_id)
-    all_members_sorted = sorted(member_dict, key=lambda e: e[1], reverse=True)[:10]
+    all_members_sorted = sorted(member_dict, key=lambda e: e[1], reverse=True)
     return all_members_sorted[:limit]
 
-async def addToMemberBalance(guild_id: int, member_id: int, amount: int) -> int:
+async def addToMemberBalance(guild_id: int, member_id: int, amount: int, set_to_zero_if_result_negative: bool = False) -> int:
     old_balance = await getMemberBalance(guild_id, member_id)
     new_balance = old_balance + amount
     try:
         await setMemberBalance(guild_id, member_id, new_balance)
     except NegativeBalanceException as e:
+        if set_to_zero_if_result_negative:
+            await setMemberBalance(guild_id, member_id, 0)
         raise NegativeBalanceException(f'Member balance would go negative. user only has {old_balance}', e.missing_funds)
 
     return new_balance
