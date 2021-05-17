@@ -35,7 +35,7 @@ class PlayFile(commands.Cog):
 	async def play(self, ctx, *, source: str):
 		await gather(
 			play_file(ctx.author.voice.channel, source, self.player_volume),
-			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+			ctx.message.add_reaction(self.cfg.react_confirm)
 		)
 
 	@commands.command(name='Volume', aliases=['Vol'])

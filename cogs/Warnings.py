@@ -10,7 +10,7 @@ from dataclasses import dataclass
 requirements = {'general': [], 'server': ['react_confirm', 'chan_member_log']}
 
 def load_warnings():
-	with open('data/Warning.json', 'r', encoding="utf8") as warning_file:
+	with open('data/Warnings.json', encoding='utf8') as warning_file:
 		return defaultdict(lambda: defaultdict(list),
 		{
 			guild_id: defaultdict(list,
@@ -33,7 +33,7 @@ def load_warnings():
 		})
 
 def save_warnings(guilds):
-	with open('data/Warning.json', 'w', encoding="utf8") as warning_file:
+	with open('data/Warnings.json', 'w', encoding='utf8') as warning_file:
 		warning_file.write(json.dumps(guilds, indent=4))
 
 @dataclass
@@ -46,15 +46,15 @@ class Warnings(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
-		self.guilds = self.load_warnings()
+		self.guilds = load_warnings()
 
 	@commands.command(name='Warn')
 	async def warn(self, ctx, user: discord.User, *, reason = '[no reason given]', strikes = 1):
-		member_log = await self.bot.fetch_channel(self.cfg.servers[ctx.guild.id].chan_member_log)
+		member_log = await self.bot.fetch_channel(self.cfg.chan_member_log)
 		await asyncio.gather(
-			user.send(f"You have been warned in {ctx.guild.name} for the following reason:\n{reason}"),
+			user.send(f'You have been warned in {ctx.guild.name} for the following reason:\n{reason}'),
 			member_log.send(f"{user.name} (id: {user.id}) was warned for '{reason}'"),
-			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+			ctx.message.add_reaction(self.cfg.react_confirm)
 		)
 
 		self.add_warning(ctx.guild.id, user.id, reason, strikes)

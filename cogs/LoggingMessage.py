@@ -24,12 +24,12 @@ class LoggingMessage(commands.Cog):
 		embed.add_field(name='After', value=f'{after.content}', inline=False)
 		embed.set_footer(text=f'User ID: {after.id}')
 
-		log_channel = await self.bot.fetch_channel(self.cfg.servers[after.guild.id].chan_message_log)
+		log_channel = await self.bot.fetch_channel(self.cfg.chan_message_log)
 		await log_channel.send(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_raw_message_delete(self, payload):
-		log_channel = await self.bot.fetch_channel(self.cfg.servers[payload.guild_id].chan_message_log)
+		log_channel = await self.bot.fetch_channel(self.cfg.chan_message_log)
 		if not payload.cached_message:
 			channel = await self.bot.fetch_channel(payload.channel_id)
 
@@ -60,7 +60,7 @@ class LoggingMessage(commands.Cog):
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
-		log_channel = await self.bot.fetch_channel(self.cfg.servers[member.guild.id].chan_member_log)
+		log_channel = await self.bot.fetch_channel(self.cfg.chan_member_log)
 		await log_channel.send(embed=embed)
 
 	@commands.Cog.listener()
@@ -71,7 +71,7 @@ class LoggingMessage(commands.Cog):
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
-		log_channel = await self.bot.fetch_channel(self.cfg.servers[member.guild.id].chan_member_log)
+		log_channel = await self.bot.fetch_channel(self.cfg.chan_member_log)
 		await log_channel.send(embed=embed)
 
 

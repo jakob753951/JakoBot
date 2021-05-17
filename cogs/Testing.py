@@ -5,7 +5,7 @@ from CustomChecks import *
 
 requirements = {'general': [], 'server': []}
 
-class GeneralCommands(commands.Cog):
+class Testing(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
@@ -23,6 +23,14 @@ class GeneralCommands(commands.Cog):
 	async def purge(self, ctx, limit: int = 100):
 		await ctx.channel.purge(limit=limit)
 
+	@is_admin()
+	@commands.command(name='RemoveRoles')
+	async def remove_roles(self, ctx):
+		for role in ctx.guild.roles:
+			v = input(f'Delete role "{role.name}"? [hit enter for yes, type something for no]')
+			if not v:
+				await role.delete()
+
 
 def setup(bot):
-	bot.add_cog(GeneralCommands(bot))
+	bot.add_cog(Testing(bot))

@@ -6,36 +6,36 @@ from Configuration import *
 import CurrencyManager as manager
 from CurrencyUtils import *
 from CustomChecks import *
+from discord_slash import cog_ext, SlashContext
 
 requirements = {
-	'general': [],
-	'server': [
+	'general': [
 		'currency_name_singular',
-		'currency_name_plural',
+		'currency_name_plural'
+	],
+	'server': [
 		'timely_cooldown_hours',
 		'timely_amount',
 		'chans_timely'
 	]
 }
 
-fmt = "%Y-%m-%dT%H:%M:%S"
+fmt = '%Y-%m-%dT%H:%M:%S'
 
-def get_cooldown(guild_id, user_id):
+def get_cooldown(user_id):
 		with open('data/TimelyCooldowns.json') as cooldowns_file:
 			cooldowns = json.loads(cooldowns_file.read())
 
 		try:
-			time_string = cooldowns[str(guild_id)][str(user_id)]
+			time_string = cooldowns[str(user_id)]
 			return datetime.strptime(time_string, fmt)
 		except Exception:
 			return datetime.min
 
-def set_cooldown(guild_id, user_id):
+def set_cooldown(user_id):
 		with open('data/TimelyCooldowns.json') as cooldowns_file:
 			cooldowns = json.loads(cooldowns_file.read())
-		if str(guild_id) not in cooldowns:
-			cooldowns[str(guild_id)] = {}
-		cooldowns[str(guild_id)][str(user_id)] = datetime.strftime(datetime.utcnow(), fmt)
+		cooldowns[str(user_id)] = datetime.strftime(datetime.utcnow(), fmt)
 		with open('data/TimelyCooldowns.json', 'w') as cooldowns_file:
 			cooldowns_file.write(json.dumps(cooldowns, indent=4))
 
@@ -44,13 +44,11 @@ class Timely(commands.Cog):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
 
-	@commands.guild_only()
-	@commands.command(name='Timely', aliases=['Daily', 'Hourly'])
-	async def timely(self, ctx):
-		guild_cfg = self.cfg.servers[ctx.guild.id]
-
-		if len(guild_cfg.chans_timely) != 0 and ctx.channel.id not in guild_cfg.chans_timely:
-			chans = [ctx.guild.get_channel(chan_id) for chan_id in guild_cfg.chans_timely]
+	@cog_ext.cog_slash(name='timely', description='Claim your timely reward.', 
+	guild_ids=[842807211607851018])
+	async def timely(self, ctx: SlashContext):
+		if len(self.cfg.chans_timely) != 0 and ctx.channel.id not in self.cfg.chans_timely:
+			chans = [ctx.guild.get_channel(chan_id) for chan_id in self.cfg.chans_timely]
 			desc = f'Arr matey! To {chans[0].mention} you must go to claim your booty... yarr!'
 
 			sent_msg, _ = await gather(
@@ -61,9 +59,9 @@ class Timely(commands.Cog):
 			await sent_msg.delete()
 			return
 
-		last_reward_time = get_cooldown(ctx.guild.id, ctx.author.id)
+		last_reward_time = get_cooldown(ctx.author.id)
 
-		available_time = last_reward_time + timedelta(hours=guild_cfg.timely_cooldown_hours)
+		available_time = last_reward_time + timedelta(hours=self.cfg.timely_cooldown_hours)
 
 		cur_time = datetime.utcnow()
 		if not available_time < cur_time:
@@ -72,22 +70,21 @@ class Timely(commands.Cog):
 			embed.set_footer(text='Next timely will be available: ')
 			responses: list = await gather(
 				ctx.send(embed=embed),
-				ctx.message.delete()
+				sleep(5)
 			)
-			await sleep(5)
 			await responses[0].delete()
 			return
 
-		amount = guild_cfg.timely_amount
+		amount = self.cfg.timely_amount
 
-		set_cooldown(ctx.guild.id, ctx.author.id)
-		desc=f"{ctx.author.mention} You've claimed your {amount} {pluralise(ctx.guild.id, amount)}."
-		embed = Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow() + timedelta(hours=guild_cfg.timely_cooldown_hours))
+		set_cooldown(ctx.author.id)
+		desc=f"{ctx.author.mention} You've claimed your {amount} {pluralise(amount)}."
+		embed = Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow() + timedelta(hours=self.cfg.timely_cooldown_hours))
 		embed.set_footer(text='You can claim again:')
 
 		await gather(
-			manager.addToMemberBalance(ctx.guild.id, ctx.author.id, amount),
-			transaction_log(self.bot, ctx.guild.id, ctx.author, amount, title=f"User claimed their timely."),
+			manager.addToMemberBalance(ctx.author.id, amount),
+			transaction_log(self.bot, ctx.author, amount, title=f'User claimed their timely.'),
 			ctx.send(embed=embed)
 		)
 

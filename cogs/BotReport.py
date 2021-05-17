@@ -9,7 +9,7 @@ def get_report_embed(member: discord.Member):
 	desc = f'{member.mention} has been reported for being a bot. Should they be banned?'
 	return discord.Embed(description=desc)
 
-class ForwardDM(commands.Cog):
+class BotReport(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
@@ -17,14 +17,12 @@ class ForwardDM(commands.Cog):
 
 	@commands.command(name='Report', aliases=[])
 	async def report(self, ctx, member: discord.Member):
-		server_cfg = self.cfg.servers[ctx.guild.id]
-
 		was_report_created = await self.try_create_report(member)
 		if not was_report_created:
 			await ctx.send('this user has already been reported')
 			return
 
-		await ctx.message.add_reaction(server_cfg.react_confirm)
+		await ctx.message.add_reaction(self.cfg.react_confirm)
 
 	async def try_create_report(self, reported_member: discord.Member):
 		try:
@@ -41,9 +39,7 @@ class ForwardDM(commands.Cog):
 		self.reports[vote_id] = reported_member.id
 
 	async def send_vote(self, reported_member: discord.Member):
-		server_cfg = self.cfg.servers[reported_member.guild.id]
-
-		to_channel = await self.bot.fetch_channel(server_cfg.chan_reports)
+		to_channel = await self.bot.fetch_channel(self.cfg.chan_reports)
 
 		embed = get_report_embed(reported_member)
 
@@ -54,7 +50,5 @@ class ForwardDM(commands.Cog):
 		return msg.id
 
 
-
-
 def setup(bot):
-	bot.add_cog(ForwardDM(bot))
+	bot.add_cog(BotReport(bot))

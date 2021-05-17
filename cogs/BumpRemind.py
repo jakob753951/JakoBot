@@ -19,18 +19,17 @@ class Remind(commands.Cog):
 			return
 
 		guild = message.guild
-		server_cfg = self.cfg.servers[guild.id]
 
-		if message.channel.id != server_cfg.chan_remind:
+		if message.channel.id != self.cfg.chan_remind:
 			return
 
-		await message.add_reaction(server_cfg.react_confirm)
+		await message.add_reaction(self.cfg.react_confirm)
 
 		self.is_waiting = True
 		await asyncio.sleep(2 * 60 * 60)
 		self.is_waiting = False
 
-		role = guild.get_role(server_cfg.role_remind)
+		role = guild.get_role(self.cfg.role_remind)
 		await message.channel.send(f'{role.mention} Time to bump!\n`!d bump`')
 
 

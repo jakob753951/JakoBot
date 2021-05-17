@@ -30,7 +30,7 @@ class PersonalVC(commands.Cog):
 			return
 
 		# User entered an irrelevant channel, so we don't care
-		if after.channel != await self.bot.fetch_channel(self.cfg.servers[member.guild.id].chan_personal_vc):
+		if after.channel != await self.bot.fetch_channel(self.cfg.chan_personal_vc):
 			return
 
 		# If we reach this point, the user has connected to the 'Create personal VC' channel
@@ -44,7 +44,7 @@ class PersonalVC(commands.Cog):
 		channel_name = f"{username}'s channel"
 
 		# Get cate_personal_vc for the server
-		cat = await self.bot.fetch_channel(self.cfg.servers[member.guild.id].cate_personal_vc)
+		cat = await self.bot.fetch_channel(self.cfg.cate_personal_vc)
 
 		tc, vc, role = await asyncio.gather(
 			cat.create_text_channel(channel_name),

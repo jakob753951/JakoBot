@@ -13,7 +13,7 @@ from CustomChecks import *
 
 requirements = {'general': [], 'server': ['react_confirm', 'currency_name_singular', 'currency_name_plural', 'role_admin']}
 
-fmt = "%Y-%m-%dT%H:%M:%S"
+fmt = '%Y-%m-%dT%H:%M:%S'
 
 class Drops(commands.Cog):
 	def __init__(self, bot):
@@ -87,7 +87,7 @@ class Drops(commands.Cog):
 			name=chosen_drop['name'],
 			amount=drop['pick_value'],
 			abs_amount=abs(drop['pick_value']),
-			curr_name=pluralise(message.guild.id, drop['pick_value'])
+			curr_name=pluralise(drop['pick_value'])
 		)
 
 		embed = discord.Embed(color=0x0000ff, title='A drop has appeared!', description=desc, timestamp=datetime.utcnow())
@@ -127,7 +127,7 @@ class Drops(commands.Cog):
 
 		self.save_data()
 
-		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
+		await ctx.message.add_reaction(self.cfg.react_confirm)
 
 	@is_admin()
 	@commands.command(name='RemoveDrops', aliases=['DisableDrops', 'DropsRemove', 'DropsDisable'])
@@ -161,16 +161,13 @@ class Drops(commands.Cog):
 
 		amount = drop['pick_value' if take_kind == 'pick' else 'run_value']
 
-		try:
-			await currency.addToMemberBalance(ctx.guild.id, ctx.author.id, amount)
-		except NegativeBalanceException:
-			await currency.setMemberBalance(ctx.guild.id, ctx.author.id, 0)
+		await currency.addToMemberBalance(ctx.author.id, amount, set_to_zero_if_result_negative=True)
 
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
-		desc = text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(ctx.guild.id, amount))
+		desc = text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(amount))
 		embed = discord.Embed(description=desc, color=(0x00ff00 if amount > 0 else 0xff0000))
 		to_do = [
-			transaction_log(self.bot, ctx.guild.id, ctx.author, amount),
+			transaction_log(self.bot, ctx.author, amount),
 			ctx.send(embed=embed)
 		]
 

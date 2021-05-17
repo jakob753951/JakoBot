@@ -25,7 +25,7 @@ class Logging(commands.Cog):
 		embed.add_field(name='After', value=f'{after.content or "[No content]"}', inline=False)
 		embed.set_footer(text=f'User ID: {after.id}')
 
-		webhook = Webhook.from_url(self.cfg.servers[after.guild.id].msg_log_webhook_url, adapter=RequestsWebhookAdapter())
+		webhook = Webhook.from_url(self.cfg.msg_log_webhook_url, adapter=RequestsWebhookAdapter())
 		try:
 			webhook.send(embed=embed)
 		except Exception as err:
@@ -36,7 +36,7 @@ class Logging(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_raw_message_delete(self, payload):
-		webhook = Webhook.from_url(self.cfg.servers[payload.guild_id].msg_log_webhook_url, adapter=RequestsWebhookAdapter())
+		webhook = Webhook.from_url(self.cfg.msg_log_webhook_url, adapter=RequestsWebhookAdapter())
 		if not payload.cached_message:
 			channel = await self.bot.fetch_channel(payload.channel_id)
 
@@ -67,7 +67,7 @@ class Logging(commands.Cog):
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
-		webhook = Webhook.from_url(self.cfg.servers[member.guild.id].member_log_webhook_url, adapter=RequestsWebhookAdapter())
+		webhook = Webhook.from_url(self.cfg.member_log_webhook_url, adapter=RequestsWebhookAdapter())
 		webhook.send(embed=embed)
 
 	@commands.Cog.listener()
@@ -78,7 +78,7 @@ class Logging(commands.Cog):
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
-		webhook = Webhook.from_url(self.cfg.servers[member.guild.id].member_log_webhook_url, adapter=RequestsWebhookAdapter())
+		webhook = Webhook.from_url(self.cfg.member_log_webhook_url, adapter=RequestsWebhookAdapter())
 		webhook.send(embed=embed)
 
 
