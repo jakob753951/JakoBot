@@ -63,7 +63,7 @@ class Gambling(commands.Cog):
 		embed = Embed(description=desc, color=0xffff00)
 		image_url = f"https://ladegaardmoeller.dk/JakoBot/Gambling/Images/{'Heads' if result else 'Tails'}.png"
 		embed.set_image(url=image_url)
-		gather(
+		await gather(
 			ctx.send(embed=embed),
 			currency.addToMemberBalance(ctx.guild.id, ctx.author.id, winnings),
 			transaction_log(self.bot, ctx.guild.id, ctx.author, winnings, title=f"{ctx.author.name} {'won' if success else 'lost'} a BetFlip")

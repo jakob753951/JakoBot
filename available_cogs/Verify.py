@@ -3,7 +3,7 @@ from discord.ext import commands
 from Configuration import load_config
 from CustomChecks import *
 
-requirements = {'general': [], 'server': ['roles_can_verify', 'role_unverified', 'role_verified', 'chan_verify_rx']}
+requirements = {'general': [], 'server': ['roles_can_verify', 'role_unverified', 'role_verified', 'chan_verify_rx', 'react_confirm']}
 
 class Verify(commands.Cog):
 	def __init__(self, bot):
@@ -26,8 +26,8 @@ class Verify(commands.Cog):
 		self.recently_verified.add(member.id)
 
 		try:
-			await member.remove_roles(unverified, reason="verification")
 			await member.add_roles(verified, reason="verification")
+			await member.remove_roles(unverified, reason="verification")
 		except Exception:
 			await ctx.send(embed=discord.Embed(description='Something went wrong. Please try again later'))
 			return
@@ -35,6 +35,9 @@ class Verify(commands.Cog):
 		self.recently_verified.remove(member.id)
 
 		await self.post_welcome_message(member, ctx.author, details)
+
+		positive_reaction = msg_cfg.react_confirm
+		await ctx.message.add_reaction(positive_reaction)
 
 	@commands.Cog.listener()
 	async def on_member_update(self, before: discord.Member, after: discord.Member):
@@ -68,7 +71,7 @@ class Verify(commands.Cog):
 		msg_cfg = self.cfg.servers[server.id]
 		verify_rx = server.get_channel(msg_cfg.chan_verify_rx)
 
-		message = f'{member.mention} ({member.id}) is verified'
+		message = f'{member.mention} ({member.id}) was verified'
 
 		if verifier:
 			message += f' by {verifier.mention}'

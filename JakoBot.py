@@ -1,6 +1,7 @@
 from os import listdir
 from os.path import isfile, join
 import discord
+from discord import Embed
 from discord.ext import commands
 import GenerateConfig
 
@@ -39,9 +40,9 @@ is_owner = lambda ctx: ctx.author.id == cfg.owner_id
 async def load(ctx, extension_name: str):
 	try:
 		bot.load_extension(f'{cogs_dir}.{extension_name}')
-		embed = discord.Embed(color=0x00ff00, title=f'Extension {extension_name} loaded')
+		embed = Embed(color=0x00ff00, title=f'Extension {extension_name} loaded')
 	except Exception as e:
-		embed = discord.Embed(color=0xff0000, title='An error occurrred while loading:', description=repr(e))
+		embed = Embed(color=0xff0000, title='An error occurrred while loading:', description=repr(e))
 	await ctx.send(embed=embed)
 
 @bot.command(name='Unload', aliases=['Disable'])
@@ -49,21 +50,30 @@ async def load(ctx, extension_name: str):
 async def unload(ctx, extension_name: str):
 	try:
 		bot.unload_extension(f'{cogs_dir}.{extension_name}')
-		embed = discord.Embed(color=0x00ff00, title=f'Extension {extension_name} unloaded')
+		embed = Embed(color=0x00ff00, title=f'Extension {extension_name} unloaded')
 	except Exception as e:
-		embed = discord.Embed(color=0xff0000, title='An error occurrred while unloading:', description=repr(e))
+		embed = Embed(color=0xff0000, title='An error occurrred while unloading:', description=repr(e))
 	await ctx.send(embed=embed)
 
-@bot.command()
+@bot.command(name='Reload', aliases=['Restart'])
 @commands.check(is_owner)
 async def reload(ctx, extension_name: str):
 	try:
 		bot.reload_extension(f'{cogs_dir}.{extension_name}')
-		embed = discord.Embed(color=0x00ff00, title=f'Extension {extension_name} reloaded')
+		embed = Embed(color=0x00ff00, title=f'Extension {extension_name} reloaded')
 	except Exception as e:
-		embed = discord.Embed(color=0xff0000, title='An error occurrred while reloading:', description=repr(e))
+		embed = Embed(color=0xff0000, title='An error occurrred while reloading:', description=repr(e))
 	await ctx.send(embed=embed)
 
+@bot.command(name='ListExtensions', aliases=['ListCogs'])
+@commands.check(is_owner)
+async def list_extensions(ctx):
+	await ctx.send(
+		embed=Embed(
+			title='Loaded extensions:',
+			description='\n'.join(extension.split('.')[-1] for extension in bot.extensions)
+		)
+	)
 
 print('Starting bot...')
 bot.run(cfg.token)

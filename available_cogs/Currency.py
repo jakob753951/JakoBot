@@ -96,7 +96,7 @@ class Currency(commands.Cog):
 				transaction_log(self.bot, ctx.guild.id, member, amount, ctx.author, 'Send command')
 			)
 		except InsufficientFundsException as e:
-			await ctx.send(embed=Embed(description=f"You don't have enough money to send. You're missing {e.missing_funds}"))
+			await ctx.send(embed=Embed(title='Insufficient funds', description=f"You don't have enough money to send. You're missing {e.missing_funds}"))
 			return
 
 	@commands.command(name='Balance', aliases=['Bal', '$'])
