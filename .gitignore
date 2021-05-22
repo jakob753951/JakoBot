@@ -5,6 +5,5 @@
 Config.json
 data/**
 ServerCfg.py
-Configuration.py
 credentials.json
 token.pickle
