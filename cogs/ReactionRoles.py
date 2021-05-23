@@ -14,6 +14,18 @@ def load_reaction_roles():
 class ReactionRoles(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
+
+	@is_admin()
+	@commands.command(name='PostReactionRoles')
+	async def post_embed(self, ctx, json_str = None):
+		if json_str == None:
+			with open('data/Embed.json') as embed_file:
+				json_str = embed_file.read()
+
+		embed_dict = json.loads(json_str)
+		embed = discord.Embed.from_dict(embed_dict)
+		await ctx.send(embed=embed)
+		await ctx.message.delete()
 	
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload):
