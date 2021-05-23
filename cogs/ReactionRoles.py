@@ -16,7 +16,7 @@ class ReactionRoles(commands.Cog):
 		self.bot = bot
 
 	@is_admin()
-	@commands.command(name='PostReactionRoles')
+	@commands.command(name='PostEmbed')
 	async def post_embed(self, ctx, json_str = None):
 		if json_str == None:
 			with open('data/Embed.json') as embed_file:
