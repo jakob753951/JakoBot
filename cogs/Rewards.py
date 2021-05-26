@@ -155,7 +155,7 @@ class Rewards(commands.Cog):
 
 		async with channel.typing():
 			try:
-				load_rewards(ctx.guild.id)
+				load_rewards()
 			except Exception:
 				print('Error in load_rewards in post_rewards in Rewards.py.\nUsing cached version.')
 
