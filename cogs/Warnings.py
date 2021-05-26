@@ -57,7 +57,7 @@ class Warnings(commands.Cog):
 			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 		)
 
-		self.add_warning(ctx.guild.id, user.id, reason, strikes)
+		self.add_warning(user.id, reason, strikes)
 
 	@commands.command(name='UserWarnings', aliases=['UserWarns'])
 	async def user_warnings(self, ctx, user: discord.User):

@@ -41,32 +41,29 @@ class Currency(commands.Cog):
 	@is_admin()
 	@commands.command(name='AddCurrency')
 	async def add_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
-		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await gather(
-			manager.addToMemberBalance(ctx.guild.id, member.id, amount),
-			transaction_log(self.bot, ctx.guild.id, member, amount, title=f'{ctx.author.name} added currency to this user:'),
-			ctx.message.add_reaction(msg_cfg.react_confirm)
+			manager.addToMemberBalance(member.id, amount),
+			transaction_log(self.bot, member, amount, title=f'{ctx.author.name} added currency to this user:'),
+			ctx.message.add_reaction(self.cfg.react_confirm)
 		)
 
 	@is_admin()
 	@commands.command(name='RemoveCurrency')
 	async def remove_currency(self, ctx, member: discord.Member, amount: int, *, reason: str = None):
-		msg_cfg = self.cfg.servers[ctx.guild.id]
 		await gather(
-			manager.addToMemberBalance(ctx.guild.id, member.id, amount * -1),
-			transaction_log(self.bot, ctx.guild.id, member, amount * -1, title=f'{ctx.author.name} removed currency from this user:'),
-			ctx.message.add_reaction(msg_cfg.react_confirm)
+			manager.addToMemberBalance(member.id, amount * -1),
+			transaction_log(self.bot, member, amount * -1, title=f'{ctx.author.name} removed currency from this user:'),
+			ctx.message.add_reaction(self.cfg.react_confirm)
 		)
 
 	@is_admin()
 	@commands.command(name='ClearCurrency')
 	async def clear_currency(self, ctx, member: discord.Member):
-		msg_cfg = self.cfg.servers[ctx.guild.id]
-		chan_rx = await self.bot.fetch_channel(msg_cfg.chan_transaction_history)
+		chan_rx = await self.bot.fetch_channel(self.cfg.chan_transaction_history)
 		await gather(
-			manager.setMemberBalance(ctx.guild.id, member.id, 0),
+			manager.setMemberBalance(member.id, 0),
 			chan_rx.send(f'Cleared the balance of {member.mention}'),
-			ctx.message.add_reaction(msg_cfg.react_confirm)
+			ctx.message.add_reaction(self.cfg.react_confirm)
 		)
 
 	@commands.command(name='Give', aliases=['Send', 'Share'])
@@ -88,12 +85,12 @@ class Currency(commands.Cog):
 			return
 
 		try:
-			sender_new_balance = await manager.transferBetweenMembers(ctx.guild.id, ctx.author.id, member.id, amount)
+			sender_new_balance = await manager.transferBetweenMembers(ctx.author.id, member.id, amount)
 			embed = Embed(description='Funds have been sent.', color=0x00ff00)
-			embed.add_field(name='New balance:', value=f'{sender_new_balance} {pluralise(ctx.guild.id, sender_new_balance)}')
+			embed.add_field(name='New balance:', value=f'{sender_new_balance} {pluralise(sender_new_balance)}')
 			await gather(
 				ctx.send(embed=embed),
-				transaction_log(self.bot, ctx.guild.id, member, amount, ctx.author, 'Send command')
+				transaction_log(self.bot, member, amount, ctx.author, 'Send command')
 			)
 		except InsufficientFundsException as e:
 			await ctx.send(embed=Embed(title='Insufficient funds', description=f"You don't have enough money to send. You're missing {e.missing_funds}"))
@@ -104,9 +101,9 @@ class Currency(commands.Cog):
 		if not member:
 			member = ctx.author
 
-		current_balance = await manager.getMemberBalance(ctx.guild.id, member.id)
+		current_balance = await manager.getMemberBalance(member.id)
 
-		balance_text = f"{member.mention}'s current balance is {current_balance} {pluralise(ctx.guild.id, current_balance)}"
+		balance_text = f"{member.mention}'s current balance is {current_balance} {pluralise(current_balance)}"
 		embed = Embed(color=0x1111ff, description=balance_text)
 		await ctx.send(embed=embed)
 
@@ -115,7 +112,7 @@ class Currency(commands.Cog):
 		if limit > 16:
 			limit = 16
 		Member = namedtuple('Member', ['rank', 'user', 'balance'])
-		members = await manager.getTopRichest(ctx.guild.id, limit)
+		members = await manager.getTopRichest(limit)
 		leaderboard = [Member(rank+1, ctx.guild.get_member(mem_info[0]), mem_info[1]) for rank, mem_info in enumerate(members)]
 
 		embed = Embed(title='Leaderboard', color=0x0000ff)
@@ -124,7 +121,7 @@ class Currency(commands.Cog):
 				mem2 = Member(None, None, '\u200b')
 			embed.add_field(name=rank_string(mem1.rank), value=rank_string(mem2.rank) if mem2.user else '\u200b', inline=True)
 			embed.add_field(name=mem1.user.display_name if mem1.user else '\u200b', value=mem2.user.display_name if mem2.user else '\u200b', inline=True)
-			embed.add_field(name=f'{mem1.balance} {pluralise(ctx.guild.id, mem1.balance)}', value=f'{mem2.balance} {pluralise(ctx.guild.id, mem2.balance)}' if mem2.user else '\u200b', inline=True)
+			embed.add_field(name=f'{mem1.balance} {pluralise(mem1.balance)}', value=f'{mem2.balance} {pluralise(mem2.balance)}' if mem2.user else '\u200b', inline=True)
 
 		await ctx.send(embed=embed)
 

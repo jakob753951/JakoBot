@@ -14,10 +14,8 @@ class Verify(commands.Cog):
 	@can_verify()
 	@commands.command(name='Verify')
 	async def verify(self, ctx, member: discord.Member, *, details = None):
-		msg_cfg = self.cfg.servers[ctx.guild.id]
-
-		unverified = ctx.guild.get_role(msg_cfg.role_unverified)
-		verified = ctx.guild.get_role(msg_cfg.role_verified)
+		unverified = ctx.guild.get_role(self.cfg.role_unverified)
+		verified = ctx.guild.get_role(self.cfg.role_verified)
 
 		if verified in member.roles:
 			await ctx.send(embed=discord.Embed(description='Member is already verified!'))
@@ -36,7 +34,7 @@ class Verify(commands.Cog):
 
 		await self.post_welcome_message(member, ctx.author, details)
 
-		positive_reaction = msg_cfg.react_confirm
+		positive_reaction = self.cfg.react_confirm
 		await ctx.message.add_reaction(positive_reaction)
 
 	@commands.Cog.listener()
@@ -46,12 +44,7 @@ class Verify(commands.Cog):
 
 		server = after.guild
 
-		# if we don't have the id in our config, return
-		if server.id not in self.cfg.servers:
-			return
-
-		msg_cfg = self.cfg.servers[server.id]
-		verified = server.get_role(msg_cfg.role_verified)
+		verified = server.get_role(self.cfg.role_verified)
 
 		# If user already had role, return
 		if verified in before.roles:
@@ -60,7 +53,7 @@ class Verify(commands.Cog):
 		if verified not in after.roles:
 			return
 
-		unverified = server.get_role(msg_cfg.role_unverified)
+		unverified = server.get_role(self.cfg.role_unverified)
 		await after.remove_roles(unverified, reason="verification")
 
 		await self.post_welcome_message(after)
@@ -68,8 +61,7 @@ class Verify(commands.Cog):
 	async def post_welcome_message(self, member: discord.Member, verifier: discord.Member = None, details = None):
 		#log the verification
 		server = member.guild
-		msg_cfg = self.cfg.servers[server.id]
-		verify_rx = server.get_channel(msg_cfg.chan_verify_rx)
+		verify_rx = server.get_channel(self.cfg.chan_verify_rx)
 
 		message = f'{member.mention} ({member.id}) was verified'
 
@@ -80,8 +72,8 @@ class Verify(commands.Cog):
 			message += f' with info:\n"{details}"'
 
 		await verify_rx.send(embed=discord.Embed(description=message))
-		# welcome = server.get_channel(msg_cfg.chan_verify_welcome)
-		# await welcome.send(f'Welcome {member.mention} to the server! Please read the {msg_cfg.chan_rules.mention}, remember to get your {msg_cfg.chan_roles.mention}, and maybe make a profile in {msg_cfg.chan_create_profile.mention}.')
+		# welcome = server.get_channel(self.cfg.chan_verify_welcome)
+		# await welcome.send(f'Welcome {member.mention} to the server! Please read the {self.cfg.chan_rules.mention}, remember to get your {self.cfg.chan_roles.mention}, and maybe make a profile in {self.cfg.chan_create_profile.mention}.')
 
 
 def setup(bot):

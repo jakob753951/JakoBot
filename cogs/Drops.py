@@ -66,7 +66,7 @@ class Drops(commands.Cog):
 
 		# Get random drop with biases
 		with open('data/Drops.json') as drop_file:
-			drops = json.loads(drop_file.read())[str(message.guild.id)]
+			drops = json.loads(drop_file.read())
 
 		chosen_drop = random.choices(population=drops['drops'], weights=drops['probabilities'])[0]
 
@@ -162,15 +162,15 @@ class Drops(commands.Cog):
 		amount = drop['pick_value' if take_kind == 'pick' else 'run_value']
 
 		try:
-			await currency.addToMemberBalance(ctx.guild.id, ctx.author.id, amount)
+			await currency.addToMemberBalance(ctx.author.id, amount)
 		except NegativeBalanceException:
-			await currency.setMemberBalance(ctx.guild.id, ctx.author.id, 0)
+			await currency.setMemberBalance(ctx.author.id, 0)
 
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
-		desc = text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(ctx.guild.id, amount))
+		desc = text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(amount))
 		embed = discord.Embed(description=desc, color=(0x00ff00 if amount > 0 else 0xff0000))
 		to_do = [
-			transaction_log(self.bot, ctx.guild.id, ctx.author, amount),
+			transaction_log(self.bot, ctx.author, amount),
 			ctx.send(embed=embed)
 		]
 

@@ -124,7 +124,7 @@ class Rewards(commands.Cog):
 				await ctx.send(repr(e))
 				return
 
-			last_reward_time = get_cooldown(ctx.guild.id, member.id, reward_id.lower())
+			last_reward_time = get_cooldown(member.id, reward_id.lower())
 
 			available_time = last_reward_time + timedelta(hours=reward['cooldown_in_hours'])
 
@@ -138,13 +138,13 @@ class Rewards(commands.Cog):
 
 			amount = reward['amount']
 
-			set_cooldown(ctx.guild.id, member.id, reward_id.lower())
+			set_cooldown(member.id, reward_id.lower())
 
-			desc=f"{member.mention} was rewarded {amount} {pluralise(ctx.guild.id, amount)} for task number {reward_id.upper()}: {reward['name']}"
+			desc=f"{member.mention} was rewarded {amount} {pluralise(amount)} for task number {reward_id.upper()}: {reward['name']}"
 			embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
 			await gather(
-				manager.addToMemberBalance(ctx.guild.id, member.id, amount),
-				transaction_log(self.bot, ctx.guild.id, member, amount, title=f"User was rewarded by {ctx.author.name} for task {reward_id.upper()}: {reward['name']}"),
+				manager.addToMemberBalance(member.id, amount),
+				transaction_log(self.bot, member, amount, title=f"User was rewarded by {ctx.author.name} for task {reward_id.upper()}: {reward['name']}"),
 				ctx.send(embed=embed)
 			)
 
@@ -168,7 +168,7 @@ class Rewards(commands.Cog):
 
 			for reward in rewards:
 				title = f"{reward['id'].upper()}) {reward['name']}"
-				desc = f"{reward['description']}\n{reward['amount']} {pluralise(ctx.guild.id, reward['amount'])}"
+				desc = f"{reward['description']}\n{reward['amount']} {pluralise(reward['amount'])}"
 				embed.add_field(name=title, value=desc, inline=False)
 
 			await gather(

@@ -26,15 +26,13 @@ class Gambling(commands.Cog):
 
 	@commands.command(name='BetFlip', aliases=['BF'])
 	async def bet_flip(self, ctx, amount, guess: str):
-		msg_cfg = self.cfg.servers[ctx.guild.id]
-
-		bet = await parse_amount(ctx.guild.id, ctx.author.id, amount, max_amount=msg_cfg.coinflip_max_bet)
+		bet = await parse_amount(ctx.author.id, amount, max_amount=self.cfg.coinflip_max_bet)
 		if bet < 2:
 			await ctx.send(embed=Embed(title='Bet too small. Minimum is 2.', color=0xff0000))
 			return
 
-		if bet > msg_cfg.coinflip_max_bet:
-			await ctx.send(embed=Embed(title=f'Bet too large. Maximum is {msg_cfg.coinflip_max_bet}.', color=0xff0000))
+		if bet > self.cfg.coinflip_max_bet:
+			await ctx.send(embed=Embed(title=f'Bet too large. Maximum is {self.cfg.coinflip_max_bet}.', color=0xff0000))
 			return
 
 		heads_stings = ['h', 'head', 'heads']
@@ -47,15 +45,15 @@ class Gambling(commands.Cog):
 			await ctx.send(embed=Embed(title='Invalid Guess! >:[', color=0xff0000))
 			return
 
-		if await currency.getMemberBalance(ctx.guild.id, ctx.author.id) < bet:
+		if await currency.getMemberBalance(ctx.author.id) < bet:
 			await ctx.send(embed=Embed(title="You don't have enough money to do that", color=0xff0000))
 
 		result = random.getrandbits(1)
 		success = result == int_guess
 
 		if success:
-			winnings = int(bet * (msg_cfg.return_percent / 100))
-			desc = f'{ctx.author.mention} You guessed it! You won {bet + winnings} {pluralise(ctx.guild.id, winnings)}'
+			winnings = int(bet * (self.cfg.return_percent / 100))
+			desc = f'{ctx.author.mention} You guessed it! You won {bet + winnings} {pluralise(winnings)}'
 		else:
 			winnings = bet * -1
 			desc = f'{ctx.author.mention} Better luck next time'
@@ -65,8 +63,8 @@ class Gambling(commands.Cog):
 		embed.set_image(url=image_url)
 		await gather(
 			ctx.send(embed=embed),
-			currency.addToMemberBalance(ctx.guild.id, ctx.author.id, winnings),
-			transaction_log(self.bot, ctx.guild.id, ctx.author, winnings, title=f"{ctx.author.name} {'won' if success else 'lost'} a BetFlip")
+			currency.addToMemberBalance(ctx.author.id, winnings),
+			transaction_log(self.bot, ctx.author, winnings, title=f"{ctx.author.name} {'won' if success else 'lost'} a BetFlip")
 		)
 
 

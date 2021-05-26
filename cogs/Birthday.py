@@ -25,13 +25,13 @@ class Birthday(commands.Cog):
 	async def birthday(self, ctx, member: discord.Member):
 		amount = 500
 
-		desc=f"Here's your birthday present. We hope you like it!\nIt's **{amount}** {pluralise(ctx.guild.id, amount)}!!!"
+		desc=f"Here's your birthday present. We hope you like it!\nIt's **{amount}** {pluralise(amount)}!!!"
 		embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
 		embed.set_footer(text='Happy birthday')
 
 		await gather(
-			manager.addToMemberBalance(ctx.guild.id, member.id, amount),
-			transaction_log(self.bot, ctx.guild.id, member, amount, title=f"User got a birthday present."),
+			manager.addToMemberBalance(member.id, amount),
+			transaction_log(self.bot, member, amount, title=f"User got a birthday present."),
 			member.send(embed=embed)
 		)
 

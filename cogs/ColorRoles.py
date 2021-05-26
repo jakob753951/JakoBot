@@ -143,7 +143,7 @@ class ColorRoles(commands.Cog):
 		role_price = 10000 if role_color else 2000
 		role = await ctx.guild.create_role(name=role_name)
 
-		if not await currency_check(ctx.guild.id, ctx.author.id, role_price):
+		if not await currency_check(ctx.author.id, role_price):
 			await handle_insufficient_funds(ctx)
 			return
 
@@ -154,14 +154,14 @@ class ColorRoles(commands.Cog):
 				await self.give_role_priority(role)
 
 		embed = Embed(
-			title=f'Are you sure you want to buy a role with the name {role_name} for {role_price} {pluralise(ctx.guild.id, role_price)}?'
+			title=f'Are you sure you want to buy a role with the name {role_name} for {role_price} {pluralise(role_price)}?'
 		)
 		if not await self.get_confirmation(ctx.channel, ctx.author, embed):
 			await role.delete()
 			return
 
 		try:
-			await currency.addToMemberBalance(ctx.guild.id, ctx.author.id, -role_price)
+			await currency.addToMemberBalance(ctx.author.id, -role_price)
 		except InsufficientFundsException as e:
 			await handle_insufficient_funds(ctx, e)
 			return
