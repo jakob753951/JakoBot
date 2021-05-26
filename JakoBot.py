@@ -1,30 +1,29 @@
 from os import listdir
 from os.path import isfile, join
 import discord
+from discord import Embed
 from discord.ext import commands
-import GenerateConfig
-
-print('Generating configs...')
-GenerateConfig.generate_all()
-
 from Configuration import *
 
 print('Loading config...')
-cfg = load_config('config.json')
+cfg = load_config('Config.json')
 
 intents = discord.Intents.default()
 intents.members = True
 
 print('making bot...')
-bot = commands.Bot(command_prefix=commands.when_mentioned_or(cfg.prefix), description=cfg.description, intents=intents, pm_help=True)
+bot = commands.Bot(
+	command_prefix=commands.when_mentioned_or(cfg.prefix),
+	description=cfg.description,
+	intents=intents,
+	case_insensitive=True,
+	pm_help=True
+)
 
 print('loading cogs...')
-#load cogs from cogs_dir
-cogs_dir = "enabled_cogs"
-if __name__ == '__main__':
-	#for every file (no extension) in cogs_dir
-	for file_name in [''.join(f.split('.')[:-1]) for f in listdir(cogs_dir) if isfile(join(cogs_dir, f))]:
-		bot.load_extension(f'{cogs_dir}.{file_name}')
+cogs_dir = 'cogs'
+for cog_name in cfg.launch_cogs:
+	bot.load_extension(f'{cogs_dir}.{cog_name}')
 
 @bot.event
 async def on_ready():
@@ -34,36 +33,64 @@ async def on_ready():
 
 is_owner = lambda ctx: ctx.author.id == cfg.owner_id
 
-@bot.command()
+@bot.command(name='Load', aliases=['Enable'])
 @commands.check(is_owner)
 async def load(ctx, extension_name: str):
 	try:
 		bot.load_extension(f'{cogs_dir}.{extension_name}')
-		await ctx.send(f'Extension {extension_name} loaded')
-		embed = discord.Embed(color=0x00ff00, title=f'Extension {extension_name} loaded')
+		embed = Embed(
+			title=f'Extension {extension_name} loaded',
+			color=0x00ff00
+		)
 	except Exception as e:
-		embed = discord.Embed(color=0xff0000, title='An error occurrred while loading:', description=repr(e))
+		embed = Embed(
+			title='An error occurrred while loading:',
+			description=repr(e),
+			color=0xff0000
+		)
 	await ctx.send(embed=embed)
 
-@bot.command()
+@bot.command(name='Unload', aliases=['Disable'])
 @commands.check(is_owner)
 async def unload(ctx, extension_name: str):
 	try:
 		bot.unload_extension(f'{cogs_dir}.{extension_name}')
-		embed = discord.Embed(color=0x00ff00, title=f'Extension {extension_name} unloaded')
+		embed = Embed(
+			title=f'Extension {extension_name} unloaded',
+			color=0x00ff00
+		)
 	except Exception as e:
-		embed = discord.Embed(color=0xff0000, title='An error occurrred while unloading:', description=repr(e))
+		embed = Embed(
+			title='An error occurrred while unloading:',
+			description=repr(e),
+			color=0xff0000
+		)
 	await ctx.send(embed=embed)
 
-@bot.command()
+@bot.command(name='Reload', aliases=['Restart'])
 @commands.check(is_owner)
 async def reload(ctx, extension_name: str):
 	try:
 		bot.reload_extension(f'{cogs_dir}.{extension_name}')
-		embed = discord.Embed(color=0x00ff00, title=f'Extension {extension_name} reloaded')
+		embed = Embed(
+			title=f'Extension {extension_name} reloaded',
+			color=0x00ff00
+		)
 	except Exception as e:
-		embed = discord.Embed(color=0xff0000, title='An error occurrred while reloading:', description=repr(e))
+		embed = Embed(
+			title='An error occurrred while reloading:',
+			description=repr(e),
+			color=0xff0000
+		)
 	await ctx.send(embed=embed)
+
+@bot.command(name='ListExtensions', aliases=['ListCogs'])
+@commands.check(is_owner)
+async def list_extensions(ctx):
+	await ctx.send(embed=Embed(
+		title='Loaded extensions:',
+		description='\n'.join(extension.split('.')[-1] for extension in bot.extensions)
+	))
 
 
 print('Starting bot...')

@@ -7,7 +7,7 @@ requirements = {'general': [], 'server': ['react_confirm', 'chan_remind', 'role_
 class Remind(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 		self.is_waiting = False
 
 	@commands.Cog.listener()

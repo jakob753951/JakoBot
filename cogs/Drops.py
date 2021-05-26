@@ -1,11 +1,13 @@
-from CustomChecks import *
+from contextlib import suppress
 import random
 from datetime import datetime, timedelta
+import asyncio
 import json
 import discord
 from discord.ext import commands
-from Configuration import *
+from Configuration import load_config
 import CurrencyManager as currency
+from CurrencyUtils import *
 from CustomExceptions import *
 from CustomChecks import *
 
@@ -13,22 +15,16 @@ requirements = {'general': [], 'server': ['react_confirm', 'currency_name_singul
 
 fmt = "%Y-%m-%dT%H:%M:%S"
 
-def pluralise(server_cfg, amount):
-	if abs(amount) == 1:
-		return server_cfg.currency_name_singular
-	else:
-		return server_cfg.currency_name_plural
-
 class Drops(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('config.json')
+		self.cfg = load_config('Config.json')
 		try:
 			self.load_data()
 		except Exception as e:
 			print(f'Error when loading DropChannels.json: {e}')
 			self.data = {}
-			print('defaulting to "\{\}"')
+			print('defaulting to "{}"')
 
 	def load_data(self):
 		with open('data/DropChannels.json') as data_file:
@@ -37,22 +33,6 @@ class Drops(commands.Cog):
 	def save_data(self):
 		with open('data/DropChannels.json', 'w') as data_file:
 			data_file.write(json.dumps(self.data, indent=4))
-
-	async def transaction_log(self, msg_cfg, recipient: discord.Member, amount: int, sender: discord.Member = None):
-		chan_rx = await self.bot.fetch_channel(msg_cfg.chan_transaction_history)
-
-		if sender:
-			desc = f'{sender.mention} sent {recipient.mention} {amount} {pluralise(msg_cfg, amount)}'
-		else:
-			desc = f"{recipient.mention} {'got' if amount >= 0 else 'lost'} {abs(amount)} {pluralise(msg_cfg, amount)}"
-
-		embed = discord.Embed(color=0x0000ff, title=f'User received money:', description=desc, timestamp=datetime.utcnow())
-		embed.set_author(name=f'{recipient.name}#{recipient.discriminator}', icon_url=recipient.avatar_url)
-		if sender:
-			embed.add_field(name='Sender: ', value=f'{sender.name}#{sender.discriminator}', inline=True)
-		embed.add_field(name='Amount: ', value=amount, inline=True)
-
-		await chan_rx.send(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
@@ -66,8 +46,6 @@ class Drops(commands.Cog):
 
 		if message.content.startswith('.'):
 			return
-
-		msg_cfg = self.cfg.servers[message.guild.id]
 
 		# Get the data for the channel the message was sent in
 		channel_data = self.data[str(message.channel.id)]
@@ -88,7 +66,7 @@ class Drops(commands.Cog):
 
 		# Get random drop with biases
 		with open('data/Drops.json') as drop_file:
-			drops = json.loads(drop_file.read())[str(message.guild.id)]
+			drops = json.loads(drop_file.read())
 
 		chosen_drop = random.choices(population=drops['drops'], weights=drops['probabilities'])[0]
 
@@ -109,10 +87,10 @@ class Drops(commands.Cog):
 			name=chosen_drop['name'],
 			amount=drop['pick_value'],
 			abs_amount=abs(drop['pick_value']),
-			curr_name=pluralise(msg_cfg, drop['pick_value'])
+			curr_name=pluralise(drop['pick_value'])
 		)
 
-		embed = discord.Embed(color=0xff0000, title='A drop has appeared!', description=desc, timestamp=datetime.utcnow())
+		embed = discord.Embed(color=0x0000ff, title='A drop has appeared!', description=desc, timestamp=datetime.utcnow())
 		embed.set_image(url=f"https://ladegaardmoeller.dk/JakoBot/Drops/Images/{chosen_drop['drop_image']}")
 		sent_msg = await message.channel.send(embed=embed)
 
@@ -125,7 +103,7 @@ class Drops(commands.Cog):
 		self.save_data()
 
 	@is_admin()
-	@commands.command(name='AddDrops', aliases=['adddrops', 'enabledrops', 'editdrops', 'changedrops', 'dropsadd', 'dropsenable', 'dropsedit', 'dropschange'])
+	@commands.command(name='AddDrops', aliases=['EnableDrops', 'EditDrops', 'Changedrops', 'DropsAdd', 'DropsEnable', 'DropsEdit', 'DropsChange'])
 	async def add_drops(self, ctx, channel: discord.TextChannel = None, chance: float = 0.05, minutes_between = 2):
 		if not channel:
 			channel = ctx.channel
@@ -152,7 +130,7 @@ class Drops(commands.Cog):
 		await ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
 
 	@is_admin()
-	@commands.command(name='RemoveDrops', aliases=['removedrops', 'disabledrops'])
+	@commands.command(name='RemoveDrops', aliases=['DisableDrops', 'DropsRemove', 'DropsDisable'])
 	async def remove_drops(self, ctx, channel: discord.TextChannel = None):
 		if not channel:
 			channel = ctx.channel
@@ -160,23 +138,22 @@ class Drops(commands.Cog):
 		del self.data[str(channel.id)]
 		self.save_data()
 
-	@commands.command(name='Pick', aliases=['pick', 'take'])
+	@commands.command(name='Pick', aliases=['Take', 'Grab', 'Yoink', 'Collect', 'Fetch'])
 	async def pick(self, ctx):
 		await self.grab_drop(ctx, 'pick')
 
-	@commands.command(name='Run', aliases=['run', 'ignore'])
+	@commands.command(name='Run', aliases=['Ignore'])
 	async def run(self, ctx):
 		await self.grab_drop(ctx, 'run')
 
 	async def grab_drop(self, ctx, take_kind):
-		msg_cfg = self.cfg.servers[ctx.guild.id]
+		self.load_data()
 		if str(ctx.channel.id) not in self.data:
 			return
 
-		self.load_data()
+		await ctx.message.delete()
 
 		if not self.data[str(ctx.channel.id)]['active_drops']:
-			await ctx.message.delete()
 			return
 
 		drop = self.data[str(ctx.channel.id)]['active_drops'].pop()
@@ -185,24 +162,23 @@ class Drops(commands.Cog):
 		amount = drop['pick_value' if take_kind == 'pick' else 'run_value']
 
 		try:
-			await currency.addToMemberBalance(ctx.guild.id, ctx.author.id, amount)
+			await currency.addToMemberBalance(ctx.author.id, amount)
 		except NegativeBalanceException:
-			await currency.setMemberBalance(ctx.guild.id, ctx.author.id, 0)
-
-		await self.transaction_log(msg_cfg, ctx.author, amount)
-
-		try:
-			drop_message = await ctx.channel.fetch_message(drop['message_id'])
-		except Exception:
-			drop_message = None
-
-		if drop_message:
-			await drop_message.delete()
-		await ctx.message.delete()
+			await currency.setMemberBalance(ctx.author.id, 0)
 
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
-		await ctx.send(text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(msg_cfg, amount)))
+		desc = text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(amount))
+		embed = discord.Embed(description=desc, color=(0x00ff00 if amount > 0 else 0xff0000))
+		to_do = [
+			transaction_log(self.bot, ctx.author, amount),
+			ctx.send(embed=embed)
+		]
 
+		with suppress(Exception):
+			drop_message = await ctx.channel.fetch_message(drop['message_id'])
+			to_do.append(drop_message.delete())
+
+		await asyncio.gather(*to_do)
 
 def setup(bot):
 	bot.add_cog(Drops(bot))

@@ -1,12 +1,10 @@
-/.vscode
-/config.json
-/Inactivity
-/TruthOrDare
 **/__pycache__/**
-/enabled_cogs/**
 /env
+/enabled_cogs/**
+.vscode
+Config.json
 data/**
-Warning/warnings.json
 ServerCfg.py
 Configuration.py
-fields.json
+credentials.json
+token.pickle
