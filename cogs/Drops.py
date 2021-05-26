@@ -87,7 +87,7 @@ class Drops(commands.Cog):
 			name=chosen_drop['name'],
 			amount=drop['pick_value'],
 			abs_amount=abs(drop['pick_value']),
-			curr_name=pluralise(message.guild.id, drop['pick_value'])
+			curr_name=pluralise(drop['pick_value'])
 		)
 
 		embed = discord.Embed(color=0x0000ff, title='A drop has appeared!', description=desc, timestamp=datetime.utcnow())

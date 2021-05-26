@@ -83,7 +83,7 @@ class Timely(commands.Cog):
 		embed.set_footer(text='You can claim again:')
 
 		await gather(
-			manager.addToMemberBalance(amount),
+			manager.addToMemberBalance(ctx.author.id, amount),
 			transaction_log(self.bot, ctx.author, amount, title=f"User claimed their timely."),
 			ctx.send(embed=embed)
 		)

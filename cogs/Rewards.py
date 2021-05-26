@@ -27,24 +27,22 @@ requirements = {
 
 fmt = "%Y-%m-%dT%H:%M:%S"
 
-def get_cooldown(guild_id, user_id, reward_id):
+def get_cooldown(user_id, reward_id):
 	with open('data/RewardCooldowns.json') as cooldowns_file:
 		cooldowns = json.loads(cooldowns_file.read())
 
 	try:
-		time_string = cooldowns[str(guild_id)][str(user_id)][str(reward_id)]
+		time_string = cooldowns[str(user_id)][str(reward_id)]
 		return datetime.strptime(time_string, fmt)
 	except Exception:
 		return datetime.min
 
-def set_cooldown(guild_id, user_id, reward_id):
+def set_cooldown(user_id, reward_id):
 	with open('data/RewardCooldowns.json') as cooldowns_file:
 		cooldowns = json.loads(cooldowns_file.read())
-	if str(guild_id) not in cooldowns:
-		cooldowns[str(guild_id)] = {}
-	if str(user_id) not in cooldowns[str(guild_id)]:
-		cooldowns[str(guild_id)][str(user_id)] = {}
-	cooldowns[str(guild_id)][str(user_id)][str(reward_id)] = datetime.strftime(datetime.utcnow(), fmt)
+	if str(user_id) not in cooldowns:
+		cooldowns[str(user_id)] = {}
+	cooldowns[str(user_id)][str(reward_id)] = datetime.strftime(datetime.utcnow(), fmt)
 	with open('data/RewardCooldowns.json', 'w') as cooldowns_file:
 		cooldowns_file.write(json.dumps(cooldowns, indent=4))
 
@@ -81,13 +79,13 @@ def generate_service():
 
 	return build('sheets', 'v4', credentials=creds)
 
-def load_rewards(guild_id) -> list:
+def load_rewards() -> list:
 	cfg = load_config('Config.json')
 	service = generate_service()
 	range_name = 'Rewards!A2:F'
 
 	sheet = service.spreadsheets()
-	result = sheet.values().get(spreadsheetId=cfg.servers[guild_id].rewards_sheet_id, range=range_name).execute()
+	result = sheet.values().get(spreadsheetId=cfg.rewards_sheet_id, range=range_name).execute()
 	rows = result.get('values', [])
 
 	rewards = [
