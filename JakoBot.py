@@ -1,5 +1,3 @@
-from os import listdir
-from os.path import isfile, join
 import discord
 from discord import Embed
 from discord.ext import commands
