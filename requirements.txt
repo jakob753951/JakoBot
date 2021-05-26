@@ -1,5 +1,6 @@
-aiohttp==3.7.3
+aiohttp==3.7.4
 async-timeout==3.0.1
+attrdict==2.0.1
 attrs==20.3.0
 bandit==1.7.0
 cachetools==4.2.1
@@ -37,5 +38,5 @@ smmap==3.0.5
 stevedore==3.3.0
 typing-extensions==3.7.4.3
 uritemplate==3.0.1
-urllib3==1.26.3
+urllib3==1.26.4
 yarl==1.6.3
