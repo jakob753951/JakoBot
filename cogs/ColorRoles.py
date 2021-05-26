@@ -19,7 +19,7 @@ def get_data():
 
 def get_preset_roles():
 	data = get_data()
-	data['preset_roles']
+	return data['preset_roles']
 
 def get_id_by_index(index: int) -> int:
 	preset_roles = get_preset_roles()
@@ -29,9 +29,9 @@ def get_preset_role_by_index(guild: discord.Guild, index: int) -> discord.Role:
 	role_id = get_id_by_index(index)
 	return guild.get_role(role_id)
 
-def get_preset_role_info(role_index: int) -> dict:
+def get_preset_role_info(guild: discord.Guild, role_index: int) -> dict:
 	data = get_data()
-	role = get_preset_role_by_index(role_index)
+	role = get_preset_role_by_index(guild, role_index)
 
 	return {
 		'id': role.id,
@@ -53,7 +53,7 @@ def get_role_embed(guild: discord.Guild, role_index: int) -> Embed:
 	return embed
 
 def get_menu_embed(guild: discord.Guild, page: int) -> Embed:
-	preset_roles = get_preset_roles(guild.id)
+	preset_roles = get_preset_roles()
 
 	numbers = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣']
 	desc = '\n'.join([
@@ -215,7 +215,7 @@ class ColorRoles(commands.Cog):
 				if reaction.emoji == '▶':
 					page += 1
 
-				page = page % ((len(get_preset_roles(guild.id)) // 10) + 1)
+				page = page % ((len(get_preset_roles()) // 10) + 1)
 
 				self.menus[message.id] = page
 				await message.edit(embed=get_menu_embed(guild, page))
@@ -254,7 +254,7 @@ class ColorRoles(commands.Cog):
 				new_balance = await currency.addToMemberBalance(user.id, -role_data['price'])
 
 				role = guild.get_role(role_data['id'])
-				roles = [guild.get_role(id) for id in get_preset_roles(guild.id) if id != role_data['id']]
+				roles = [guild.get_role(id) for id in get_preset_roles() if id != role_data['id']]
 
 				await user.remove_roles(*roles, reason='Purchased new role')
 				await user.add_roles(role, reason='Purchased role')
