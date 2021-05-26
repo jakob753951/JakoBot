@@ -24,12 +24,12 @@ class LoggingMessage(commands.Cog):
 		embed.add_field(name='After', value=f'{after.content}', inline=False)
 		embed.set_footer(text=f'User ID: {after.id}')
 
-		log_channel = await self.bot.fetch_channel(self.cfg.servers[after.guild.id].chan_message_log)
+		log_channel = await self.bot.fetch_channel(self.cfg.chan_message_log)
 		await log_channel.send(embed=embed)
 
 	@commands.Cog.listener()
 	async def on_raw_message_delete(self, payload):
-		log_channel = await self.bot.fetch_channel(self.cfg.servers[payload.guild_id].chan_message_log)
+		log_channel = await self.bot.fetch_channel(self.cfg.chan_message_log)
 		if not payload.cached_message:
 			channel = await self.bot.fetch_channel(payload.channel_id)
 
@@ -54,24 +54,20 @@ class LoggingMessage(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
-		title = f'{member.mention} has joined **{member.guild.name}**!'
-		desc = f'New member count: {get_member_count(member.guild)}'
-		embed = discord.Embed(color=0x00ff00, title=title, description=desc, timestamp=datetime.utcnow())
-		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
-		embed.set_footer(text=f'Member ID: {member.id}')
-
-		log_channel = await self.bot.fetch_channel(self.cfg.servers[member.guild.id].chan_member_log)
-		await log_channel.send(embed=embed)
+		self.on_member_count_update(member, embed_color=0x00ff00, joined_left='joined')
 
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
-		title = f'Has left **{member.guild.name}**!'
+		self.on_member_count_update(member, embed_color=0xff0000, joined_left='left')
+
+	async def on_member_count_update(self, member: discord.Member, embed_color: int, joined_left: str):
+		title = f'Has {joined_left} **{member.guild.name}**!'
 		desc = f'New member count: {get_member_count(member.guild)}'
-		embed = discord.Embed(color=0xff0000, title=title, description=desc, timestamp=datetime.utcnow())
+		embed = discord.Embed(color=embed_color, title=title, description=desc, timestamp=datetime.utcnow())
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
-		log_channel = await self.bot.fetch_channel(self.cfg.servers[member.guild.id].chan_member_log)
+		log_channel = await self.bot.fetch_channel(self.cfg.chan_member_log)
 		await log_channel.send(embed=embed)
 
 

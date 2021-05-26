@@ -61,20 +61,16 @@ class Logging(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
-		title = f'Has joined **{member.guild.name}**!'
-		desc = f'New member count: {get_member_count(member.guild)}'
-		embed = discord.Embed(color=0x00ff00, title=title, description=desc, timestamp=datetime.utcnow())
-		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
-		embed.set_footer(text=f'Member ID: {member.id}')
-
-		webhook = Webhook.from_url(self.cfg.member_log_webhook_url, adapter=RequestsWebhookAdapter())
-		webhook.send(embed=embed)
+		self.on_member_count_update(member, embed_color=0x00ff00, joined_left='joined')
 
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
-		title = f'Has left **{member.guild.name}**!'
+		self.on_member_count_update(member, embed_color=0xff0000, joined_left='left')
+
+	async def on_member_count_update(self, member: discord.Member, embed_color: int, joined_left: str):
+		title = f'Has {joined_left} **{member.guild.name}**!'
 		desc = f'New member count: {get_member_count(member.guild)}'
-		embed = discord.Embed(color=0xff0000, title=title, description=desc, timestamp=datetime.utcnow())
+		embed = discord.Embed(color=embed_color, title=title, description=desc, timestamp=datetime.utcnow())
 		embed.set_author(name=f'{member.name}#{member.discriminator}', icon_url=member.avatar_url)
 		embed.set_footer(text=f'Member ID: {member.id}')
 
