@@ -30,13 +30,6 @@ class ForwardDM(commands.Cog):
 		forward_channel = await self.bot.fetch_channel(self.cfg.chan_forward_dm)
 		await forward_channel.send(f'{after.author.name} edited their message: "{before.content}" --> "{after.content}"')
 
-	@commands.command(name='SendDM')
-	async def send_dm(self, ctx, recipient: discord.User, *, message):
-		await asyncio.gather(
-			recipient.send(message),
-			ctx.message.add_reaction(self.cfg.servers[ctx.guild.id].react_confirm)
-		)
-
 
 def setup(bot):
 	bot.add_cog(ForwardDM(bot))

@@ -3,6 +3,7 @@ from discord import Embed
 from discord.ext import commands
 from discord.ext.commands.converter import TextChannelConverter
 from Configuration import load_config
+from asyncio import gather
 
 requirements = {'general': [], 'server': ['react_confirm']}
 
@@ -51,6 +52,13 @@ class GeneralCommands(commands.Cog):
 	@commands.command(name='SendDM', aliases=['DMMember', 'DMUser'])
 	async def send_dm(self, ctx, user: discord.Member, *, message):
 		await user.send(message)
+	
+	@commands.command(name='SendDM', aliases=['DMMember', 'DMUser'])
+	async def send_dm(self, ctx, recipient: discord.User, *, message):
+		await gather(
+			recipient.send(message),
+			ctx.message.add_reaction(self.cfg.react_confirm)
+		)
 
 
 def setup(bot):
