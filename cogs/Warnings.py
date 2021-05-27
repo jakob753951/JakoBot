@@ -10,7 +10,7 @@ from dataclasses import dataclass
 requirements = {'general': [], 'server': ['react_confirm', 'chan_member_log']}
 
 def load_warnings():
-	with open('data/Warning.json', 'r', encoding="utf8") as warning_file:
+	with open('data/Warnings.json', 'r', encoding="utf8") as warning_file:
 		return defaultdict(lambda: defaultdict(list),
 		{
 			id:
@@ -27,9 +27,10 @@ def load_warnings():
 			in json.loads(warning_file.read()).items()
 		})
 
-def save_warnings(guilds):
-	with open('data/Warning.json', 'w', encoding="utf8") as warning_file:
-		json.dump(guilds, warning_file, indent=4)
+def save_warnings(warnings):
+	with open('data/Warnings.json', 'w', encoding="utf8") as warning_file:
+		json.dump(warnings, warning_file, indent=4)
+
 
 @dataclass
 class MemberWarning:
@@ -41,7 +42,7 @@ class Warnings(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
-		self.warnings = self.load_warnings()
+		self.warnings = load_warnings()
 
 	@commands.command(name='Warn')
 	async def warn(self, ctx, user: discord.User, *, reason = '[no reason given]', strikes = 1):
