@@ -36,13 +36,17 @@ is_owner = lambda ctx: ctx.author.id == cfg.owner_id
 async def load(ctx, extension_name: str):
 	try:
 		bot.load_extension(f'{cogs_dir}.{extension_name}')
+		log_message = f'Extension {extension_name} loaded'
+		print(log_message)
 		embed = Embed(
-			title=f'Extension {extension_name} loaded',
+			title=log_message,
 			color=0x00ff00
 		)
 	except Exception as e:
+		log_message = 'An error occurrred while loading:'
+		print(log_message)
 		embed = Embed(
-			title='An error occurrred while loading:',
+			title=log_message,
 			description=repr(e),
 			color=0xff0000
 		)
@@ -53,13 +57,17 @@ async def load(ctx, extension_name: str):
 async def unload(ctx, extension_name: str):
 	try:
 		bot.unload_extension(f'{cogs_dir}.{extension_name}')
+		log_message = f'Extension {extension_name} unloaded'
+		print(log_message)
 		embed = Embed(
-			title=f'Extension {extension_name} unloaded',
+			title=log_message,
 			color=0x00ff00
 		)
 	except Exception as e:
+		log_message = 'An error occurrred while loading:'
+		print(log_message)
 		embed = Embed(
-			title='An error occurrred while unloading:',
+			title=log_message,
 			description=repr(e),
 			color=0xff0000
 		)
@@ -70,13 +78,17 @@ async def unload(ctx, extension_name: str):
 async def reload(ctx, extension_name: str):
 	try:
 		bot.reload_extension(f'{cogs_dir}.{extension_name}')
+		log_message = f'Extension {extension_name} reloaded'
+		print(log_message)
 		embed = Embed(
-			title=f'Extension {extension_name} reloaded',
+			title=log_message,
 			color=0x00ff00
 		)
 	except Exception as e:
+		log_message = 'An error occurrred while loading:'
+		print(log_message)
 		embed = Embed(
-			title='An error occurrred while reloading:',
+			title=log_message,
 			description=repr(e),
 			color=0xff0000
 		)
