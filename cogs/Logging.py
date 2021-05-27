@@ -61,11 +61,11 @@ class Logging(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_member_join(self, member):
-		self.on_member_count_update(member, embed_color=0x00ff00, joined_left='joined')
+		await self.on_member_count_update(member, embed_color=0x00ff00, joined_left='joined')
 
 	@commands.Cog.listener()
 	async def on_member_remove(self, member):
-		self.on_member_count_update(member, embed_color=0xff0000, joined_left='left')
+		await self.on_member_count_update(member, embed_color=0xff0000, joined_left='left')
 
 	async def on_member_count_update(self, member: discord.Member, embed_color: int, joined_left: str):
 		title = f'Has {joined_left} **{member.guild.name}**!'

@@ -15,7 +15,7 @@ class TruthOrDare(commands.Cog):
 	@commands.command(name='TruthOrDare', aliases=['TorD'])
 	async def truth_or_dare(self, ctx, *, category = 'sfw'):
 		# check for incorrect channel
-		if ctx.channel.id != self.cfg.servers[ctx.guild.id].chan_truth_or_dare:
+		if ctx.channel.id != self.cfg.chan_truth_or_dare:
 			return
 
 		# check for incorrect category
