@@ -14,6 +14,9 @@ class ForwardDM(commands.Cog):
 	async def on_message(self, message):
 		if not isinstance(message.channel, discord.channel.DMChannel):
 			return
+		
+		if message.author.id == self.bot.id:
+			return
 
 		forward_channel = await self.bot.fetch_channel(self.cfg.chan_forward_dm)
 		await forward_channel.send(f'{message.author.name}: "{message.content}"')
