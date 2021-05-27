@@ -12,7 +12,7 @@ class TruthOrDare(commands.Cog):
 		with open('data/TruthOrDare.json', 'r', encoding="utf8") as prompt_file:
 			self.questions = json.loads(prompt_file.read())
 
-	@commands.command(name='TruthOrDare', aliases=['TorD'])
+	@commands.command(name='TruthOrDare', aliases=['TorD', 'ToD'])
 	async def truth_or_dare(self, ctx, *, category = 'sfw'):
 		# check for incorrect channel
 		if ctx.channel.id != self.cfg.chan_truth_or_dare:
