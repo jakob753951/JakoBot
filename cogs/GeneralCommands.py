@@ -48,10 +48,6 @@ class GeneralCommands(commands.Cog):
 	async def say_no_embed(self, ctx, *args):
 		channel, message = await parse_args(ctx, args, self.cfg.servers[ctx.guild.id].react_confirm)
 		await channel.send(message, files=ctx.message.attachments)
-
-	@commands.command(name='SendDM', aliases=['DMMember', 'DMUser'])
-	async def send_dm(self, ctx, user: discord.Member, *, message):
-		await user.send(message)
 	
 	@commands.command(name='SendDM', aliases=['DMMember', 'DMUser'])
 	async def send_dm(self, ctx, recipient: discord.User, *, message):
