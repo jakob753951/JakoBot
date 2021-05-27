@@ -8,7 +8,7 @@ class Support(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
-		with open('Support/tickets.json', 'r', encoding="utf8") as ticket_file:
+		with open('data/Support.json', 'r', encoding="utf8") as ticket_file:
 			self.tickets = json.loads(ticket_file.read())
 
 	@commands.Cog.listener()
