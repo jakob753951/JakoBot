@@ -1,5 +1,4 @@
 import json
-from typing import List, Tuple
 from CustomExceptions import *
 
 def load_data():
@@ -31,10 +30,10 @@ async def removeMemberData(member_id: int):
     del data[member_id]
     save_data(data)
 
-async def getAllMembersBalances() -> List[Tuple[int, int]]:
+async def getAllMembersBalances() -> list[tuple[int, int]]:
     return [(member_id, balance) for member_id, balance in  load_data().items()]
 
-async def getTopRichest(limit: int = 10) -> List[Tuple[int, int]]:
+async def getTopRichest(limit: int = 10) -> list[tuple[int, int]]:
     member_dict = await getAllMembersBalances()
     all_members_sorted = sorted(member_dict, key=lambda elem: elem[1], reverse=True)
     return all_members_sorted[:limit]
