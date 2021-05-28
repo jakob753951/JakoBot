@@ -3,6 +3,7 @@ import discord
 import json
 from CustomChecks import *
 from attrdict import AttrMap
+from asyncio import gather
 
 requirements = {'general': [], 'server': []}
 
@@ -27,11 +28,11 @@ def save_data(data):
 def parse_role(ctx, query_string) -> discord.Role:
 	# Check if query_string is an id
 	if query_string in (role.id for role in ctx.guild.roles):
-		return next(role for role in ctx.guild.roles if role.id == role)
+		return next(role for role in ctx.guild.roles if role.id == query_string)
 
 	# Check if query_string matches a role name exactly
 	if query_string in (role.name for role in ctx.guild.roles):
-		return next(role for role in ctx.guild.roles if role.name == role)
+		return next(role for role in ctx.guild.roles if role.name == query_string)
 
 	# Check if query_string matches a role name case-insensitive
 	if query_string.lower() in (role.name.lower() for role in ctx.guild.roles):
@@ -41,7 +42,7 @@ def parse_role(ctx, query_string) -> discord.Role:
 
 class ReactionRoles(commands.Cog):
 	def __init__(self, bot):
-		self.bot = bot
+		self.bot: commands.Bot = bot
 		self.cfg = load_config()
 	
 	@is_admin()
@@ -53,6 +54,8 @@ class ReactionRoles(commands.Cog):
 			await ctx.send('Role not found')
 			return
 
+		msg = await ctx.channel.fetch_message(message_id)
+
 		msgs = load_data()
 		if message_id not in msgs:
 			msgs[message_id] = AttrMap({
@@ -62,7 +65,11 @@ class ReactionRoles(commands.Cog):
 
 		msgs[message_id].roles[emoji] = role.id
 		save_data(msgs)
-		await ctx.message.add_reaction(self.cfg.react_confirm)
+
+		await gather(
+			ctx.message.add_reaction(self.cfg.react_confirm),
+			msg.add_reaction(emoji)
+		)
 	
 	@commands.Cog.listener()
 	async def on_raw_reaction_add(self, payload):
@@ -78,9 +85,22 @@ class ReactionRoles(commands.Cog):
 		if payload.message_id not in msgs:
 			return
 		
-		msg_data = msgs[payload.message_id]
+		msg_data: AttrMap = msgs[payload.message_id]
 
+		emoji = payload.emoji.name
 
+		if emoji not in msg_data.roles:
+			return
+
+		role_id = msg_data.roles[emoji]
+
+		guild: discord.Guild = self.bot.get_guild(payload.guild_id)
+
+		role: discord.Role = guild.get_role(role_id)
+
+		member: discord.Member = guild.get_member(payload.user_id)
+
+		await member.add_roles(role, reason='Reaction Role')
 
 
 def setup(bot):
