@@ -100,7 +100,9 @@ class ReactionRoles(commands.Cog):
 
 		member: discord.Member = guild.get_member(payload.user_id)
 
-		await member.add_roles(role, reason='Reaction Role')
+		action = member.add_roles if payload.event_type == 'REACTION_ADD' else member.remove_roles
+
+		await action(role, reason='Reaction Role')
 
 
 def setup(bot):
