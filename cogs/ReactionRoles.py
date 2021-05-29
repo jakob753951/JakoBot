@@ -81,26 +81,27 @@ class ReactionRoles(commands.Cog):
 
 	async def handle_reaction(self, payload: discord.RawReactionActionEvent):
 		msgs = load_data()
-
 		if payload.message_id not in msgs:
 			return
-		
+
 		msg_data: AttrMap = msgs[payload.message_id]
 
 		emoji = payload.emoji.name
-
 		if emoji not in msg_data.roles:
 			return
-
 		role_id = msg_data.roles[emoji]
 
 		guild: discord.Guild = self.bot.get_guild(payload.guild_id)
-
 		role: discord.Role = guild.get_role(role_id)
-
 		member: discord.Member = guild.get_member(payload.user_id)
 
-		action = member.add_roles if payload.event_type == 'REACTION_ADD' else member.remove_roles
+		if payload.event_type == 'REACTION_ADD':
+			action = member.add_roles
+			if msg_data.unique:
+				roles_to_remove = [guild.get_role(r) for r in msg_data.roles.values() if r != role_id]
+				await member.remove_roles(*roles_to_remove, reason='Unique Reaction Role')
+		else:
+			action = member.remove_roles
 
 		await action(role, reason='Reaction Role')
 
