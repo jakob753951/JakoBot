@@ -23,12 +23,8 @@ class Verify(commands.Cog):
 
 		self.recently_verified.add(member.id)
 
-		try:
-			await member.add_roles(verified, reason="verification")
-			await member.remove_roles(unverified, reason="verification")
-		except Exception:
-			await ctx.send(embed=discord.Embed(description='Something went wrong. Please try again later'))
-			return
+		await member.add_roles(verified, reason="verification")
+		await member.remove_roles(unverified, reason="verification")
 
 		self.recently_verified.remove(member.id)
 
