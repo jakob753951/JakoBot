@@ -18,6 +18,7 @@ async def parse_args(ctx, args, react_confirm):
 		await ctx.message.delete()
 
 	message = ' '.join(ctx.message.content.split(' ')[start_index:])
+	message = message.replace('\\n', '\n')
 	return (channel, message)
 
 class GeneralCommands(commands.Cog):
@@ -41,18 +42,18 @@ class GeneralCommands(commands.Cog):
 
 	@commands.command(name='Say')
 	async def say(self, ctx, *args):
-		channel, message = await parse_args(ctx, args, self.cfg.servers[ctx.guild.id].react_confirm)
+		channel, message = await parse_args(ctx, args, self.cfg.react_confirm)
 		await channel.send(embed=Embed(description=message, color=0xff8000), files=ctx.message.attachments)
 
 	@commands.command(name='SayNoEmbed', aliases=['NoEmbedSay'])
 	async def say_no_embed(self, ctx, *args):
-		channel, message = await parse_args(ctx, args, self.cfg.servers[ctx.guild.id].react_confirm)
+		channel, message = await parse_args(ctx, args, self.cfg.react_confirm)
 		await channel.send(message, files=ctx.message.attachments)
 	
 	@commands.command(name='SendDM', aliases=['DMMember', 'DMUser'])
 	async def send_dm(self, ctx, recipient: discord.User, *, message):
 		await gather(
-			recipient.send(message),
+			recipient.send(message.replace('\\n', '\n')),
 			ctx.message.add_reaction(self.cfg.react_confirm)
 		)
 
