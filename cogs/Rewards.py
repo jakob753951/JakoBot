@@ -120,7 +120,7 @@ class Rewards(commands.Cog):
 				reward = get_reward(reward_id.lower())
 			except ValueError as e:
 				await ctx.send(repr(e))
-				return
+				continue
 
 			last_reward_time = get_cooldown(member.id, reward_id.lower())
 
@@ -132,7 +132,7 @@ class Rewards(commands.Cog):
 				embed = discord.Embed(color=0xff0000, title=title, timestamp=available_time)
 				embed.set_footer(text='Next reward will be available: ')
 				await ctx.send(embed=embed)
-				return
+				continue
 
 			amount = reward['amount']
 
