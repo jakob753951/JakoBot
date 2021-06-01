@@ -14,6 +14,19 @@ from CustomChecks import *
 requirements = {'general': [], 'server': ['react_confirm', 'currency_name_singular', 'currency_name_plural', 'role_admin']}
 
 fmt = "%Y-%m-%dT%H:%M:%S"
+	
+def should_drop(channel_data):
+	# Check that channel has not had a drop recently
+	last_message_time = datetime.strptime(channel_data['last_drop'], fmt)
+	available_time = last_message_time + timedelta(minutes=channel_data['minute_difference'])
+
+	cur_time = datetime.utcnow()
+	if not available_time < cur_time:
+		return
+
+	# Check against chance
+	if not random.random() < channel_data['drop_chance']:
+		return
 
 class Drops(commands.Cog):
 	def __init__(self, bot):
@@ -28,41 +41,25 @@ class Drops(commands.Cog):
 
 	def load_data(self):
 		with open('data/DropChannels.json') as data_file:
-			self.data = json.loads(data_file.read())
+			self.data = json.load(data_file)
 
 	def save_data(self):
 		with open('data/DropChannels.json', 'w') as data_file:
-			data_file.write(json.dumps(self.data, indent=4))
+			json.dump(self.data, data_file, indent=4)
 
 	@commands.Cog.listener()
 	async def on_message(self, message):
 		if message.author.bot:
 			return
-
-		self.load_data()
-
-		if not str(message.channel.id) in self.data:
-			return
-
 		if message.content.startswith('.'):
 			return
 
-		# Get the data for the channel the message was sent in
-		channel_data = self.data[str(message.channel.id)]
-
-		# Check that channel has not had a drop recently
-		last_message_time = datetime.strptime(channel_data['last_drop'], fmt)
-		available_time = last_message_time + timedelta(minutes=channel_data['minute_difference'])
-
-		cur_time = datetime.utcnow()
-		if not available_time < cur_time:
+		self.load_data()
+		if not str(message.channel.id) in self.data:
 			return
 
-		# Check against chance
-		if not random.random() < channel_data['drop_chance']:
+		if not should_drop(channel_data=self.data[str(message.channel.id)]):
 			return
-
-		# If we reach this point, we should make a drop
 
 		# Get random drop with biases
 		with open('data/Drops.json') as drop_file:
