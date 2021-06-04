@@ -22,11 +22,13 @@ def should_drop(channel_data):
 
 	cur_time = datetime.utcnow()
 	if not available_time < cur_time:
-		return
+		return False
 
 	# Check against chance
 	if not random.random() < channel_data['drop_chance']:
-		return
+		return False
+
+	return True
 
 class Drops(commands.Cog):
 	def __init__(self, bot):
