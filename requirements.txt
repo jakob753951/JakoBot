@@ -38,5 +38,5 @@ smmap==3.0.5
 stevedore==3.3.0
 typing-extensions==3.7.4.3
 uritemplate==3.0.1
-urllib3==1.26.4
+urllib3==1.26.5
 yarl==1.6.3
