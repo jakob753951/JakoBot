@@ -65,7 +65,7 @@ class Drops(commands.Cog):
 
 		# Get random drop with biases
 		with open('data/Drops.json') as drop_file:
-			drops = json.loads(drop_file.read())
+			drops = json.load(drop_file)
 
 		chosen_drop = random.choices(population=drops['drops'], weights=drops['probabilities'])[0]
 
@@ -81,6 +81,10 @@ class Drops(commands.Cog):
 			'pick_message': chosen_drop['pick_message'],
 			'run_message': chosen_drop['run_message'],
 		}
+		if 'pick_image_url' in chosen_drop:
+			drop['pick_image_url'] = chosen_drop['pick_image_url']
+		if 'run_image_url' in chosen_drop:
+			drop['run_image_url'] = chosen_drop['run_image_url']
 
 		desc = chosen_drop['drop_message'].format(
 			name=chosen_drop['name'],
@@ -167,7 +171,15 @@ class Drops(commands.Cog):
 
 		text = drop['pick_message' if take_kind == 'pick' else 'run_message']
 		desc = text.format(user=ctx.author.mention, name=drop['name'], amount=amount, abs_amount=abs(amount), curr_name=pluralise(amount))
-		embed = discord.Embed(description=desc, color=(0x00ff00 if amount > 0 else 0xff0000))
+		embed = discord.Embed(
+			description=desc,
+			color=(0x00ff00 if amount > 0 else 0xff0000)
+		)
+		if take_kind == 'pick' and 'pick_image_url' in drop:
+			embed.set_image(url=drop['pick_image_url'])
+		if take_kind == 'run' and 'run_image_url' in drop:
+			embed.set_image(url=drop['run_image_url'])
+
 		to_do = [
 			transaction_log(self.bot, ctx.author, amount),
 			ctx.send(embed=embed)
