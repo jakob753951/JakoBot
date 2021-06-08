@@ -12,7 +12,6 @@ class TruthOrDare(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
-		self.last_user: discord.Member = None
 		with open('data/TruthOrDare.json', encoding="utf8") as prompt_file:
 			self.questions = json.load(prompt_file)
 
@@ -21,12 +20,13 @@ class TruthOrDare(commands.Cog):
 		# check for incorrect channel
 		if ctx.channel.id != self.cfg.chan_truth_or_dare:
 			return
-		
-		if self.last_user and self.last_user == ctx.author:
-			sent_msg = await ctx.send(embed=Embed(title="Can't ask twice in a row"))
-			await sleep(5)
-			await sent_msg.delete()
-			return
+
+		if self.cfg.truth_or_dare_no_two_in_a_row:
+			if self.last_user and self.last_user == ctx.author:
+				sent_msg = await ctx.send(embed=Embed(title="Can't ask twice in a row"))
+				await sleep(5)
+				await sent_msg.delete()
+				return
 
 		# check for incorrect category
 		if category not in self.questions:
