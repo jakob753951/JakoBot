@@ -181,7 +181,7 @@ class Drops(commands.Cog):
 			embed.set_image(url=drop['run_image_url'])
 
 		to_do = [
-			transaction_log(self.bot, ctx.author, amount),
+			transaction_log(self.bot, ctx.author, amount, title=f'User picked up a {drop["name"]}'),
 			ctx.send(embed=embed)
 		]
 
