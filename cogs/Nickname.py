@@ -9,11 +9,13 @@ class Nickname(commands.Cog):
 
 	@commands.Cog.listener()
 	async def on_member_update(self, before, after):
-		if not after.id == 442752995323805718:
+		if after.id != 442752995323805718:
 			return
 
-		if after.nick != None:
-			await after.edit(reason='Piss off mate', nick='Cody')
+		nick_to_set = 'Cody'
+
+		if after.nick != nick_to_set:
+			await after.edit(reason='Piss off mate', nick=nick_to_set)
 			await after.send(embed=Embed(title='Piss off mate'))
 
 
