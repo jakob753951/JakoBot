@@ -6,6 +6,7 @@ from Configuration import *
 import CurrencyManager as manager
 from CurrencyUtils import *
 from CustomChecks import *
+from discord_slash import cog_ext, SlashContext
 
 requirements = {
 	'general': [],
@@ -42,20 +43,34 @@ class Timely(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 		self.cfg = load_config('Config.json')
+	
+	@cog_ext.cog_slash(
+		name='timely',
+		description='Claim your timely reward.',
+		guild_ids=[669731845260443678]
+	)
+	async def timely_slash(self, ctx: SlashContext):
+		await self.timely(ctx)
 
 	@commands.guild_only()
 	@commands.command(name='Timely', aliases=['Daily', 'Hourly'])
+	async def timely_cmd(self, ctx: commands.Context):
+		await self.timely(ctx)
+
 	async def timely(self, ctx):
 		if len(self.cfg.chans_timely) != 0 and ctx.channel.id not in self.cfg.chans_timely:
 			chans = [ctx.guild.get_channel(chan_id) for chan_id in self.cfg.chans_timely]
 			desc = f'Arr matey! To {chans[0].mention} you must go to claim your booty... yarr!'
 
-			sent_msg, _ = await gather(
-				ctx.send(embed=Embed(title='Incorrect channel', description=desc, color=0xff0000)),
-				ctx.message.delete()
-			)
-			await sleep(5)
-			await sent_msg.delete()
+			if isinstance(ctx, commands.Context):
+				sent_msg, _ = await gather(
+					ctx.send(embed=Embed(title='Incorrect channel', description=desc, color=0xff0000)),
+					ctx.message.delete(),
+					sleep(5)
+				)
+				await sent_msg.delete()
+			else:
+				await ctx.send(embed=Embed(title='Incorrect channel', description=desc, color=0xff0000), hidden=True)
 			return
 
 		last_reward_time = get_cooldown(ctx.author.id)
@@ -67,12 +82,16 @@ class Timely(commands.Cog):
 			desc = f"**{ctx.author.mention} Timely isn't available yet.**"
 			embed = Embed(color=0xff0000, description=desc, timestamp=available_time)
 			embed.set_footer(text='Next timely will be available: ')
-			responses: list = await gather(
-				ctx.send(embed=embed),
-				ctx.message.delete()
-			)
-			await sleep(5)
-			await responses[0].delete()
+			
+			if isinstance(ctx, commands.Context):
+				sent_msg, _ = await gather(
+					ctx.send(embed=embed),
+					ctx.message.delete(),
+					sleep(5)
+				)
+				await sent_msg.delete()
+			else:
+				await ctx.send(embed=embed, hidden=True)
 			return
 
 		amount = self.cfg.timely_amount

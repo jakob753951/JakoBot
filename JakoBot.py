@@ -2,6 +2,8 @@ import discord
 from discord import Embed
 from discord.ext import commands
 from Configuration import *
+from discord_slash import SlashCommand, SlashContext
+from discord_slash.utils.manage_commands import create_option
 
 print('Loading config...')
 cfg = load_config('Config.json')
@@ -16,6 +18,12 @@ bot = commands.Bot(
 	intents=intents,
 	case_insensitive=True,
 	pm_help=True
+)
+slash = SlashCommand(
+	bot,
+	override_type=True,
+	sync_commands=True,
+	sync_on_cog_reload=True
 )
 
 print('loading cogs...')
