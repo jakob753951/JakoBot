@@ -1,4 +1,5 @@
 from discord.ext import commands
+from discord import Embed
 
 requirements = {'general': [], 'server': []}
 
@@ -11,8 +12,9 @@ class Nickname(commands.Cog):
 		if not after.id == 442752995323805718:
 			return
 
-		if after.nick != before.nick:
-			after.nick = before.nick
+		if after.nick != None:
+			await after.edit(reason='Piss off mate', nick='Cody')
+			await after.send(embed=Embed(title='Piss off mate'))
 
 
 def setup(bot):
