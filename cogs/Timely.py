@@ -84,7 +84,7 @@ class Timely(commands.Cog):
 			embed.set_footer(text='Next timely will be available: ')
 			
 			if isinstance(ctx, commands.Context):
-				sent_msg, _ = await gather(
+				sent_msg, _, _ = await gather(
 					ctx.send(embed=embed),
 					ctx.message.delete(),
 					sleep(5)
