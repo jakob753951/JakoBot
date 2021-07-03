@@ -44,7 +44,7 @@ class GeneralCommands(commands.Cog):
 	async def ban(self, ctx: commands.Context, member: discord.Member, reason: str = None):
 		await member.ban(reason=reason)
 		
-	@commands.command(name='ban')
+	@commands.command(name='kick')
 	async def kick(self, ctx: commands.Context, member: discord.Member, reason: str = None):
 		await member.kick(reason=reason)
 
