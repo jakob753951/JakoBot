@@ -41,12 +41,16 @@ class GeneralCommands(commands.Cog):
 			await ctx.send("Yea.")
 		
 	@commands.command(name='ban')
-	async def ban(self, ctx: commands.Context, member: discord.Member, reason: str = None):
-		await member.ban(reason=reason)
+	async def ban(self, ctx: commands.Context, user: discord.User, reason: str = None):
+		guild = ctx.guild
+		await guild.ban(user, reason=reason)
+		await ctx.send(embed=Embed(description=f'User {user.name} was banned.', color=0xff0000))
 		
 	@commands.command(name='kick')
-	async def kick(self, ctx: commands.Context, member: discord.Member, reason: str = None):
-		await member.kick(reason=reason)
+	async def kick(self, ctx: commands.Context, user: discord.User, reason: str = None):
+		guild = ctx.guild
+		await guild.kick(user, reason=reason)
+		await ctx.send(embed=Embed(description=f'User {user.name} was kicked.', color=0xff0000))
 
 	@commands.command(name='Say')
 	async def say(self, ctx, *args):
