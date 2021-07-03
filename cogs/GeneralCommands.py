@@ -39,6 +39,14 @@ class GeneralCommands(commands.Cog):
 			await ctx.send("Yea gurl.")
 		else:
 			await ctx.send("Yea.")
+		
+	@commands.command(name='ban')
+	async def ban(self, ctx: commands.Context, member: discord.Member, reason: str = None):
+		await member.ban(reason=reason)
+		
+	@commands.command(name='ban')
+	async def kick(self, ctx: commands.Context, member: discord.Member, reason: str = None):
+		await member.kick(reason=reason)
 
 	@commands.command(name='Say')
 	async def say(self, ctx, *args):
