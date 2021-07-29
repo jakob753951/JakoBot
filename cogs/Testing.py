@@ -5,7 +5,7 @@ from CustomChecks import *
 
 requirements = {'general': [], 'server': []}
 
-class GeneralCommands(commands.Cog):
+class Testing(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
 
@@ -25,4 +25,4 @@ class GeneralCommands(commands.Cog):
 
 
 def setup(bot):
-	bot.add_cog(GeneralCommands(bot))
+	bot.add_cog(Testing(bot))
