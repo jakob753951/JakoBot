@@ -3,6 +3,7 @@ import random
 from datetime import datetime, timedelta
 import asyncio
 import json
+import yaml
 import discord
 from discord.ext import commands
 from Configuration import load_config
@@ -64,8 +65,8 @@ class Drops(commands.Cog):
 			return
 
 		# Get random drop with biases
-		with open('data/Drops.json') as drop_file:
-			drops = json.load(drop_file)
+		with open('data/Drops.yaml') as drop_file:
+			drops = yaml.safe_load(drop_file)
 
 		chosen_drop = random.choices(population=drops['drops'], weights=drops['probabilities'])[0]
 
