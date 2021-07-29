@@ -108,7 +108,16 @@ class Currency(commands.Cog):
 		await ctx.send(embed=embed)
 
 	@commands.command(name='Leaderboard', aliases=['LB', 'Scoreboard'])
-	async def leaderboard(self, ctx, limit: int = 10):
+	async def leaderboard(self, ctx, limit_or_phone: str = None, maybe_limit: int = 10):
+		if limit_or_phone and limit_or_phone.lower() == 'phone':
+			await self.phone_leaderboard(ctx, limit=maybe_limit)
+			return
+		
+		if limit_or_phone and limit_or_phone.isdigit:
+			limit = int(limit_or_phone)
+		else:
+			limit = maybe_limit
+		
 		if limit > 16:
 			limit = 16
 		Member = namedtuple('Member', ['rank', 'user', 'balance'])
@@ -123,6 +132,33 @@ class Currency(commands.Cog):
 			embed.add_field(name=mem1.user.display_name if mem1.user else '[UNKNOWN USER]', value=mem2.user.display_name if mem2.user else '[UNKNOWN USER]', inline=True)
 			embed.add_field(name=f'{mem1.balance} {pluralise(mem1.balance)}', value=f'{mem2.balance} {pluralise(mem2.balance)}' if mem2.balance else '\u200b', inline=True)
 
+		await ctx.send(embed=embed)
+
+	async def phone_leaderboard(self, ctx, limit):
+		if limit > 16:
+			limit = 16
+
+		Member = namedtuple('Member', ['rank', 'user', 'balance'])
+		members = await manager.getTopRichest(limit)
+		leaderboard = [Member(rank+1, ctx.guild.get_member(member_info[0]), member_info[1]) for rank, member_info in enumerate(members)]
+
+		lb_line_format = '{place} - {user_name}: {balance}'
+
+		lines = []
+		for member in leaderboard:
+			line = lb_line_format.format_map({
+				'place': member.rank,
+				'user_name': member.user.display_name,
+				'balance': f'{member.balance} {pluralise(member.balance)}'
+			})
+
+			# Bold every other line
+			if member.rank % 2 != 0:
+				line = f'**{line}**'
+
+			lines.append(line)
+
+		embed = Embed(title='Leaderboard', color=0x0000ff, description='\n'.join(lines))
 		await ctx.send(embed=embed)
 
 
