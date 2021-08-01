@@ -6,3 +6,4 @@ Config.json
 data/**
 credentials.json
 token.pickle
+service_account.json

@@ -12,6 +12,7 @@ import pickle
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from google.oauth2 import service_account
 
 requirements = {
 	'general': [],
@@ -70,9 +71,11 @@ def generate_service():
 		if creds and creds.expired and creds.refresh_token:
 			creds.refresh(Request())
 		else:
-			flow = InstalledAppFlow.from_client_secrets_file(
-				'credentials.json', scopes)
-			creds = flow.run_local_server()
+			creds = service_account.Credentials.from_service_account_file(
+        		'service_account.json', scopes=scopes)
+			# flow = InstalledAppFlow.from_client_secrets_file(
+			# 	'credentials.json', scopes)
+			# creds = flow.run_local_server()
 		# Save the credentials for the next run
 		with open('token.pickle', 'wb') as token:
 			pickle.dump(creds, token)
@@ -82,26 +85,30 @@ def generate_service():
 def load_rewards() -> list:
 	cfg = load_config('Config.json')
 	service = generate_service()
-	range_name = 'Rewards!A2:F'
+	sheet_names = ['General', 'Creative', 'Little', 'NSFW']
+	categories = {}
+	for sheet_name in sheet_names:
+		range_name = f'{sheet_name}!A2:F'
 
-	sheet = service.spreadsheets()
-	result = sheet.values().get(spreadsheetId=cfg.rewards_sheet_id, range=range_name).execute()
-	rows = result.get('values', [])
+		sheet = service.spreadsheets()
+		result = sheet.values().get(spreadsheetId=cfg.rewards_sheet_id, range=range_name).execute()
+		rows = result.get('values', [])
 
-	rewards = [
-		{
-			'id': reward_id,
-			'name': name,
-			'description': description,
-			'amount': int(amount),
-			'cooldown_in_hours': int(cooldown_in_hours)
-		}
-		for reward_id, name, description, amount, cooldown_in_hours, active in rows
-		if active.lower().strip() == 'yes'
-	]
+		rewards = [
+			{
+				'id': reward_id,
+				'name': name,
+				'description': description,
+				'amount': int(amount),
+				'cooldown_in_hours': int(cooldown_in_hours)
+			}
+			for reward_id, name, description, amount, cooldown_in_hours, active in rows
+			if active.lower().strip() == 'yes'
+		]
+		categories[sheet_name] = rewards
 
 	with open('data/Rewards.json', 'w') as rewards_file:
-		rewards_file.write(json.dumps(rewards))
+		rewards_file.write(json.dumps(categories))
 
 class Rewards(commands.Cog):
 	def __init__(self, bot):
@@ -156,23 +163,20 @@ class Rewards(commands.Cog):
 		async with channel.typing():
 			try:
 				load_rewards()
-			except Exception:
+			except Exception as e:
 				print('Error in load_rewards in post_rewards in Rewards.py.\nUsing cached version.')
+				await channel.send(repr(e))
+			categories = get_rewards()
+			for sheet_name, category in categories.items():
+				embed = discord.Embed(color=0x00ff00, title=f'{sheet_name}:', timestamp=datetime.utcnow())
+				embed.set_footer(text='Last updated at:')
 
-			rewards = get_rewards()
+				for reward in category:
+					name = f"{reward['id'].upper()}) {reward['name']}"
+					value = f"{reward['description']}\n{reward['amount']} {pluralise(reward['amount'])}"
+					embed.add_field(name=name, value=value, inline=False)
 
-			embed = discord.Embed(color=0x00ff00, title='Task list:', timestamp=datetime.utcnow())
-			embed.set_footer(text='Last updated at:')
-
-			for reward in rewards:
-				title = f"{reward['id'].upper()}) {reward['name']}"
-				desc = f"{reward['description']}\n{reward['amount']} {pluralise(reward['amount'])}"
-				embed.add_field(name=title, value=desc, inline=False)
-
-			await gather(
-				ctx.message.delete(),
-				channel.send(embed=embed)
-			)
+				await channel.send(embed=embed)
 
 
 def setup(bot):
