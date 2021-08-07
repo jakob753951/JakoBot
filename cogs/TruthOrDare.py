@@ -11,7 +11,7 @@ requirements = {'general': [], 'server': ['chan_truth_or_dare']}
 class TruthOrDare(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 		with open('data/TruthOrDare.json', encoding="utf8") as prompt_file:
 			self.questions = json.load(prompt_file)
 

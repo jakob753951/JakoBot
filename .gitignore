@@ -7,3 +7,4 @@ data/**
 credentials.json
 token.pickle
 service_account.json
+Config.yaml

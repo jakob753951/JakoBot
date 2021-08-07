@@ -11,7 +11,7 @@ requirements = {'general': ['chan_confessions', 'confession_seed'], 'server': []
 class Confessions(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 		with open('data/Confessions.json', 'r', encoding="utf8") as confessions_file:
 			self.confessions = json.loads(confessions_file.read())
 

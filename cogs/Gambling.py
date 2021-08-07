@@ -22,7 +22,7 @@ requirements = {
 class Gambling(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 
 	@commands.command(name='BetFlip', aliases=['BF'])
 	async def bet_flip(self, ctx, amount, guess: str):

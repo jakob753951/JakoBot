@@ -17,7 +17,7 @@ async def handle_insufficient_funds(ctx, exception: InsufficientFundsException =
 class SimpleColorRoles(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 	
 	
 	@commands.command(name='PurchaseColor', aliases=['BuyColor'])

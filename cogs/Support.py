@@ -7,7 +7,7 @@ requirements = {'general': [], 'server': ['chan_forward_dm']}
 class Support(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 		with open('data/Support.json', 'r', encoding="utf8") as ticket_file:
 			self.tickets = json.loads(ticket_file.read())
 

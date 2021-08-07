@@ -12,7 +12,7 @@ def get_report_embed(member: discord.Member):
 class ForwardDM(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 		self.reports = {}
 
 	@commands.command(name='Report', aliases=[])

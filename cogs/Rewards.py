@@ -83,7 +83,7 @@ def generate_service():
 	return build('sheets', 'v4', credentials=creds)
 
 def load_rewards() -> list:
-	cfg = load_config('Config.json')
+	cfg = load_config()
 	service = generate_service()
 	sheet_names = ['General', 'Creative', 'Little', 'NSFW']
 	categories = {}
@@ -113,7 +113,7 @@ def load_rewards() -> list:
 class Rewards(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 
 	@commands.guild_only()
 	@commands.check_any(is_admin(), is_staff())

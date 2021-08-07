@@ -34,7 +34,7 @@ def should_drop(channel_data):
 class Drops(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 		try:
 			self.load_data()
 		except Exception as e:

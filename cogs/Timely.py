@@ -42,7 +42,7 @@ def set_cooldown(user_id):
 class Timely(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 	
 	@cog_ext.cog_slash(
 		name='timely',

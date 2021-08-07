@@ -17,7 +17,7 @@ requirements = {
 class Birthday(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 
 	@is_staff()
 	@commands.guild_only()

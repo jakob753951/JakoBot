@@ -8,7 +8,7 @@ requirements = {'general': [], 'server': ['roles_can_verify', 'role_unverified',
 class Verify(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 		self.recently_verified = set()
 
 	@can_verify()

@@ -109,7 +109,7 @@ class ConfirmAwaiter(commands.Cog):
 class ColorRoles(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 		self.menus = {}
 		self.examine_messages = {}
 		self.confirms = {}

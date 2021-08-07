@@ -41,7 +41,7 @@ class MemberWarning:
 class Warnings(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 		self.warnings = load_warnings()
 
 	@commands.command(name='Warn')

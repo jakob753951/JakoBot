@@ -8,7 +8,7 @@ requirements = {'general': ['chan_forward_dm'], 'server': ['react_confirm']}
 class ForwardDM(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 
 	@commands.Cog.listener()
 	async def on_message(self, message):

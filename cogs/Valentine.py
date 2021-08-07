@@ -11,7 +11,7 @@ requirements = {'general': ['chan_valentine', 'valentine_seed'], 'server': []}
 class Valentine(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 		with open('data/Valentine.json', 'r', encoding="utf8") as valentines_file:
 			self.valentines = json.loads(valentines_file.read())
 

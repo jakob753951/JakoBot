@@ -4,14 +4,14 @@ import CurrencyManager as currency
 from Configuration import load_config
 
 def pluralise(amount: int):
-	cfg = load_config('Config.json')
+	cfg = load_config()
 	if abs(amount) == 1:
 		return cfg.currency_name_singular
 	else:
 		return cfg.currency_name_plural
 
 async def transaction_log(bot, recipient: discord.User, amount: int, sender: discord.user = None, title: str = 'User received money:'):
-	cfg = load_config('Config.json')
+	cfg = load_config()
 	log_channel = await bot.fetch_channel(cfg.chan_transaction_history)
 
 	if sender:

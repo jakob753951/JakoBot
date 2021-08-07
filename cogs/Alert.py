@@ -9,7 +9,7 @@ requirements = {'general': [], 'server': ['react_confirm']}
 class Alert(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 	
 	@commands.command(name='Alert', aliases=['Alarm'])
 	async def alert(self, ctx, *, message: str = 'The alert has been sounded.'):

@@ -11,7 +11,7 @@ def get_member_count(guild: discord.Guild):
 class LoggingMessage(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-		self.cfg = load_config('Config.json')
+		self.cfg = load_config()
 
 	@commands.Cog.listener()
 	async def on_message_edit(self, before, after):

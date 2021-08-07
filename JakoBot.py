@@ -6,7 +6,7 @@ from discord_slash import SlashCommand, SlashContext
 from discord_slash.utils.manage_commands import create_option
 
 print('Loading config...')
-cfg = load_config('Config.json')
+cfg = load_config()
 
 intents = discord.Intents.default()
 intents.members = True
