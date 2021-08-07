@@ -85,7 +85,7 @@ def generate_service():
 def load_rewards() -> list:
 	cfg = load_config()
 	service = generate_service()
-	sheet_names = ['General', 'Creative', 'Little', 'NSFW']
+	sheet_names = cfg.rewards_sheet_names
 	categories = {}
 	for sheet_name in sheet_names:
 		range_name = f'{sheet_name}!A2:F'
