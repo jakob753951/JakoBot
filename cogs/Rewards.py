@@ -52,12 +52,13 @@ def get_rewards():
 		return json.loads(rewards_file.read())
 
 def get_reward(reward_id):
-	reward_list = [reward for reward in get_rewards() if reward['id'] == reward_id]
+	for category_name, rewards in get_rewards().items():
+		matching_rewards = [reward for reward in rewards if reward['id'] == reward_id]
+		if len(matching_rewards) == 1:
+			return category_name, matching_rewards[0]
 
-	if len(reward_list) != 1:
-		raise ValueError('Invalid reward id. Please try again with a correct one.')
-
-	return reward_list[0]
+	raise ValueError('Invalid reward id. Please try again with a correct one.')
+	
 
 def generate_service():
 	scopes = ['https://www.googleapis.com/auth/spreadsheets.readonly']
@@ -124,7 +125,7 @@ class Rewards(commands.Cog):
 
 		for reward_id in reward_ids:
 			try:
-				reward = get_reward(reward_id.lower())
+				category_name, reward = get_reward(reward_id.lower())
 			except ValueError as e:
 				await ctx.send(repr(e))
 				continue
@@ -145,6 +146,7 @@ class Rewards(commands.Cog):
 
 			set_cooldown(member.id, reward_id.lower())
 
+			title=f'Task completed from the {category_name} list!'
 			desc=f"{member.mention} was rewarded {amount} {pluralise(amount)} for task number {reward_id.upper()}: {reward['name']}"
 			embed = discord.Embed(color=0x00ff00, description=desc, timestamp=datetime.utcnow())
 			await gather(
@@ -154,7 +156,7 @@ class Rewards(commands.Cog):
 			)
 
 	@commands.guild_only()
-	@is_admin()
+	@is_staff()
 	@commands.command(name='PostRewards', aliases=['PostTasks'])
 	async def post_rewards(self, ctx, channel: discord.TextChannel = None):
 		if not channel:
@@ -177,6 +179,7 @@ class Rewards(commands.Cog):
 					embed.add_field(name=name, value=value, inline=False)
 
 				await channel.send(embed=embed)
+			await ctx.message.delete()
 
 
 def setup(bot):
