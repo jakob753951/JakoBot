@@ -18,11 +18,10 @@ class Confessions(commands.Cog):
 	@commands.dm_only()
 	@commands.command(name='Confession', aliases=['Confess'])
 	async def confession(self, ctx, *, text):
-		random.seed(ctx.author.id + self.cfg.confession_seed)
+		seed = datetime.now().month
+		random.seed(ctx.author.id + seed)
 		user_id = random.randint(1, 10000000) * 15686156365675451 % 0xffffffff
 		color = user_id % 0xffffff
-		if ctx.author.id == 250667785368109056:
-			color = 0xf50bbe
 		embed = discord.Embed(colour=color, description=text, timestamp=datetime.utcnow())
 		chan = await self.bot.fetch_channel(self.cfg.chan_confessions)
 		await asyncio.gather(
