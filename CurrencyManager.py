@@ -30,6 +30,10 @@ async def removeMemberData(member_id: int):
     del data[member_id]
     save_data(data)
 
+async def removeAllData():
+    data = {}
+    save_data(data)
+
 async def getAllMembersBalances() -> list[tuple[int, int]]:
     return [(member_id, balance) for member_id, balance in  load_data().items()]
 
