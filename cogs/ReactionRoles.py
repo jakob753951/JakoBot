@@ -58,16 +58,19 @@ def load_all_reaction_roles():
 
 def get_n_letter_emojis(n):
 	for i in range(n):
+		i += 0b01100000 # ascii offset for lowercase letters
 		i += 1
-		i += 0b01100000
 		letter = chr(i)
 		yield f'regional_indicator_{letter}'
 
-def generate_emojis(role_names: list):
+def get_n_number_emojis(n):
 	number_names = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'keycap_ten']
+	for number in number_names:
+		yield number
 
+def generate_emojis(role_names: list):
 	if len(role_names) <= 10:
-		emojis = number_names[:len(role_names)]
+		emojis = get_n_number_emojis(len(role_names))
 	else:
 		emojis = get_n_letter_emojis(len(role_names))
 
