@@ -7,6 +7,7 @@ import CurrencyManager as manager
 from CurrencyUtils import *
 from CustomChecks import *
 from discord_slash import cog_ext, SlashContext
+import json
 
 requirements = {
 	'general': [],
