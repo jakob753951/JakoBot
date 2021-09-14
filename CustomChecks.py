@@ -4,15 +4,16 @@ from Configuration import load_config
 def is_admin():
 	async def predicate(ctx):
 		cfg = load_config()
-		role = ctx.guild.get_role(cfg.role_admin)
-		return role in ctx.author.roles
+		admin_role = ctx.guild.get_role(cfg.role_admin)
+		return admin_role in ctx.author.roles
 	return commands.check(predicate)
 
 def is_staff():
 	async def predicate(ctx):
 		cfg = load_config()
-		role = ctx.guild.get_role(cfg.role_staff)
-		return role in ctx.author.roles
+		staff_role = ctx.guild.get_role(cfg.role_staff)
+		admin_role = ctx.guild.get_role(cfg.role_admin)
+		return staff_role in ctx.author.roles or admin_role in ctx.author.roles
 	return commands.check(predicate)
 
 def can_verify():
