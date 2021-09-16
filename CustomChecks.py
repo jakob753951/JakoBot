@@ -1,6 +1,12 @@
 from discord.ext import commands
 from Configuration import load_config
 
+def is_top_admin():
+	async def predicate(ctx):
+		cfg = load_config()
+		return ctx.author.id in cfg.top_admins
+	return commands.check(predicate)
+
 def is_admin():
 	async def predicate(ctx):
 		cfg = load_config()

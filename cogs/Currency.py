@@ -66,6 +66,18 @@ class Currency(commands.Cog):
 			ctx.message.add_reaction(self.cfg.react_confirm)
 		)
 
+	@is_top_admin()
+	@commands.command(name='ResetCurrency')
+	async def reset_currency(self, ctx):
+		chan_rx = await self.bot.fetch_channel(self.cfg.chan_transaction_history)
+		embed = Embed(title='Currency Reset!', description=f'{ctx.author.mention} just reset the entire currency.')
+		await gather(
+			manager.removeAllData(),
+			chan_rx.send(embed=embed),
+			ctx.send(embed=embed),
+			ctx.message.add_reaction(self.cfg.react_confirm)
+		)
+
 	@commands.command(name='Give', aliases=['Send', 'Share'])
 	async def give(self, ctx, member: discord.Member, amount: int):
 		if amount < 1:
