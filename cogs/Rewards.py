@@ -53,7 +53,7 @@ def get_rewards():
 
 def get_reward(reward_id):
 	for category_name, rewards in get_rewards().items():
-		matching_rewards = [reward for reward in rewards if reward['id'] == reward_id]
+		matching_rewards = [reward for reward in rewards if reward['id'].lower() == reward_id]
 		if len(matching_rewards) == 1:
 			return category_name, matching_rewards[0]
 
@@ -72,8 +72,7 @@ def generate_service():
 		if creds and creds.expired and creds.refresh_token:
 			creds.refresh(Request())
 		else:
-			creds = service_account.Credentials.from_service_account_file(
-        		'service_account.json', scopes=scopes)
+			creds = service_account.Credentials.from_service_account_file('service_account.json', scopes=scopes)
 			# flow = InstalledAppFlow.from_client_secrets_file(
 			# 	'credentials.json', scopes)
 			# creds = flow.run_local_server()
@@ -86,7 +85,7 @@ def generate_service():
 def load_rewards() -> list:
 	cfg = load_config()
 	service = generate_service()
-	sheet_names = cfg.rewards_sheet_names
+	sheet_names = [*cfg.rewards_sheet_names, cfg.rewards_seasonal_sheet_name]
 	categories = {}
 	for sheet_name in sheet_names:
 		range_name = f'{sheet_name}!A2:F'
@@ -109,7 +108,7 @@ def load_rewards() -> list:
 		categories[sheet_name] = rewards
 
 	with open('data/Rewards.json', 'w') as rewards_file:
-		rewards_file.write(json.dumps(categories))
+		rewards_file.write(json.dumps(categories, indent=4))
 
 class Rewards(commands.Cog):
 	def __init__(self, bot):
@@ -179,6 +178,33 @@ class Rewards(commands.Cog):
 					embed.add_field(name=name, value=value, inline=False)
 
 				await channel.send(embed=embed)
+			await ctx.message.delete()
+
+	@commands.guild_only()
+	@is_staff()
+	@commands.command(name='PostHolidayRewards', aliases=['PostHolidayTasks'])
+	async def post_holiday_rewards(self, ctx, channel: discord.TextChannel = None):
+		if not channel:
+			channel = ctx.channel
+
+		cfg = load_config()
+
+		async with channel.typing():
+			try:
+				load_rewards()
+			except Exception as e:
+				print('Error in load_rewards in post_rewards in Rewards.py.\nUsing cached version.')
+				await channel.send(repr(e))
+			category = get_rewards()[cfg.rewards_seasonal_sheet_name]
+			embed = discord.Embed(color=0x00ff00, title=f'Holiday Tasks:', timestamp=datetime.utcnow())
+			embed.set_footer(text='Last updated at:')
+
+			for reward in category:
+				name = f"{reward['id'].upper()}) {reward['name']}"
+				value = f"{reward['description']}\n{reward['amount']} {pluralise(reward['amount'])}"
+				embed.add_field(name=name, value=value, inline=False)
+
+			await channel.send(embed=embed)
 			await ctx.message.delete()
 
 
