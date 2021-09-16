@@ -31,6 +31,9 @@ async def removeMemberData(member_id: int):
     save_data(data)
 
 async def removeAllData():
+    data = load_data()
+    with open('data/BackupBalances.json', 'w') as data_file:
+        data_file.write(json.dumps(data, indent=4))
     data = {}
     save_data(data)
 
